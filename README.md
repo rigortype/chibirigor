@@ -54,7 +54,7 @@ $ ruby test/test_part1.rb
 ## 進捗
 
 - [x] Part 1 ― リテラルと算術（`Const` / `type_of` / `check` / `annotate`）
-- [ ] Part 2 ― メソッド送信とディスパッチ
+- [x] Part 2 ― メソッド送信とディスパッチ（`Dispatch` 表 / アリティ・型チェック / 未知は degrade）
 - [ ] Part 3 ― Scope と文
 - [ ] Part 4 ― Union と絞り込み
 - [ ] Part 5 ― ハッシュと配列の型

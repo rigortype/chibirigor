@@ -19,22 +19,12 @@ module Chibirigor
     end
   end
 
-  # メソッド送信。Part 1 では算術 `+` だけを特別扱いする。
+  # メソッド送信。レシーバと各引数の型を求め、ディスパッチ表に委ねる。
+  # （Part 1 の `+` 場当たり特別扱いを、Part 2 で手書きの表に一般化した。）
   def type_of_call(node, diagnostics)
-    receiver = node.receiver ? type_of(node.receiver, diagnostics) : nil
-    args = node.arguments&.arguments || []
-
-    if node.name == :+ && receiver && Type.integerish?(receiver)
-      arg = type_of(args.first, diagnostics)
-      unless Type.integerish?(arg)
-        diagnostics << diagnostic(node, "整数に #{arg} は足せません")
-        return Type::Dynamic.new
-      end
-      # 値そのもの（Const[3]）には畳まず、Integer に丸める
-      return Type::Nominal[:Integer]
-    end
-
-    Type::Dynamic.new # それ以外のメソッドはまだ知らない → 脅かさない
+    receiver = node.receiver ? type_of(node.receiver, diagnostics) : Type::Dynamic.new
+    arg_types = (node.arguments&.arguments || []).map { |arg| type_of(arg, diagnostics) }
+    Dispatch.dispatch(receiver, node.name, arg_types, node, diagnostics)
   end
 
   def diagnostic(node, message)
