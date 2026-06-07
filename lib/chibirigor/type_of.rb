@@ -16,10 +16,23 @@ module Chibirigor
     when Prism::FalseNode   then Type::Const[false]
     when Prism::NilNode     then Type::Const[nil]
     when Prism::LocalVariableReadNode then scope.local(node.name) || Type::Dynamic.new
+    when Prism::HashNode then type_of_hash(node, scope, diagnostics)
+    when Prism::ArrayNode then Type::Tuple[node.elements.map { |el| type_of(el, scope, diagnostics) }.freeze]
     when Prism::CallNode then type_of_call(node, scope, diagnostics)
     when Prism::IfNode then type_of_if(node, scope, diagnostics)
     else Type::Dynamic.new
     end
+  end
+
+  # ハッシュリテラル → HashShape（symbol キーのみ覚える）。
+  def type_of_hash(node, scope, diagnostics)
+    fields = {}
+    node.elements.each do |assoc|
+      next unless assoc.is_a?(Prism::AssocNode) && assoc.key.is_a?(Prism::SymbolNode)
+
+      fields[assoc.key.unescaped.to_sym] = type_of(assoc.value, scope, diagnostics)
+    end
+    Type::HashShape[fields.freeze]
   end
 
   # if / 三項演算子。両枝の型をまとめ、枝ごとに型を絞る（ナローイング）。
@@ -50,8 +63,29 @@ module Chibirigor
   # （Part 1 の `+` 場当たり特別扱いを、Part 2 で手書きの表に一般化した。）
   def type_of_call(node, scope, diagnostics)
     receiver = node.receiver ? type_of(node.receiver, scope, diagnostics) : Type::Dynamic.new
-    arg_types = (node.arguments&.arguments || []).map { |arg| type_of(arg, scope, diagnostics) }
+    arg_nodes = node.arguments&.arguments || []
+
+    # 構造的な型の添字読み（h[:k] / a[0]）はリテラルのキー/添字だけ特別扱い。
+    if node.name == :[] && arg_nodes.size == 1
+      indexed = read_index(receiver, arg_nodes.first)
+      return indexed if indexed
+    end
+
+    arg_types = arg_nodes.map { |arg| type_of(arg, scope, diagnostics) }
     Dispatch.dispatch(receiver, node.name, arg_types, node, diagnostics)
+  end
+
+  # 構造的な型からの読み出し。読めなければ nil（通常ディスパッチに回す）。
+  def read_index(receiver, arg_node)
+    if receiver.is_a?(Type::HashShape) && arg_node.is_a?(Prism::SymbolNode)
+      # 未知キーは nil（実 Ruby が nil を返すから。エラーにしない）
+      return receiver.fields.fetch(arg_node.unescaped.to_sym, Type::Const[nil])
+    end
+    if receiver.is_a?(Type::Tuple) && arg_node.is_a?(Prism::IntegerNode)
+      return receiver.elements.fetch(arg_node.value, Type::Const[nil])
+    end
+
+    nil
   end
 
   def diagnostic(node, message)

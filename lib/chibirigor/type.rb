@@ -23,6 +23,16 @@ module Chibirigor
       def to_s = members.map(&:to_s).join(' | ')
     end
 
+    # ハッシュの構造。キーごとの型を覚える。例: {foo: 1, bar: "a"}
+    HashShape = Data.define(:fields) do
+      def to_s = "{#{fields.map { |key, type| "#{key}: #{type}" }.join(', ')}}"
+    end
+
+    # 配列を「位置ごとの型」で覚える。例: [1, "a"]
+    Tuple = Data.define(:elements) do
+      def to_s = "[#{elements.map(&:to_s).join(', ')}]"
+    end
+
     module_function
 
     # 型の配列を 1 つの型にまとめる。入れ子の Union をならし、重複を消す。

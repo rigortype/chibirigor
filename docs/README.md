@@ -23,7 +23,7 @@
 - [`20260607-chibirigor-part4-sample.md`](20260607-chibirigor-part4-sample.md) ―
   Part 4 Union と絞り込み（難所・実装は `lib/` に反映済み）
 - [`20260607-chibirigor-part5-sample.md`](20260607-chibirigor-part5-sample.md) ―
-  Part 5 ハッシュと配列の型（中難度・open/closed）
+  Part 5 ハッシュと配列の型（中難度・open/closed・実装は `lib/` に反映済み）
 - [`20260607-chibirigor-part6-sample.md`](20260607-chibirigor-part6-sample.md) ―
   Part 6 受理判定・三値・gradual（最難）
 

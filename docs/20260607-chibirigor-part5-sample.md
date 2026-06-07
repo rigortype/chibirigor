@@ -58,24 +58,24 @@ type_of(parse(%q[[1, "x"]]))               # => [1, "x"]
 `[]` というメソッド送信（`h.[](:foo)`）。引数が**リテラルの symbol/整数**なら、型から引けます：
 
 ```ruby
-def read_index(recv_type, arg_node)
-  if recv_type.is_a?(HashShape) && arg_node.is_a?(Prism::SymbolNode)
-    key = arg_node.unescaped.to_sym
-    return recv_type.fields.fetch(key, Nominal[:NilClass])   # ★未知キーは nil
+def read_index(receiver, arg_node)
+  if receiver.is_a?(Type::HashShape) && arg_node.is_a?(Prism::SymbolNode)
+    # 未知キーは nil（実 Ruby が nil を返すから。エラーにしない）
+    return receiver.fields.fetch(arg_node.unescaped.to_sym, Type::Const[nil])
   end
-  if recv_type.is_a?(Tuple) && arg_node.is_a?(Prism::IntegerNode)
-    return recv_type.elements.fetch(arg_node.value, Nominal[:NilClass])
+  if receiver.is_a?(Type::Tuple) && arg_node.is_a?(Prism::IntegerNode)
+    return receiver.elements.fetch(arg_node.value, Type::Const[nil])
   end
-  Dynamic.new   # 動的なキー（変数など）は読めない → 脅かさない
+  nil   # 特別扱いできない → 通常のディスパッチに回す
 end
 ```
 
 ```ruby
 # h : {foo: 1, bar: "a"} のとき
-h[:foo]   # => 1          （Const[1]）
-h[:zzz]   # => NilClass   （★エラーにしない）
+h[:foo]   # => 1     （Const[1]）
+h[:zzz]   # => nil   （★エラーにしない）
 a[0]      # => 1
-a[9]      # => NilClass
+a[9]      # => nil
 ```
 
 `h[:zzz]` で **エラーを出さない**のがポイントです。理由は単純で、**実際の Ruby が
