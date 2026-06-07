@@ -30,14 +30,14 @@ $ ruby subst.rb
 
 1. **examples が全部緑か** ― `ruby <file>` が exit 0（自己チェック PASS）。
 2. **コードの逐語同期** ― 本文の ```code ブロックに `<!-- include: file.rb#region -->` を付けると、
-   その file の「`# region <id>` … `# endregion`」区間と**バイト一致**しているかを検査。
+   その file の「`# region <id>` … `# endregion`」区間と**バイト一致**しているかをチェック。
 3. **出力の逐語同期** ― 本文の ```text ブロックに `<!-- run: file.rb -->` を付けると、各行が
-   その file の**実出力にそのまま含まれる**か（subset 可）を検査。
+   その file の**実出力にそのまま含まれる**か（subset 可）をチェック。
 
 使い方（依存ゼロ・stdlib のみ）：
 
 ```console
-$ ruby check_docs.rb        # 検査（ドリフトがあれば exit 1）
+$ ruby check_docs.rb        # チェック（ドリフトがあれば exit 1）
 $ ruby check_docs.rb --fix  # include ブロックを region から再生成して同期
 ```
 

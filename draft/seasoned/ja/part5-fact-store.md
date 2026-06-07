@@ -1,7 +1,7 @@
 # 【ドラフト】The Seasoned chibirigor Part 5 ― 完全な FactStore
 
 > 参考書（任意）：フロー解析の一般論（データフロー解析）。型理論の教科書（TAPL/『しくみ』）には
-> 直接の対応章はありません ― ここは gradual・実用検査器の独自地形です。
+> 直接の対応章はありません ― ここは gradual・実用チェッカーの独自地形です。
 > 前編の素朴な `Scope`／`narrow` を、Rigor の本物の **FactStore** へ拡張する章です。
 
 前編 Part 3・4 で、私たちは型環境を `Scope`（変数名→型の Hash）として持ち、ナローイングを

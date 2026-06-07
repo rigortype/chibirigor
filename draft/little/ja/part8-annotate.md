@@ -26,7 +26,7 @@ end
 when Prism::DefNode then type_of_def(node, scope, diagnostics)
 
 def type_of_def(node, scope, diagnostics)
-  method_return_type(node, scope, diagnostics)  # 本体を型検査（診断も集まる）
+  method_return_type(node, scope, diagnostics)  # 本体を型チェック（診断も集まる）
   Type::Const[node.name]                        # def 式の値はメソッド名シンボル
 end
 
@@ -57,7 +57,7 @@ def type_of_body(statements_node, scope, diagnostics)
 end
 ```
 
-これで **`def` の本体も型検査される**ようになりました（`check` が `def bad; 1 + "x"; end` の
+これで **`def` の本体も型チェックされる**ようになりました（`check` が `def bad; 1 + "x"; end` の
 中のエラーを拾う）。引数は `untyped` なので、`def ok(x); x + 1; end` は誤検知しません
 （`untyped + Integer` は `:maybe` → 黙る）。
 
@@ -95,7 +95,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 ```
 
 `check` と `annotate` は**同じ推論器**（`type_of`/`method_return_type`）を使います。
-推論が主役で、検査も表示もその副産物 ― これが Part 0 で言った「推論器」の姿です。
+推論が主役で、チェックも表示もその副産物 ― これが Part 0 で言った「推論器」の姿です。
 
 ---
 
@@ -120,7 +120,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 ## 8-4. この章のまとめ
 
-足したもの：`type_of` の `DefNode` 対応（本体検査＋戻り型合成）、`annotate` の `method_signature`。
+足したもの：`type_of` の `DefNode` 対応（本体チェック＋戻り型合成）、`annotate` の `method_signature`。
 
 この章の三題噺：
 
@@ -145,7 +145,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 > **検証メモ**
 > - 「推論器」の手応え：`def greet: () -> String` のように、注釈ゼロから戻り型が立つのを
->   見せられた。これが『しくみ』（注釈必須の検査器）との一番の違い。○
+>   見せられた。これが『しくみ』（注釈必須のチェッカー）との一番の違い。○
 > - FP 安全：引数 untyped なので本体の `x + 1` 等は `:maybe` で黙る。脅かさない。○
 > - 複雑さ予算：新規は `type_of_def`/`method_return_type`/`method_param_names`/`method_signature`。
 >   いずれも既存の `type_of_body` を使い回すだけ。○

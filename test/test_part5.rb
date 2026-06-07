@@ -26,7 +26,7 @@ assert.call('tuple is inferred', atypes[0], '[1, "x"]')
 assert.call('index reads the element type', atypes[1], '1')
 assert.call('out-of-range index reads nil', atypes[2], 'nil')
 
-# 読んだ型が検査に流れる
+# 読んだ型がチェックに流れる
 assert.call('hash value type flows into a check', Chibirigor.check("h = { foo: \"a\" }\nh[:foo] + 1").size, 1)
 
 # 未知キーの読みは決してエラーにしない

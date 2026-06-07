@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # 型カリア（型を表すデータ）。Part 1 ではこの 3 つだけ。
+  # 型キャリア（型を表すデータ）。Part 1 ではこの 3 つだけ。
   module Type
     # 「この値そのもの」を表す型。例: Const[1], Const["hi"]
     Const = Data.define(:value) do

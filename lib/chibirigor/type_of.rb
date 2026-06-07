@@ -5,7 +5,7 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 式（Prism のノード）から型を求める。型検査器の心臓。
+  # 式（Prism のノード）から型を求める。型チェッカーの心臓。
   # scope は型環境（変数名→型）。わからなければ Dynamic を返す（脅かさない）。
   def type_of(node, scope, diagnostics)
     case node
@@ -26,9 +26,9 @@ module Chibirigor
     end
   end
 
-  # メソッド定義。本体を型検査し、def 式の値（メソッド名シンボル）を返す。
+  # メソッド定義。本体を型チェックし、def 式の値（メソッド名シンボル）を返す。
   def type_of_def(node, scope, diagnostics)
-    method_return_type(node, scope, diagnostics) # 本体を型検査（診断収集）
+    method_return_type(node, scope, diagnostics) # 本体を型チェック（診断収集）
     Type::Const[node.name]
   end
 
@@ -55,7 +55,7 @@ module Chibirigor
 
   # if / 三項演算子。両枝の型をまとめ、枝ごとに型を絞る（ナローイング）。
   def type_of_if(node, scope, diagnostics)
-    type_of(node.predicate, scope, diagnostics) # 条件も型検査（入れ子のエラー検出）
+    type_of(node.predicate, scope, diagnostics) # 条件も型チェック（入れ子のエラー検出）
 
     then_type = type_of_body(node.statements, Narrowing.narrow(scope, node.predicate, true), diagnostics)
     else_type =

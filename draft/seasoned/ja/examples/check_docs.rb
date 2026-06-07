@@ -14,7 +14,7 @@ Encoding.default_internal = Encoding::UTF_8
 #      *そのまま含まれる*か（出力の逐語同期。subset 可）。
 #
 # 使い方:
-#   ruby check_docs.rb         # 検査（ドリフトがあれば exit 1）
+#   ruby check_docs.rb         # チェック（ドリフトがあれば exit 1）
 #   ruby check_docs.rb --fix   # include ブロックを region から再生成して同期
 #
 # 依存ゼロ・stdlib のみ。CI でも手元でも回る。
@@ -48,7 +48,7 @@ def extract_region(file, id)
   lines[(s + 1)...e].map(&:rstrip)
 end
 
-# --- 2 & 3. 各章の include / run ディレクティブを検査 -----------------------
+# --- 2 & 3. 各章の include / run ディレクティブをチェック -----------------------
 CHAPTERS.each do |md|
   lines = File.readlines(md, chomp: true)
   i = 0

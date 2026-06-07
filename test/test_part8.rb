@@ -22,7 +22,7 @@ assert.call('return type synthesized from body', sig, 'def greet: () -> String')
 sig2 = Chibirigor.annotate("def mystery(x)\n  x\nend\n").first[:type]
 assert.call('untyped param yields untyped return', sig2, 'def mystery: (untyped) -> untyped')
 
-# def の本体も型検査される（check と annotate は同じ推論器を共有）
+# def の本体も型チェックされる（check と annotate は同じ推論器を共有）
 assert.call('def body is type-checked', Chibirigor.check("def bad\n  1 + \"x\"\nend\n").size, 1)
 
 # untyped 引数は本体で誤検知しない（脅かさない）
