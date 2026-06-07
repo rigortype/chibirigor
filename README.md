@@ -1,4 +1,4 @@
-# ちび Rigor (chibirigor)
+# chibirigor
 
 最小限の Ruby 型推論器を、ステップバイステップで実装して学ぶオンラインブック／チュートリアル。
 [chibivue](https://github.com/chibivue-land/chibivue) をモデルに、本物の
@@ -64,7 +64,7 @@ $ ruby test/test_part1.rb
 - [ ] Part 9 ― まとめ：gradual の哲学
 
 > 高度な内容（双方向型付けの形式化、変性、再帰型、本物の型推論、健全性理論ほか）は
-> 続編「ちび Rigor 修行」に送ります。
+> 続編「chibirigor 修行」に送ります。
 
 ## ドキュメント
 

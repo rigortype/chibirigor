@@ -11,7 +11,7 @@ require_relative 'chibirigor/evaluator'
 require_relative 'chibirigor/checker'
 require_relative 'chibirigor/annotator'
 
-# ちび Rigor ― 最小限の Ruby 型推論器（教材）
+# chibirigor ― 最小限の Ruby 型推論器（教材）
 #
 # 提供機能:
 #   Chibirigor.check(source)    => 診断の配列

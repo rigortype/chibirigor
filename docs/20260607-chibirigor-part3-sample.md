@@ -1,4 +1,4 @@
-# 【試し書き】ちび Rigor 本編 Part 3 ― ローカル変数と不変 Scope
+# 【試し書き】chibirigor 本編 Part 3 ― ローカル変数と不変 Scope
 
 > 変数を導入し、「型環境＝Scope」を登場させる章。実装は `lib/chibirigor/scope.rb` と
 > `evaluator.rb` に反映済み。コードは実 Prism/Ruby で動作確認済み。
