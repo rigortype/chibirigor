@@ -29,14 +29,6 @@ module Chibirigor
       end # Dynamic などは nil（＝ディスパッチできない）
     end
 
-    # 引数の型が仮引数の型に合うかの、手書きの判定。
-    # （Part 6 でこれを三値の accepts に置き換える。いまは素朴なクラス一致。）
-    def matches?(param, arg)
-      return true if param.is_a?(Type::Dynamic) || arg.is_a?(Type::Dynamic)
-
-      class_of(param) == class_of(arg)
-    end
-
     def dispatch(receiver_type, name, arg_types, node, diagnostics)
       signature = METHODS[[class_of(receiver_type), name]]
       return Type::Dynamic.new unless signature # 知らないメソッド → 脅かさない
@@ -49,7 +41,8 @@ module Chibirigor
       end
 
       signature[:params].zip(arg_types).each do |param, arg|
-        next if matches?(param, arg)
+        # 怒るのは :no（確実に合わない）のときだけ。:yes も :maybe も黙る。
+        next unless Accepts.call(param, arg) == :no
 
         diagnostics << Chibirigor.diagnostic(node, "#{param} が必要ですが #{arg} が渡されました")
       end

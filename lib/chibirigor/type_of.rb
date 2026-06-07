@@ -20,6 +20,7 @@ module Chibirigor
     when Prism::ArrayNode then Type::Tuple[node.elements.map { |el| type_of(el, scope, diagnostics) }.freeze]
     when Prism::CallNode then type_of_call(node, scope, diagnostics)
     when Prism::IfNode then type_of_if(node, scope, diagnostics)
+    when Prism::ParenthesesNode then type_of_body(node.body, scope, diagnostics)
     else Type::Dynamic.new
     end
   end
