@@ -1,4 +1,4 @@
-# 【試し書き】chibirigor 本編 Part 2 ― メソッド送信とディスパッチ
+# 【試し書き】The Little chibirigor Part 2 ― メソッド送信とディスパッチ
 
 > Part 1 で `+` だけを場当たり的に扱った所を、Ruby らしく「メソッド送信」として一般化する章。
 > 実装は `lib/chibirigor/dispatch.rb` に反映済み。コードは実 Prism/Ruby で動作確認済み。

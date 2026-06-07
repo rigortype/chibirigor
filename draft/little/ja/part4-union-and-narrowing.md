@@ -1,4 +1,4 @@
-# 【試し書き】chibirigor 本編 Part 4 ― Union と絞り込み
+# 【試し書き】The Little chibirigor Part 4 ― Union と絞り込み
 
 > Part 6 の試し書きで「Union を `accepts` に渡すときの三値の優先順位は初学者に少し効く →
 > Part 4 で先に地ならししておくと安全」という課題が出た。本章はその地ならしを兼ねた

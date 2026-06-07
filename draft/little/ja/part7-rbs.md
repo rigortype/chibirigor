@@ -1,4 +1,4 @@
-# 【試し書き】chibirigor 本編 Part 7 ― RBS ひとさじ
+# 【試し書き】The Little chibirigor Part 7 ― RBS ひとさじ
 
 > Part 2 の手書きディスパッチ表を、「別ファイルに書いた型」＝ RBS から生成する表に差し替える章。
 > 実装は `lib/chibirigor/rbs.rb` に反映済み。コードは実 Prism/Ruby で動作確認済み。

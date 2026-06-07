@@ -64,15 +64,18 @@ $ ruby test/test_part1.rb
 - [x] Part 9 ― まとめ：gradual の哲学（`untyped` の伝播 / わざと見逃す総括 / baseline）
 
 > 高度な内容（双方向型付けの形式化、変性、再帰型、本物の型推論、健全性理論ほか）は
-> 続編「chibirigor 修行」に送ります。
+> 続編「The Seasoned chibirigor」に送ります。
 
 ## ドキュメント
 
-設計・本文（チュートリアル）・副読本対応は、すべて [`docs/`](docs/README.md) に置いています
-（本家 Rigor とは**意図的に分離**：実装の*最小版*と*本物*を取り違えないため）。
+本家 Rigor とは**意図的に分離**しています（実装の*最小版*と*本物*を取り違えないため）。
 
-- 設計の作業スパイン：[`docs/20260607-chibirigor-tutorial-draft.md`](docs/20260607-chibirigor-tutorial-draft.md)
-- 各 Part の試し書きと、副読本『型システムのしくみ』との対応表は [`docs/`](docs/README.md) 参照。
+- **本文（チュートリアル）** ― 二巻構成。Scheme の名著にならい前編 = **The Little chibirigor**、
+  後編 = **The Seasoned chibirigor**。
+  - 前編（ファーストドラフト・日本語、全 9 章）：[`draft/little/ja/`](draft/little/ja/README.md)
+  - 後編：`draft/seasoned/ja/`（未着手）
+- **設計・副読本対応**：[`docs/`](docs/README.md)（設計の作業スパイン、『型システムのしくみ』
+  との対応レポート）。
 
 ## 必要環境
 

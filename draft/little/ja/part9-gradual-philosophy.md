@@ -1,4 +1,4 @@
-# 【試し書き】chibirigor 本編 Part 9（最終章）― gradual の哲学
+# 【試し書き】The Little chibirigor Part 9（最終章）― gradual の哲学
 
 > ここまでを `gradual`（漸進的型付け）の価値観で締める最終章。実装は `type.rb`・`checker.rb`
 > に少しだけ反映済み。コードは実 Prism/Ruby で動作確認済み。
@@ -113,7 +113,7 @@ chibirigor は、ちょうどその先から始めました：
 | 8 | `def` の戻り型合成、RBS 風シグネチャ、`untyped` の可視化 |
 | 9 | `untyped` の伝播、わざと見逃す総括、baseline |
 
-**続編「chibirigor 修行」へ**：双方向型付けの形式化、変性、再帰型、本物の型推論（引数推論）、
+**続編「The Seasoned chibirigor」へ**：双方向型付けの形式化、変性、再帰型、本物の型推論（引数推論）、
 完全な FactStore、健全性理論、`erasure`/sig-gen 本体 ―『型システムのしくみ』の先と、Rigor の
 作り込みへ。
 
@@ -123,4 +123,4 @@ chibirigor は、ちょうどその先から始めました：
 > - 最終章にふさわしく、新規コードは最小（union の 1 行＋baseline の 1 行）。残りは*総括*。○
 > - 「わざと見逃す 4 箇所」は全て既出の実装を指すだけ＝伏線回収になっている。○
 > - 本書との対比表で「終着点＝出発点」を締めに使えた。○
-> - 全 9 章のテスト（test_part1〜9）が緑。chibirigor 本編は一通り通った。○
+> - 全 9 章のテスト（test_part1〜9）が緑。The Little chibirigorは一通り通った。○

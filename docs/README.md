@@ -1,43 +1,30 @@
 # chibirigor ドキュメント
 
-このディレクトリに、chibirigor の**設計・本文（チュートリアル）・副読本対応**をすべて置く。
-本家 Rigor のリポジトリとは分離している（実装の*最小版*と*本物*を取り違えないため）。
+このディレクトリには **設計・副読本対応** を置く。**本文（チュートリアル）は `draft/` に分離**。
+chibirigor 全体は本家 Rigor のリポジトリとは分離している（実装の*最小版*と*本物*を取り違えない
+ため）。
+
+## 本文（チュートリアル）― `draft/` 以下
+
+二巻構成。Scheme の名著にならって前編 = **The Little chibirigor**、後編 = **The Seasoned
+chibirigor** と呼ぶ。
+
+- 前編（ファーストドラフト・日本語）：[`../draft/little/ja/`](../draft/little/ja/README.md)
+  ― 全 9 章。各章は実装（`lib/`）と対応し、コードは実 Prism/Ruby で動作確認済み。
+- 後編：`draft/seasoned/ja/`（未着手）― 双方向型付けの形式化・変性・再帰型・本物の型推論・
+  健全性理論など。
 
 ## 設計
 
 - [`20260607-chibirigor-tutorial-draft.md`](20260607-chibirigor-tutorial-draft.md) ―
-  チュートリアル全体の設計ドラフト。本編／続編の分割、全 Part の step 一覧、実装スケルトン、
+  チュートリアル全体の設計ドラフト。前編／後編の分割、全 Part の step 一覧、実装スケルトン、
   トーン・複雑さ予算、深掘り考察（v1→v3）。**作業スパインはこれ。**
-
-## 本文（チュートリアル本体・試し書き）
-
-各 Part の試し書き。1 step＝概念 1 つ＋小さなコード、三題噺（型理論 ↔ Ruby/RBS ↔ Rigor
-実装の問題）、最後に実 Ruby で確認。コードはすべて実 Prism/Ruby で動作確認済み。
-
-- [`20260607-chibirigor-part1-sample.md`](20260607-chibirigor-part1-sample.md) ―
-  Part 1 リテラルと算術（最易・実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part2-sample.md`](20260607-chibirigor-part2-sample.md) ―
-  Part 2 メソッド送信とディスパッチ（実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part3-sample.md`](20260607-chibirigor-part3-sample.md) ―
-  Part 3 ローカル変数と不変 Scope（実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part4-sample.md`](20260607-chibirigor-part4-sample.md) ―
-  Part 4 Union と絞り込み（難所・実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part5-sample.md`](20260607-chibirigor-part5-sample.md) ―
-  Part 5 ハッシュと配列の型（中難度・open/closed・実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part6-sample.md`](20260607-chibirigor-part6-sample.md) ―
-  Part 6 受理判定・三値・gradual（最難・実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part7-sample.md`](20260607-chibirigor-part7-sample.md) ―
-  Part 7 RBS ひとさじ（実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part8-sample.md`](20260607-chibirigor-part8-sample.md) ―
-  Part 8 annotate を仕上げる（メソッド sig 推論・実装は `lib/` に反映済み）
-- [`20260607-chibirigor-part9-sample.md`](20260607-chibirigor-part9-sample.md) ―
-  Part 9 gradual の哲学（最終章・実装は `lib/` に反映済み）
 
 ## 副読本との対応
 
 - [`20260607-type-systems-distilled-rigor-mapping.md`](20260607-type-systems-distilled-rigor-mapping.md)
   ― 遠藤侑介『型システムのしくみ』↔ Rigor 実装の対応レポート。§12 が chibirigor 副読本としての
-  評価（章ごとの価値表、本編/続編の分割原則）。
+  評価（章ごとの価値表、前編/後編の分割原則）。
 
-> 命名の日付プレフィックス（`20260607-`）は初期ドラフトの名残。本文を確定稿に起こす際に
-> `book/part1-...` のような構成へ整理する予定（設計ドラフトの「残る未決事項」参照）。
+> 命名の日付プレフィックス（`20260607-`）は初期ドラフトの名残。設計・対応レポートを確定稿に
+> 起こす際に整理する予定。

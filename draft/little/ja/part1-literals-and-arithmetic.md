@@ -1,4 +1,4 @@
-# 【試し書き】chibirigor 本編 Part 1 ― リテラルと算術
+# 【試し書き】The Little chibirigor Part 1 ― リテラルと算術
 
 > これは `20260607-chibirigor-tutorial-draft.md` のトーンと複雑さ予算を検証するための
 > *サンプル章*。本番原稿ではなく、「とても易しく／実装は小さく／三題噺で書けるか」の実証。

@@ -1,4 +1,4 @@
-# 【試し書き】chibirigor 本編 Part 8 ― annotate を仕上げる
+# 【試し書き】The Little chibirigor Part 8 ― annotate を仕上げる
 
 > `annotate` に「メソッドの推論シグネチャを RBS 風に見せる」を足す章。実装は
 > `lib/chibirigor/annotator.rb`・`type_of.rb` に反映済み。コードは実 Prism/Ruby で動作確認済み。
