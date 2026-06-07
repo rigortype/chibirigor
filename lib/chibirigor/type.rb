@@ -39,6 +39,7 @@ module Chibirigor
     def union(types)
       flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
       return Dynamic.new if flat.empty? # 空＝行き止まり。安全側に倒す
+      return Dynamic.new if flat.any?(Dynamic) # untyped が混じれば全体 untyped（gradual）
       return flat.first if flat.size == 1
 
       Union[flat.freeze]
