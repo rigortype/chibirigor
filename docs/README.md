@@ -18,6 +18,8 @@
   Part 1 リテラルと算術（最易・実装は `lib/` に反映済み）
 - [`20260607-chibirigor-part2-sample.md`](20260607-chibirigor-part2-sample.md) ―
   Part 2 メソッド送信とディスパッチ（実装は `lib/` に反映済み）
+- [`20260607-chibirigor-part3-sample.md`](20260607-chibirigor-part3-sample.md) ―
+  Part 3 ローカル変数と不変 Scope（実装は `lib/` に反映済み）
 - [`20260607-chibirigor-part4-sample.md`](20260607-chibirigor-part4-sample.md) ―
   Part 4 Union と絞り込み（難所）
 - [`20260607-chibirigor-part5-sample.md`](20260607-chibirigor-part5-sample.md) ―

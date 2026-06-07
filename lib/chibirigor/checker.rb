@@ -6,11 +6,15 @@ module Chibirigor
   module_function
 
   # ソースを型検査し、見つかった診断の配列を返す。
+  # 文ごとにスコープを縫って渡す（代入で型環境が育つ）。
   # 例外で止めず、最後まで読み進める（止まらない・脅かさない）。
   def check(source)
     program = Prism.parse(source).value
     diagnostics = []
-    program.statements.body.each { |stmt| type_of(stmt, diagnostics) }
+    scope = Scope.new
+    program.statements.body.each do |stmt|
+      _type, scope = eval_statement(stmt, scope, diagnostics)
+    end
     diagnostics
   end
 end

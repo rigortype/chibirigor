@@ -6,11 +6,14 @@ module Chibirigor
   module_function
 
   # 各トップレベル文の推論した型を { line:, type: } の配列で返す。
-  # type_of が型を作っているので、それを見せるだけ（合成の副産物）。
+  # 文ごとにスコープを縫う（代入後はその変数の型が見える）。診断は捨てる。
   def annotate(source)
     program = Prism.parse(source).value
+    scope = Scope.new
+    ignored = []
     program.statements.body.map do |stmt|
-      { line: stmt.location.start_line, type: type_of(stmt, []) }
+      type, scope = eval_statement(stmt, scope, ignored)
+      { line: stmt.location.start_line, type: type }
     end
   end
 end
