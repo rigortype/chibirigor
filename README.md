@@ -59,7 +59,7 @@ $ ruby test/test_part1.rb
 - [x] Part 4 ― Union と絞り込み（`Union` / `if`・三項で枝をまとめる / `nil?`・`is_a?` ナローイング / dead branch は絞らず FP 回避）
 - [x] Part 5 ― ハッシュと配列の型（`HashShape` / `Tuple` / `h[:k]`・`a[0]` 読み / 未知キーは nil で FP 回避）
 - [x] Part 6 ― 受理判定・三値（`accepts` ＝ `:yes`/`:no`/`:maybe` / `:no` だけ報告 / Union 引数の FP を解消）
-- [ ] Part 7 ― RBS ひとさじ
+- [x] Part 7 ― RBS ひとさじ（手書き表を `Rbs.load` で RBS テキストから生成・differ 置換）
 - [ ] Part 8 ― annotate を仕上げる
 - [ ] Part 9 ― まとめ：gradual の哲学
 

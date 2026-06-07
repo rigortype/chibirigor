@@ -2,22 +2,11 @@
 
 module Chibirigor
   # メソッド送信の型付け。Ruby は何でもメソッド送信なので、
-  # 「どのクラスのどのメソッドが、どんな引数を取り、何を返すか」を手書きの表で持つ。
+  # 「どのクラスのどのメソッドが、どんな引数を取り、何を返すか」を表で持つ。
+  # Part 7 でこの表を手書きから RBS 由来（Rbs.load）に差し替えた。
   module Dispatch
-    I = Type::Nominal[:Integer]
-    S = Type::Nominal[:String]
-
     # [レシーバのクラス, メソッド名] => { params: [引数の型...], returns: 戻り型 }
-    METHODS = {
-      %i[Integer +] => { params: [I], returns: I },
-      %i[Integer -] => { params: [I], returns: I },
-      %i[Integer *] => { params: [I], returns: I },
-      %i[Integer to_s] => { params: [], returns: S },
-      %i[String +] => { params: [S], returns: S },
-      %i[String *] => { params: [I], returns: S },
-      %i[String length] => { params: [], returns: I },
-      %i[String upcase] => { params: [], returns: S }
-    }.freeze
+    METHODS = Rbs.load(Rbs::CORE)
 
     module_function
 

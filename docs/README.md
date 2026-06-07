@@ -26,6 +26,8 @@
   Part 5 ハッシュと配列の型（中難度・open/closed・実装は `lib/` に反映済み）
 - [`20260607-chibirigor-part6-sample.md`](20260607-chibirigor-part6-sample.md) ―
   Part 6 受理判定・三値・gradual（最難・実装は `lib/` に反映済み）
+- [`20260607-chibirigor-part7-sample.md`](20260607-chibirigor-part7-sample.md) ―
+  Part 7 RBS ひとさじ（実装は `lib/` に反映済み）
 
 ## 副読本との対応
 
