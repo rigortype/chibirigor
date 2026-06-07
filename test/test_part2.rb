@@ -28,11 +28,11 @@ assert.call('wrong arity is reported', Chibirigor.check('"ab".length(1)').size, 
 # 知らないメソッドは脅かさない
 assert.call('unknown method stays silent', Chibirigor.check('foo.bar(1, 2)'), [])
 
-# 戻り型（annotate で確認）
-types = Chibirigor.annotate("1.to_s\n\"ab\".length\n\"a\" * 3\n").map { |a| a[:type].to_s }
+# 戻り型（annotate で確認。畳まれないメソッドで戻り型そのものを見る）
+types = Chibirigor.annotate("1.to_s\n\"ab\".length\n\"a\".upcase\n").map { |a| a[:type].to_s }
 assert.call('Integer#to_s returns String', types[0], 'String')
 assert.call('String#length returns Integer', types[1], 'Integer')
-assert.call('String#* returns String', types[2], 'String')
+assert.call('String#upcase returns String', types[2], 'String')
 
 if failures.empty?
   puts "\nAll checks passed."
