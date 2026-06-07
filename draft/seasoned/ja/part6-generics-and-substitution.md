@@ -76,37 +76,43 @@ freshTypeAbs(params, body):
 動く Ruby で、シャドーイング・捕獲回避まで入れた `subst` はこうなります（`TypeAbs` が型抽象
 `<...>`）：
 
+<!-- include: subst.rb#subst -->
 ```ruby
+# 型 ty の中の型変数 x を repl で置換する。
 def subst(ty, x, repl)
   case ty
   in Symbol then ty
   in Var then ty.name == x ? repl : ty
-  in Arrow then Arrow.new(ty.params.map { subst(_1, x, repl) }, subst(ty.ret, x, repl))
+  in Arrow then Arrow.new(ty.params.map { subst(it, x, repl) }, subst(ty.ret, x, repl))
   in TypeAbs
-    return ty if ty.params.include?(x)        # ① シャドーイング → 中は置換しない
+    return ty if ty.params.include?(x) # シャドーイング → その抽象の中は置換しない
+
     body = ty.body
-    new_params = ty.params.map do |p|         # ② 束縛変数を fresh に α 変換…
-      np = fresh_name(p)                       #    （fresh_name → :"#{p}@#{n}"）
+    new_params = ty.params.map do |p| # 束縛変数を fresh に α 変換してから…
+      np = fresh_name(p)
       body = subst(body, p, Var.new(np))
       np
     end
-    TypeAbs.new(new_params, subst(body, x, repl))  # ③ それから外側の置換 → 捕獲しない
+    TypeAbs.new(new_params, subst(body, x, repl)) # …外側の置換（捕獲が起きない）
   end
 end
 ```
 
-単体で走る設計スケッチ [`examples/subst.rb`](examples/subst.rb) で、3 つの肝が**緑**になります
-（実機検証済み）：
+`TypeAbs` の節がこの章の肝です ―（①）`params.include?(x)` ならシャドーイングなので置換せず返す、
+（②）そうでなければ束縛変数を `fresh_name`（`:"#{p}@#{n}"`）で付け替えてから、（③）外側を置換する。
+単体で走る設計スケッチ [`examples/subst.rb`](examples/subst.rb) で、3 つの肝が**緑**になります：
 
+<!-- run: subst.rb -->
 ```text
 PASS: shadowing leaves the inner T untouched
-      subst(<T>(T)->Bool, T:=Num)        => <T>(T) -> Bool            （①）
-PASS: non-shadowing substitutes T, freshens U
-      subst(<U>(T,U)->Bool, T:=Num)      => <U@1>(Num, U@1) -> Bool   （②）
-PASS: capture is avoided
-      subst(foo_body, T:=U)              => (U, <U@1>(U, U@1) -> Bool) -> Bool
-                                            ↑先頭 U は bar 由来、内側は U@1 で別物（③）
+PASS: non-shadowing substitutes T and freshens U
+PASS: capture is avoided (inner U becomes U@1, distinct from the substituted U)
 ```
+
+検証されている挙動を具体例で言うと：`subst(<T>(T)->Bool, T:=Num)` は `<T>(T) -> Bool` の*まま*
+（①シャドーイング）、`subst(<U>(T,U)->Bool, T:=Num)` は `<U@1>(Num, U@1) -> Bool`（②U を fresh 化）、
+そして捕獲例 `subst(foo_body, T:=U)` は `(U, <U@1>(U, U@1) -> Bool) -> Bool` ― 先頭の `U`（`bar`
+由来）と内側の `U@1` が別物に保たれます（③捕獲回避）。
 
 最後のケースが捕獲回避そのものです ― `bar` 由来の `U` と、`arg2` の内側 `<U>` を `U@1` に
 付け替えた別物が、混線せずに保たれています。

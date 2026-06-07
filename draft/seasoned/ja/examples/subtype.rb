@@ -11,6 +11,7 @@ TOP = :Top
 
 def obj(fields) = Obj.new(fields)
 
+# region subtype
 # s <: t ?  ＝「t が要る所に s を渡しても安全か」
 def subtype(s, t)
   return true if t == TOP
@@ -26,6 +27,7 @@ def subtype(s, t)
   else false
   end
 end
+# endregion
 
 # --- 自己チェック -----------------------------------------------------------
 if __FILE__ == $PROGRAM_NAME

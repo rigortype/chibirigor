@@ -37,6 +37,7 @@ def naive_eq(s, t, map = {})
   end
 end
 
+# region type_eq
 # 畳んだ形と展開した形を等しいと見なす等価判定。
 # seen は「いま比較中のペア」。同じペアを再び問われたら true と仮定して止める（余帰納）。
 def type_eq(s, t, seen = [])
@@ -52,6 +53,7 @@ def type_eq(s, t, seen = [])
   else false
   end
 end
+# endregion
 
 # --- 自己チェック -----------------------------------------------------------
 if __FILE__ == $PROGRAM_NAME

@@ -49,4 +49,27 @@ TAPL 日本語版（住井監訳）の章題・術語。前編で TAPL を引く
 - 後編側のファイル：`draft/seasoned/ja/part1〜8` ＋ README（全 8 章ドラフト済み）。前編から
   リンクする場合の相対パスは `../../seasoned/ja/...`。
 
+## 5. ドリフト防止の仕組みを前編にも（任意・推奨）
+
+後編に、本文コードと実装の**乖離を機械的に検出する**仕組みを入れました
+（`draft/seasoned/ja/examples/check_docs.rb`、依存ゼロ・stdlib のみ）：
+
+- 本文の ```code に `<!-- include: file#region -->`、```text に `<!-- run: file -->` を付ける。
+- 対象ファイルに `# region <id> … # endregion` を置く。
+- `ruby check_docs.rb` でズレを検出、`--fix` で本文を region から再生成。
+
+**前編にもそのまま使えます**。前編は本文（`draft/little/ja/*.md`）が `lib/chibirigor/*.rb` の
+実装を引用しているので、ドリフトの危険は後編より大きいです。適用案：
+
+1. `lib/chibirigor/*.rb` の見せたい関数を `# region <id> … # endregion` で囲む（コメントなので
+   実行に影響なし）。
+2. 前編本文の該当コードブロックに `<!-- include: ../../../lib/chibirigor/type_of.rb#... -->` を付ける
+   （`include:` のパス解決は checker 側を「md からの相対」か「リポジトリルート相対」に一般化する
+   小改修が要る ― 現状は examples/ 同居前提）。
+3. `check_docs.rb` の `CHAPTERS`/`HERE` を、前編・後編の両 md ディレクトリと `lib/` を見るよう
+   一般化（または前編用にコピー）。CI（`make` 相当）に `ruby check_docs.rb` を 1 行足す。
+
+衝突回避のため、このセッションでは `lib/` と前編には触れていません。上記は前編担当が
+落ち着いたタイミングで。
+
 以上。重複していたら無視してください。

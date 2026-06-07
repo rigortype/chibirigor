@@ -16,6 +16,7 @@ def fresh_name(base)
   :"#{base}@#{$fresh}"
 end
 
+# region subst
 # 型 ty の中の型変数 x を repl で置換する。
 def subst(ty, x, repl)
   case ty
@@ -34,6 +35,7 @@ def subst(ty, x, repl)
     TypeAbs.new(new_params, subst(body, x, repl)) # …外側の置換（捕獲が起きない）
   end
 end
+# endregion
 
 def show(ty)
   case ty

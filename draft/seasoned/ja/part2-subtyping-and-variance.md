@@ -90,33 +90,39 @@ covariant）。「**返すものは多めでよい・受け取るものは少な
 §2-1〜2-3 を一本にした `subtype` を、動く Ruby で書くとこうなります（型は基底＝`Symbol`、
 レコード＝`Obj`、関数＝`Arrow`、`:Top`）：
 
+<!-- include: subtype.rb#subtype -->
 ```ruby
+# s <: t ?  ＝「t が要る所に s を渡しても安全か」
 def subtype(s, t)
   return true if t == TOP
+
   case [s, t]
-  in [Symbol, Symbol] then s == t                                  # 基底は反射のみ
-  in [Obj, Obj]                                                    # 幅＋深さ（値は共変）
+  in [Symbol, Symbol] then s == t # 基底は不変（反射律のみ）
+  in [Obj, Obj] # 幅＋深さ：t の各キーが s にあり、値は共変
     t.fields.all? { |k, tv| s.fields.key?(k) && subtype(s.fields[k], tv) }
-  in [Arrow, Arrow]
+  in [Arrow, Arrow] # 引数は反変・戻りは共変
     s.params.size == t.params.size &&
-      s.params.zip(t.params).all? { |sp, tp| subtype(tp, sp) } &&  # ★ tp/sp 入れ替え＝反変
-      subtype(s.ret, t.ret)                                        #   戻りは共変
+      s.params.zip(t.params).all? { |sp, tp| subtype(tp, sp) } && # ★ tp/sp 入れ替え＝反変
+      subtype(s.ret, t.ret)
   else false
   end
 end
 ```
 
 `Arrow` の行の `subtype(tp, sp)`（`sp` と `tp` が入れ替わっている）が、引数の反変そのものです。
-単体で走る設計スケッチ [`examples/subtype.rb`](examples/subtype.rb) で、次が**緑**になります
-（実機検証済み）：
+単体で走る設計スケッチ [`examples/subtype.rb`](examples/subtype.rb) で、`ruby subtype.rb` が
+こう**緑**になります（`arg contravariant reverse is false` が反変の証拠）：
 
+<!-- run: subtype.rb -->
 ```text
 PASS: width: {name,age} <: {name}
+PASS: width: {name} </: {name,age}
 PASS: depth: {p:{a,b}} <: {p:{a}}
 PASS: arg contravariant: ({name})->Num <: ({name,age})->Num
-PASS: arg contravariant reverse is false      ← 逆向きは false（反変の証拠）
+PASS: arg contravariant reverse is false
 PASS: ret covariant: ()->{name,age} <: ()->{name}
-PASS: Num <: Top   /   Num </: Bool
+PASS: Num <: Top
+PASS: Num </: Bool
 ```
 
 ---
