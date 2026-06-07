@@ -14,6 +14,37 @@ chibirigor は **Rigor の教育用・最小版**です。実物の
   **取り違えないでください**。
 - `docs/` に Rigor との対応レポートがありますが、それは「学習用の地図」であって移植指示では
   ありません。
+- **「持ち込まない」と「参照しない」は別**：Rigor の*実装の複雑さ*は持ち込まない。しかし本文が
+  「実 Rigor ではこうする（③ の段／「Rigor の中では」「実 Rigor では」）」と**事実を述べる箇所は、
+  必ず実 Rigor で裏が取れていること**。簡略化は自由、事実の誤りはダメ。
+
+## Rigor を「真実の源」として参照する（乖離防止）
+
+chibirigor セッションは **chibirigor リポジトリから起動**し、この `AGENTS.md` が統治の主体です。
+実 Rigor は **読み取り専用の参照先**として、次のチェックアウトを絶対パスで参照します（**編集禁止**）：
+
+- **Rigor チェックアウト**：`/Users/megurine/repo/ruby/rigor`（read-only。chibirigor セッションから
+  Rigor のファイルを変更しない）。
+
+**乖離防止の規律**（本書は意図的な*簡略版*だが、Rigor についての*記述*は実態と一致させる）：
+
+1. **「Rigor だと…／Rigor の中では…／実 Rigor では…」を書く・直すときは、その場で裏を取る。**
+   トピック別の一次情報（すべて Rigor リポジトリ内）：
+   - 思想・他ツール比較：`docs/handbook/`（特に `appendix-typeprof.md`／`appendix-steep.md` 等）
+   - 型の意味論：`docs/type-specification/`（value-lattice / special-types / relations-and-certainty /
+     control-flow-analysis / robustness-principle / normalization / rbs-erasure …）
+   - エンジン内部の契約：`docs/internal-spec/`
+   - 設計判断・なぜそうか：`docs/adr/`（`docs/adr/README.md` が索引）
+   - 実コード：`lib/rigor/`
+2. **意図的な簡略化は乖離ではない。** 各章の「続編に送ったもの」と `docs/` 設計ドラフトに記録済みの
+   簡略化（局所 Scope vs FactStore、HKT 非実装、引数は untyped 等）は*正しい縮約*。**事故的な
+   不正確さ**（実 Rigor が X なのに本書が ¬X と断言）だけを直す。両者を `docs/` の対応レポートで
+   区別する。
+3. **マイルストーンで「フィデリティ・チェック」**：本文の Rigor 主張を拾い、上記一次情報と突き合わせる
+   サブエージェントを 1 本回し、ズレを `_*-review.md` に記録 → 軸を保って選択適用（過去に
+   mametter レビューが `appendix-typeprof.md` を引いて TypeProf 不在を突いたのが好例）。
+4. **対応レポート（`docs/20260607-type-systems-distilled-rigor-mapping.md` 等）を“台帳”として維持**：
+   「本書のこの記述 ↔ Rigor のこの仕様/ADR/コード」を引けるようにしておく。
 
 ## 設計の鉄則（正は `docs/` の設計ドラフト）
 
