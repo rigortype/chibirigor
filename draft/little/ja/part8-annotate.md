@@ -98,7 +98,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 **続編に送ったもの**：
 
 - **引数の推論**（本体での使われ方から `x` の型を当てる＝ capability / duck 推論）。本編は
-  引数＝`untyped` 止まり。これが本書 9 章演習「正解を知らない」と言った前線。
+  引数＝`untyped` 止まり。これが副読本 9 章演習「正解を知らない」と言った前線。
 - 複数 `return`・early return・条件分岐をまたぐ戻り型の合流。
 - 生成した RBS の書き出し（`erasure`／sig-gen 本体）。
 
@@ -110,7 +110,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 > **検証メモ**
 > - 「推論器」の手応え：`def greet: () -> String` のように、注釈ゼロから戻り型が立つのを
->   見せられた。これが本書（注釈必須の検査器）との一番の違い。○
+>   見せられた。これが副読本（注釈必須の検査器）との一番の違い。○
 > - FP 安全：引数 untyped なので本体の `x + 1` 等は `:maybe` で黙る。脅かさない。○
 > - 複雑さ予算：新規は `type_of_def`/`method_return_type`/`method_param_names`/`method_signature`。
 >   いずれも既存の `type_of_body` を使い回すだけ。○
