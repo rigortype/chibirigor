@@ -12,6 +12,40 @@ Ruby は何でもメソッド送信なので、ここが土台になります。
 
 ---
 
+## 2-0. 先に小さく整理する（型は `Type::`、診断は `{line:, message:}`）
+
+メソッドが増えると型カリアも増えるので、Part 1 で `Chibirigor` 直下に置いた `Const`/`Nominal`/
+`Dynamic` を、`Chibirigor::Type` モジュールにまとめておきます（以降は `Type::Const` のように
+書きます）。
+
+```ruby
+module Chibirigor
+  module Type
+    Const   = Data.define(:value) { def to_s = value.inspect }
+    Nominal = Data.define(:name)  { def to_s = name.to_s }
+    Dynamic = Data.define         { def to_s = "untyped" }
+  end
+end
+```
+
+もう一つ。Part 1 の診断は「メッセージ文字列」でしたが、エラーが増えると**どの行か**を知りたく
+なります。そこで診断を `{ line:, message: }` のハッシュにし、作る用の小さなヘルパを足します
+（以降 `check` の戻り値は `{line:, message:}` の配列です）：
+
+```ruby
+module Chibirigor
+  module_function
+
+  def diagnostic(node, message)
+    { line: node.location.start_line, message: message }
+  end
+end
+```
+
+これで土台が揃いました。本題に入ります。
+
+---
+
 ## 2-1. Ruby は何でもメソッド送信
 
 Part 1 で `1 + 2` の `+` を特別扱いしたとき、こう書きました ―「`+` はメソッド送信

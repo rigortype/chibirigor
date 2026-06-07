@@ -37,6 +37,26 @@ def method_return_type(node, scope, diagnostics)
 end
 ```
 
+ここで使った小さな道具が 2 つあります。`method_param_names` は必須の仮引数名を取り出すだけ。
+`type_of_body` は「文の並びを上から評価して、**最後の文の型**を返す」ヘルパで、Part 3 の
+`eval_statement`（文を 1 つ評価して `[型, スコープ]` を返す）を使い回します（`if` の枝の本体や
+`def` の本体は、どれも「文の並び」なので同じ道具で扱えます）：
+
+```ruby
+def method_param_names(node)
+  node.parameters&.requireds&.map(&:name) || []
+end
+
+# 文の並びを評価し、最後の文の型を返す（枝の中でもスコープを縫う）
+def type_of_body(statements_node, scope, diagnostics)
+  return Type::Const[nil] if statements_node.nil?   # 空の本体は nil
+
+  last = Type::Const[nil]
+  statements_node.body.each { |stmt| last, scope = eval_statement(stmt, scope, diagnostics) }
+  last
+end
+```
+
 これで **`def` の本体も型検査される**ようになりました（`check` が `def bad; 1 + "x"; end` の
 中のエラーを拾う）。引数は `untyped` なので、`def ok(x); x + 1; end` は誤検知しません
 （`untyped + Integer` は `:maybe` → 黙る）。

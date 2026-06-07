@@ -85,12 +85,13 @@ end
 意味します。
 
 絞り込みは「条件を見て、枝ごとに変数の型を差し替えた**新しいスコープ**を作る」だけです。
-スコープは Part 3 で作った「変数名 → 型」の対応（ここでは素朴に Hash）：
+スコープは Part 3 で作った不変 `Scope`（`scope.local(名前)` で型を引き、`scope.with_local(名前, 型)`
+で束縛を 1 つ足した新しい `Scope` を返す）をそのまま使います：
 
 ```ruby
 def remove_nil(t)
-  return t unless t.is_a?(Union)
-  union(t.members.reject { |m| m == Nominal[:NilClass] })
+  return t unless t.is_a?(Type::Union)
+  Type.union(t.members.reject { |m| m == Type::Nominal[:NilClass] })
 end
 
 def narrow(scope, cond, truthy:)
@@ -98,8 +99,8 @@ def narrow(scope, cond, truthy:)
   if cond.is_a?(Prism::CallNode) && cond.name == :nil? &&
      cond.receiver.is_a?(Prism::LocalVariableReadNode)
     name = cond.receiver.name
-    narrowed = truthy ? Nominal[:NilClass] : remove_nil(scope[name])
-    return scope.merge(name => narrowed)
+    narrowed = truthy ? Type::Nominal[:NilClass] : remove_nil(scope.local(name))
+    return scope.with_local(name, narrowed)   # 不変 Scope に束縛を足して返す
   end
   scope   # ★ 絞れない条件は、スコープをそのまま返す（何も主張しない）
 end
@@ -113,9 +114,18 @@ when Prism::IfNode
   then_scope = narrow(scope, node.predicate, truthy: true)
   else_scope = narrow(scope, node.predicate, truthy: false)
   then_type = type_of(node.statements.body.last, then_scope, diagnostics)
-  else_type = type_of(node.subsequent.statements.body.last, else_scope, diagnostics)
-  union([then_type, else_type])
+  else_type =
+    if node.subsequent   # else 節がある（三項演算子も同じ IfNode）
+      type_of(node.subsequent.statements.body.last, else_scope, diagnostics)
+    else
+      Type::Const[nil]   # else が無ければ、偽のとき nil
+    end
+  Type.union([then_type, else_type])
 ```
+
+（`if cond; ...; end` のように **else が無い** とき `node.subsequent` は `nil` です。その場合は
+偽の枝の型を `nil` とします ― 実際の Ruby が、else 無しの `if` が偽のとき `nil` を返すのに
+合わせています。）
 
 動かすと、ちゃんと絞れます：
 
