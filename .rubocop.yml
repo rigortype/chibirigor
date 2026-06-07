@@ -1,0 +1,6 @@
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  Exclude:
+    # 教材用のサンプルは「わざと型エラーを含む／未使用変数を含む」ので整形しない
+    - 'examples/**/*'

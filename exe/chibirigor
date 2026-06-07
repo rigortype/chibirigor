@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+require "chibirigor"
+
+command = ARGV[0]
+file = ARGV[1]
+
+unless %w[check annotate].include?(command) && file
+  abort "usage: chibirigor <check|annotate> FILE"
+end
+
+source = File.read(file)
+
+case command
+when "check"
+  diagnostics = Chibirigor.check(source)
+  if diagnostics.empty?
+    puts "型エラーはありません"
+  else
+    diagnostics.each { |d| puts "#{file}:#{d[:line]}: #{d[:message]}" }
+    exit 1
+  end
+when "annotate"
+  Chibirigor.annotate(source).each { |a| puts "#{a[:line]}: #{a[:type]}" }
+end
