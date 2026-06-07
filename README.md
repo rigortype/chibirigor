@@ -60,7 +60,7 @@ $ ruby test/test_part1.rb
 - [x] Part 5 ― ハッシュと配列の型（`HashShape` / `Tuple` / `h[:k]`・`a[0]` 読み / 未知キーは nil で FP 回避）
 - [x] Part 6 ― 受理判定・三値（`accepts` ＝ `:yes`/`:no`/`:maybe` / `:no` だけ報告 / Union 引数の FP を解消）
 - [x] Part 7 ― RBS ひとさじ（手書き表を `Rbs.load` で RBS テキストから生成・differ 置換）
-- [ ] Part 8 ― annotate を仕上げる
+- [x] Part 8 ― annotate を仕上げる（`def` の戻り型を本体から合成・RBS 風 sig・`untyped` で推論の穴を可視化）
 - [ ] Part 9 ― まとめ：gradual の哲学
 
 > 高度な内容（双方向型付けの形式化、変性、再帰型、本物の型推論、健全性理論ほか）は

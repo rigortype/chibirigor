@@ -21,8 +21,25 @@ module Chibirigor
     when Prism::CallNode then type_of_call(node, scope, diagnostics)
     when Prism::IfNode then type_of_if(node, scope, diagnostics)
     when Prism::ParenthesesNode then type_of_body(node.body, scope, diagnostics)
+    when Prism::DefNode then type_of_def(node, scope, diagnostics)
     else Type::Dynamic.new
     end
+  end
+
+  # メソッド定義。本体を型検査し、def 式の値（メソッド名シンボル）を返す。
+  def type_of_def(node, scope, diagnostics)
+    method_return_type(node, scope, diagnostics) # 本体を型検査（診断収集）
+    Type::Const[node.name]
+  end
+
+  # メソッドの戻り型を本体から合成する。仮引数は untyped（本編は引数推論しない）。
+  def method_return_type(node, scope, diagnostics)
+    body_scope = method_param_names(node).reduce(scope) { |s, name| s.with_local(name, Type::Dynamic.new) }
+    type_of_body(node.body, body_scope, diagnostics)
+  end
+
+  def method_param_names(node)
+    node.parameters&.requireds&.map(&:name) || []
   end
 
   # ハッシュリテラル → HashShape（symbol キーのみ覚える）。
