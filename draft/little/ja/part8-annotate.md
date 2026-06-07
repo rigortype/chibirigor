@@ -1,7 +1,7 @@
 # The Little chibirigor Part 8 ― annotate を仕上げる
 
 この章のゴール：**`def` を読み、本体から戻り型を合成して RBS 風シグネチャで見せる。**
-ここで `chibirigor` が「推論器」であることが一番はっきりします ― 注釈ゼロのメソッドから、
+ここで `chibirigor` が**推論を土台にしている**ことが一番はっきりします ― 注釈ゼロのメソッドから、
 型が立ち上がってくる。
 
 ---
@@ -91,8 +91,9 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 1: def greet: () -> String
 ```
 
-`check` と `annotate` は**同じ推論器**（`type_of`/`method_return_type`）を使います。
-推論が主役で、チェックも表示もその副産物 ― これが Part 0 で言った「推論器」の姿です。
+`check` と `annotate` は**同じ推論エンジン**（`type_of`/`method_return_type`）を使います。
+推論が土台で、チェックも表示もその出力を使う ― これが Part 0 で言った「推論を土台にした
+検査器」の姿です。
 
 ---
 
@@ -108,6 +109,13 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 この **`untyped` の出方そのものが「推論が型を見失った場所」** です。どこを直せば型が
 通るようになるかが、ひと目で分かる。これは Rigor の `sig-gen`（RBS を生成する機能）の発想の
 芽です ― 生成された RBS の `untyped` は「人間が型を足すべき場所」を指しています。
+
+> ここで `def double(n)` の引数 `n` を `untyped` のままにしているのは、**設計判断**です。
+> Ruby 同梱の TypeProf なら、`double` が `double(3)` のように**呼ばれている場所**を見つけて
+> `n` を `Integer` まで逆算し、`(Integer) -> Integer` を埋めてくれます。chibirigor（と Rigor）は
+> あえてそれをしません ― 呼び出し元を全部たどる代わりに、各メソッドをローカルに見て、分から
+> ない引数は `untyped` に倒す（その方がスケールするし、誤検知も出ない）。**引数を使われ方から
+> 当てる「本物の推論」は、後編 Part 3 で正面から扱います。**
 
 - **① 型理論**：本体から戻り型を合成する（注釈なしでも型が立つ）。
 - **② Ruby/RBS**：メソッドに注釈は無いが、戻りは本体から分かることが多い。

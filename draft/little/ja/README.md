@@ -24,7 +24,7 @@
 
 | 章 | ファイル | テーマ |
 |---|---|---|
-| Part 0 | [part0-introduction.md](part0-introduction.md) | はじめに：チェッカーではなく推論器／拒まない入力／2 つの関数 |
+| Part 0 | [part0-introduction.md](part0-introduction.md) | はじめに：推論を土台にした検査器／拒まない入力／2 つの関数 |
 | Part 1 | [part1-literals-and-arithmetic.md](part1-literals-and-arithmetic.md) | リテラルと算術（`Const`/`type_of`/`check`/`annotate`） |
 | Part 2 | [part2-method-dispatch.md](part2-method-dispatch.md) | メソッド送信とディスパッチ |
 | Part 3 | [part3-scope-and-statements.md](part3-scope-and-statements.md) | ローカル変数と不変 Scope |
