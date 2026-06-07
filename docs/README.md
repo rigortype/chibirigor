@@ -11,14 +11,18 @@ chibirigor** と呼ぶ。
 
 - 前編（ファーストドラフト・日本語）：[`../draft/little/ja/`](../draft/little/ja/README.md)
   ― 全 10 章（Part 0〜9）。各章は実装（`lib/`）と対応し、コードは実 Prism/Ruby で動作確認済み。
-- 後編：[`../draft/seasoned/ja/`](../draft/seasoned/ja/README.md)（ドラフト着手・Part 1 まで）
-  ― 双方向型付けの形式化・変性・再帰型・本物の型推論・健全性理論など。
+- 後編：[`../draft/seasoned/ja/`](../draft/seasoned/ja/README.md)（ドラフト・全 8 章 Part 1〜8、
+  各章末に演習・図・動く設計スケッチ付き）― 双方向型付けの形式化・変性・再帰型・本物の型推論・
+  健全性理論など。
 
-## 設計
+## 設計・ロードマップ
 
+- [`ROADMAP.md`](ROADMAP.md) ― chibirigor 本体（`lib/`・`exe/`）の機能追加方針。定数畳み込み・
+  ソース位置表示・極小プラグインフック（フェーズ 1）／戻り型照合で双方向を一段上げる
+  （フェーズ 2）／ジェネリクス本丸（フェーズ 3・bounded）。複雑さの予算と非目標を明記。
 - [`20260607-chibirigor-tutorial-draft.md`](20260607-chibirigor-tutorial-draft.md) ―
   チュートリアル全体の設計ドラフト。前編／後編の分割、全 Part の step 一覧、実装スケルトン、
-  トーン・複雑さ予算、深掘り考察（v1→v3）。**作業スパインはこれ。**
+  トーン・複雑さ予算、深掘り考察（v1→v3）。**チュートリアルの作業スパインはこれ。**
 
 ## 副読本との対応
 
