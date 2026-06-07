@@ -65,9 +65,24 @@ end
 
 ## 8-2. RBS 風に見せる
 
-`annotate` は、`def` のときだけシグネチャ文字列を返します：
+`annotate` は、文が `def` のときだけシグネチャ文字列を、それ以外は今までどおり推論した型を
+返します。文の種類で分岐するだけ：
 
 ```ruby
+def annotate(source)
+  program = Prism.parse(source).value
+  scope = Scope.new
+  ignored = []
+  program.statements.body.map do |stmt|
+    if stmt.is_a?(Prism::DefNode)
+      { line: stmt.location.start_line, type: method_signature(stmt, scope, ignored) }
+    else
+      type, scope = eval_statement(stmt, scope, ignored)
+      { line: stmt.location.start_line, type: type }
+    end
+  end
+end
+
 def method_signature(node, scope, diagnostics)
   params = method_param_names(node).map { "untyped" }.join(", ")
   "def #{node.name}: (#{params}) -> #{method_return_type(node, scope, diagnostics)}"
