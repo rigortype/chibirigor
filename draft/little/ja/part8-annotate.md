@@ -91,14 +91,14 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 | | 内容 |
 |---|---|
-| ① 型理論 | 本体から戻り型を合成（注釈ゼロでも型が立つ） |
+| ① 型理論（TAPL 22 章「型再構築」） | 本体から戻り型を合成（注釈ゼロでも型が立つ） |
 | ② Ruby/RBS | メソッドに注釈は無いが戻りは本体から分かる |
 | ③ Rigor 実装の問題 | RBS 風 sig で見せ、`untyped` で推論の弱点を可視化（sig-gen の芽） |
 
 **続編に送ったもの**：
 
 - **引数の推論**（本体での使われ方から `x` の型を当てる＝ capability / duck 推論）。本編は
-  引数＝`untyped` 止まり。これが『しくみ』 9 章演習「正解を知らない」と言った前線。
+  引数＝`untyped` 止まり。これが『しくみ』 9 章演習「正解を知らない」と言った前線（TAPL なら 22 章「型再構築」が型推論の本拠地）。
 - 複数 `return`・early return・条件分岐をまたぐ戻り型の合流。
 - 生成した RBS の書き出し（`erasure`／sig-gen 本体）。
 
