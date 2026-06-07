@@ -1,0 +1,137 @@
+# 【ドラフト】The Seasoned chibirigor Part 6 ― ジェネリクスと型代入
+
+> 参考書（任意）：TAPL 22 章「型再構築」・23 章「全称型（System F）」／『しくみ』9 章。
+> 前編 Part 7 の RBS で*なぞった*型変数の置換を、本式に組み直す章です。
+
+前編 Part 7 で、RBS から `Array[Elem]` のような型を読みました。でも「`Elem` に `String` を
+入れて `Array[String]` にする」置換は、ごく簡単な所しか触れていません。この章は、その
+**型代入（substitution）** を正面から作ります。山場は、置換が静かに壊れる 2 つの落とし穴 ―
+**シャドーイング**と**変数捕獲** ― です。
+
+---
+
+## 6-1. 型抽象と型適用
+
+ジェネリクスは、型を**抽象**し（穴を開け）、使う所で**適用**する（穴を埋める）仕組みです。
+
+```ruby
+def select(cond, a, b) = cond ? a : b
+# 型: <T>(bool, T, T) -> T      ← <T> が型抽象（型の穴）
+# select<Integer>(...)          ← 型適用（穴を Integer で埋める）
+```
+
+`<T>` を付けるのが**型抽象（type abstraction）**、`select<Integer>` のように具体型を入れるのが
+**型適用（type application）**。TAPL 23 章の System F の用語そのものです。型適用の中身は ―
+`<T>` を外し、本体の `T` を*すべて*具体型で置き換える、つまり**型代入**です。
+
+---
+
+## 6-2. 素朴な `subst` と、その落とし穴
+
+`subst(ty, X, repl)`（型 `ty` の中の型変数 `X` を `repl` で置換）を素朴に書くと：
+
+```
+subst(Nominal[C, args], X, repl) = Nominal[C, args.map { subst(_, X, repl) }]
+subst(TypeVar[name],    X, repl) = name == X ? repl : TypeVar[name]
+subst(TypeAbs[params, body], X, repl) = TypeAbs[params, subst(body, X, repl)]   # ← ここが罠
+```
+
+最後の `TypeAbs`（内側の `<...>`）を**無条件に**潜るのが間違いです。落とし穴が 2 つ：
+
+**(1) シャドーイング**：内側の `<T>` が外側の `T` を*隠す*とき、内側の `T` は別物なので置換しては
+いけない。
+
+```ruby
+# <T>(arg1: T, arg2: <T>(x: T) => bool) => true に T:=Integer を適用
+# arg2 の内側 <T> の T は別の変数 → 置換してはいけない
+# 正: (arg1: Integer, arg2: <T>(x: T) => bool) => true
+```
+
+→ 修正：`TypeAbs.params` が `X` を含むなら、その抽象の中は**置換せず返す**。
+
+**(2) 変数捕獲（variable capture）**：置換する型 `repl` が*自由変数*を含み、それが内側の束縛変数と
+*たまたま同じ名前*だと、別物が一つに**捕獲**されてしまう。
+
+```ruby
+# foo = <T>(arg1: T, arg2: <U>(x: T, y: U) => bool) => true
+# bar = <U>() => foo<U>     ← T := U を適用
+# 素朴: (arg1: U, arg2: <U>(x: U, y: U) => bool)  ← bar の U と arg2 の U が混線！
+```
+
+`bar` 由来の `U` と、`arg2` の束縛 `U` が、同じ `U` に潰れてしまう。これが捕獲バグです。
+
+---
+
+## 6-3. fresh 変数で捕獲を避ける
+
+捕獲の修正は、**置換の前に、内側の束縛変数を*新品の名前*に付け替える**（α 変換）こと：
+
+```
+freshTypeAbs(params, body):
+  各 param を一意な新名 param@n に付け替え（subst で body も更新）
+  → 衝突しようがない名前にしてから、外側の置換を行う
+```
+
+`@`（や `#`）のような*プログラマが書けない文字*＋カウンタで、ぶつからない名前を作ります。
+これで `bar` の `U` と `arg2` の `U@1` が別物として保たれ、捕獲が起きません。
+
+```
+正: <U>() => (arg1: U, arg2: <U@1>(x: U, y: U@1) => bool) => bool
+```
+
+> **参考書メモ**：『しくみ』9 章は、まず*間違った* `subst`（`poly_bug.ts`）を見せ、シャドーイングと
+> 捕獲を具体例で炙り出し、`freshTypeAbs` で直す ― この章の構成をそっくり追っています。
+> TAPL 23 章が System F の代入と α 変換の理論を与えます。
+
+---
+
+## 6-4. 型変数下の等価判定 ― α 同値
+
+`<A>(x: A) => A` と `<B>(x: B) => B` は**同じ型**です（束縛変数の名前が違うだけ）。これを
+**α 同値（alpha-equivalence）** と呼びます。等価判定は、**名前の対応表**を引き回して解きます：
+
+```
+typeEq(TypeAbs[p1, b1], TypeAbs[p2, b2], map):
+  p1[i] と p2[i] を対応づけて map に足し、b1 と b2 を比較
+typeEq(TypeVar[n1], TypeVar[n2], map):
+  map[n1] == n2     # n1 を対応表で翻訳してから比べる
+```
+
+これは Part 4（後編）の再帰型の等価判定と*同じ技法*でした ― 束縛変数の名前対応を map で
+持つ。α 同値も再帰型の α 同値も、根は一つです。
+
+---
+
+## 6-5. erasure ― 型を消して RBS に戻す
+
+型適用は**実行時には何もしません**。`select<Integer>` は実行時にはただの `select`。TAPL 23.7 の
+*erasure（消去）定理*は「型注釈・型適用を消しても実行結果は変わらない」を保証します。
+
+Rigor にとって erasure はもう一つ意味があります ― **内部の豊かな型を、保守的に RBS へ戻す**
+操作です。`HashShape` は RBS の record か `Hash[K,V]` へ、リテラル union は基底クラスへ、
+`Dynamic[T]` は `untyped` へ。**より広くはなっても、決して狭くならない**（健全な近似）。これが
+「Rigor は RBS のスーパーセットで、いつでも RBS に書き戻せる」の中身です。
+
+---
+
+## 6-6. Rigor の中では
+
+- **型代入**：`RbsTypeTranslator.translate(..., type_vars:)` が正道の `subst`。`type_vars[:Elem]=String`
+  で `Array[Elem]` → `Array[String]`。RBS 由来なので、`『しくみ』`9 章ほど一般のネスト型抽象に
+  さらされず、**捕獲の露出面は小さい**（が、思想は同じ α 変換）。
+- **有界量化（`X extends T`）**：TAPL 26 章。Rigor では構造契約（interface/capability role）への
+  適合がその役割の一部を担う。
+- **erasure**：`Type#erase_to_rbs`。export 時に RBS へ保守的変換。
+
+---
+
+## 6-7. まとめ
+
+- ジェネリクス＝型抽象（`<T>`）＋型適用（穴を埋める）＝型代入（System F、TAPL 23 章）。
+- 素朴な `subst` は **シャドーイング**（内側の同名は別物）と **変数捕獲**（自由変数の衝突）で壊れる。
+- 直し：シャドーイングは「含むなら置換せず返す」、捕獲は **fresh 変数で α 変換してから置換**。
+- 型変数下の等価は **α 同値**（名前対応表）― 再帰型と同じ技法。
+- **erasure**：型適用は実行時に消える／Rigor は内部型を保守的に RBS へ戻せる。
+
+**次章（Part 7）**：「型システムとは何か」を健全性・正規化の理論で締め、*なぜ chibirigor は
+わざと unsound なのか*を、形式の言葉で言い切ります。
