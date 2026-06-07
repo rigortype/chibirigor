@@ -1,7 +1,4 @@
-# 【試し書き】The Little chibirigor Part 8 ― annotate を仕上げる
-
-> `annotate` に「メソッドの推論シグネチャを RBS 風に見せる」を足す章。実装は
-> `lib/chibirigor/annotator.rb`・`type_of.rb` に反映済み。コードは実 Prism/Ruby で動作確認済み。
+# The Little chibirigor Part 8 ― annotate を仕上げる
 
 この章のゴール：**`def` を読み、本体から戻り型を合成して RBS 風シグネチャで見せる。**
 ここで `chibirigor` が「推論器」であることが一番はっきりします ― 注釈ゼロのメソッドから、
@@ -151,12 +148,3 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 仕上げ、「chibirigor はわざと見逃すことで動くコードを脅かさない」を総括し、『しくみ』
 『型システムのしくみ』のおわりに（gradual typing への伏線）と接続します。
 
----
-
-> **検証メモ**
-> - 「推論器」の手応え：`def greet: () -> String` のように、注釈ゼロから戻り型が立つのを
->   見せられた。これが『しくみ』（注釈必須のチェッカー）との一番の違い。○
-> - FP 安全：引数 untyped なので本体の `x + 1` 等は `:maybe` で黙る。脅かさない。○
-> - 複雑さ予算：新規は `type_of_def`/`method_return_type`/`method_param_names`/`method_signature`。
->   いずれも既存の `type_of_body` を使い回すだけ。○
-> - 引数推論は続編に正しく逃がせた（本編の線引きどおり）。○

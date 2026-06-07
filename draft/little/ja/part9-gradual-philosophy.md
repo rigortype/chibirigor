@@ -1,7 +1,4 @@
-# 【試し書き】The Little chibirigor Part 9（最終章）― gradual の哲学
-
-> ここまでを `gradual`（漸進的型付け）の価値観で締める最終章。実装は `type.rb`・`checker.rb`
-> に少しだけ反映済み。コードは実 Prism/Ruby で動作確認済み。
+# The Little chibirigor Part 9（最終章）― gradual の哲学
 
 この章のゴール：**`untyped` の伝播を仕上げ、「chibirigor がわざと見逃している所」を総括する。**
 そして、漸進的型付け（gradual typing）という大きな流れと、その先の Rigor へ接続します。
@@ -144,10 +141,3 @@ chibirigor は、最初から一貫してこの立場で作ってきました：
 完全な FactStore、健全性理論、`erasure`/sig-gen 本体 ―『型システムのしくみ』の先と、Rigor の
 作り込みへ。
 
----
-
-> **検証メモ**
-> - 最終章にふさわしく、新規コードは最小（union の 1 行＋baseline の 1 行）。残りは*総括*。○
-> - 「わざと見逃す 4 箇所」は全て既出の実装を指すだけ＝伏線回収になっている。○
-> - 『しくみ』との対比表で「終着点＝出発点」を締めに使えた。○
-> - 全 9 章のテスト（test_part1〜9）が緑。The Little chibirigorは一通り通った。○
