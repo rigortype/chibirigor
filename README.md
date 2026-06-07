@@ -56,7 +56,7 @@ $ ruby test/test_part1.rb
 - [x] Part 1 ― リテラルと算術（`Const` / `type_of` / `check` / `annotate`）
 - [x] Part 2 ― メソッド送信とディスパッチ（`Dispatch` 表 / アリティ・型チェック / 未知は degrade）
 - [x] Part 3 ― Scope と文（不変 `Scope` / `eval_statement` で文を縫う / 再代入）
-- [ ] Part 4 ― Union と絞り込み
+- [x] Part 4 ― Union と絞り込み（`Union` / `if`・三項で枝をまとめる / `nil?`・`is_a?` ナローイング / dead branch は絞らず FP 回避）
 - [ ] Part 5 ― ハッシュと配列の型
 - [ ] Part 6 ― 受理判定・三値・gradual
 - [ ] Part 7 ― RBS ひとさじ

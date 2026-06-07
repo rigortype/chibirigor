@@ -128,6 +128,28 @@ when Prism::IfNode
 `is_a?` でも同じ要領です（`if x.is_a?(String)` の then 節は `x` を `String` に絞る）。
 形が増えても `narrow` に分岐を足すだけ。
 
+ただし `is_a?` には**落とし穴**が一つ。`x` がもともと `Integer` のとき
+`if x.is_a?(String)` の中身を「`x` は `String`」と絞ると、その枝は*起き得ない*（Integer は
+String にならない）のに `x + 1` を String の足し算とみなして**誤検知**します。これは
+「動くコードを脅かさない」に反します。だから **「そのクラスがあり得るときだけ絞る」** ―
+`x` が `Integer | String` のように String を含むときは絞る、`Integer` 単体なら絞らない
+（その枝は dead branch なので触らない）。`Dynamic` も絞りません（Rigor も post-guard の
+`Dynamic → C` narrowing は誤検知が多いとして採らない）。
+
+```ruby
+def possible?(current, klass)
+  return false if current.is_a?(Type::Dynamic)
+  members = current.is_a?(Type::Union) ? current.members : [current]
+  members.any? { |m| Dispatch.class_of(m) == klass }
+end
+# narrow_type の is_a? 節：klass && truthy && possible?(current, klass) のときだけ絞る
+```
+
+```ruby
+check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK（dead branch、誤検知しない）
+check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n x + 1\nend\n")  # String の足し算エラー（正しい）
+```
+
 ---
 
 ## 4-4. 絞り込みの 2 つの掟（ここが Rigor らしさ）

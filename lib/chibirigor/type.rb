@@ -18,7 +18,21 @@ module Chibirigor
       def to_s = 'untyped'
     end
 
+    # 型が一本に決まらないとき。例: Integer | String
+    Union = Data.define(:members) do
+      def to_s = members.map(&:to_s).join(' | ')
+    end
+
     module_function
+
+    # 型の配列を 1 つの型にまとめる。入れ子の Union をならし、重複を消す。
+    def union(types)
+      flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
+      return Dynamic.new if flat.empty? # 空＝行き止まり。安全側に倒す
+      return flat.first if flat.size == 1
+
+      Union[flat.freeze]
+    end
 
     # 整数とみなせる型か（Const[1] も Nominal[:Integer] も真）
     def integerish?(type)
