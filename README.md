@@ -72,8 +72,8 @@ $ ruby test/test_part1.rb
 
 - **本文（チュートリアル）** ― 二巻構成。Scheme の名著にならい前編 = **The Little chibirigor**、
   後編 = **The Seasoned chibirigor**。
-  - 前編（ファーストドラフト・日本語、全 9 章）：[`draft/little/ja/`](draft/little/ja/README.md)
-  - 後編：`draft/seasoned/ja/`（未着手）
+  - 前編（ファーストドラフト・日本語、全 10 章 Part 0〜9）：[`draft/little/ja/`](draft/little/ja/README.md)
+  - 後編（ドラフト着手・Part 1 まで）：[`draft/seasoned/ja/`](draft/seasoned/ja/README.md)
 - **設計・副読本対応**：[`docs/`](docs/README.md)（設計の作業スパイン、『型システムのしくみ』
   との対応レポート）。
 

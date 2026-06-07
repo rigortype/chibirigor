@@ -18,6 +18,7 @@
 
 | 章 | ファイル | テーマ |
 |---|---|---|
+| Part 0 | [part0-introduction.md](part0-introduction.md) | はじめに：検査器ではなく推論器／拒まない入力／2 つの関数 |
 | Part 1 | [part1-literals-and-arithmetic.md](part1-literals-and-arithmetic.md) | リテラルと算術（`Const`/`type_of`/`check`/`annotate`） |
 | Part 2 | [part2-method-dispatch.md](part2-method-dispatch.md) | メソッド送信とディスパッチ |
 | Part 3 | [part3-scope-and-statements.md](part3-scope-and-statements.md) | ローカル変数と不変 Scope |
@@ -28,5 +29,5 @@
 | Part 8 | [part8-annotate.md](part8-annotate.md) | annotate を仕上げる |
 | Part 9 | [part9-gradual-philosophy.md](part9-gradual-philosophy.md) | gradual の哲学（最終章） |
 
-> Part 0（イントロ：検査器 vs 推論器／拒まない入力）は設計ドラフトにアウトラインのみ。
-> 清書時に本章として書き起こします。
+前編はこれで全 10 章（Part 0〜9）が揃いました。後編 **The Seasoned chibirigor**
+（`../../seasoned/ja/`）へ続きます。
