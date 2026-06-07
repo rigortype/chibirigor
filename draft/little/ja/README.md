@@ -9,7 +9,7 @@
 > ステータス：**ファーストドラフト**。各章は実装（`lib/`）と対応し、コード断片はすべて実
 > Prism/Ruby で動作確認済み。文章・章タイトル・構成は今後の清書で変わり得ます。
 > 設計の作業スパインは [`../../../docs/20260607-chibirigor-tutorial-draft.md`](../../../docs/20260607-chibirigor-tutorial-draft.md)、
-> 副読本『型システムのしくみ』との対応は
+> 参考書 遠藤侑介『型システムのしくみ』（本文では **『しくみ』** と略記）との対応は
 > [`../../../docs/20260607-type-systems-distilled-rigor-mapping.md`](../../../docs/20260607-type-systems-distilled-rigor-mapping.md)。
 
 ## 章立て
