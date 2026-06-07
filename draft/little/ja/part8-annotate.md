@@ -137,6 +137,16 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 - 複数 `return`・early return・条件分岐をまたぐ戻り型の合流。
 - 生成した RBS の書き出し（`erasure`／sig-gen 本体）。
 
+## 演習
+
+1. `def f\n  1 + 2\nend` のシグネチャを `annotate` で確かめよ。
+2. `def g(x)\n  x.upcase\nend` の戻り型はなぜ `untyped` か。`String` を出すには何が必要か
+   （ヒント：引数の型推論＝続編の話）。
+3. 本体にエラーのある `def bad\n  1 + "x"\nend` を `check` し、診断の行番号が本体の行を指す
+   ことを確かめよ。
+
+---
+
 **次章予告（Part 9・最終章）**：ここまでを `gradual` の哲学で締めます。`untyped` の伝播を
 仕上げ、「chibirigor はわざと見逃すことで動くコードを脅かさない」を総括し、『しくみ』
 『型システムのしくみ』のおわりに（gradual typing への伏線）と接続します。
