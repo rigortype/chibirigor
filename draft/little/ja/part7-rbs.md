@@ -76,9 +76,30 @@ module Dispatch
 end
 ```
 
-`Rbs::CORE` には、Part 2 の手書き表と**同じ内容**を RBS で書いておきます。だから差し替えても
-**診断は 1 つも変わりません**。Part 1〜6 のテストが全て緑のまま、というのがその証拠
-（＝ふるまいを変えずに土台だけ入れ替える、安全なリファクタ）。
+`Rbs::CORE` には、ディスパッチに必要なコア型のメソッドを RBS テキストで書いておきます
+（Part 2 の手書き表と同じ内容＋、後の章で使う `*`・`upcase` も含めた“完全版”）：
+
+```ruby
+module Rbs
+  CORE = <<~RBS
+    class Integer
+      def +: (Integer) -> Integer
+      def -: (Integer) -> Integer
+      def *: (Integer) -> Integer
+      def to_s: () -> String
+    end
+    class String
+      def +: (String) -> String
+      def *: (Integer) -> String
+      def length: () -> Integer
+      def upcase: () -> String
+    end
+  RBS
+end
+```
+
+内容が手書き表と同じなので、差し替えても **診断は 1 つも変わりません**。Part 1〜6 のテストが
+全て緑のまま、というのがその証拠（＝ふるまいを変えずに土台だけ入れ替える、安全なリファクタ）。
 
 ```console
 $ ruby test/test_part1.rb  # … 緑

@@ -106,6 +106,11 @@ end
 これで `1 + (c ? 1 : 2)` のように **Union が引数に来ても**、中身が全部 `Integer` なら `:yes`＝
 黙る（誤検知しない）。`Integer | String` のように `String` が混じれば `:no` で報告します。
 
+> （`(c ? 1 : 2)` のような **括弧つきの式**は、Prism では `ParenthesesNode` という別ノードに
+> なります。中身を 1 つ評価して返すよう、`type_of` に 1 行足しておきましょう：
+> `when Prism::ParenthesesNode then type_of_body(node.body, scope, diagnostics)`。これを忘れると
+> 括弧つきの式が `untyped` に落ちてしまいます。）
+
 - **① 型理論**：未知（untyped）が混ざると、判定は*片側に倒せない*。
 - **② Ruby だと**：型注釈が無いコードは普通。`foo.bar` の戻りなんて誰にもわからない。
 - **③ Rigor だと**：わからない所は `:maybe`。これが次の節で「脅かさない」に直結する。
