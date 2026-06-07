@@ -106,7 +106,14 @@ module Chibirigor
     nil
   end
 
+  # 診断は「どこの・何が問題か」。位置（行・列・長さ）はキャレット表示に使う。
   def diagnostic(node, message)
-    { line: node.location.start_line, message: message }
+    location = node.location
+    {
+      line: location.start_line,
+      column: location.start_column,
+      length: location.length,
+      message: message
+    }
   end
 end

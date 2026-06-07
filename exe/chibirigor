@@ -13,13 +13,24 @@ end
 
 source = File.read(file)
 
+# 診断 1 件を「file:line:col: message」＋ 該当行＋キャレットで描く。
+def render_diagnostic(diagnostic, file, lines)
+  column = diagnostic[:column] || 0
+  length = [diagnostic[:length] || 1, 1].max
+  puts "#{file}:#{diagnostic[:line]}:#{column + 1}: #{diagnostic[:message]}"
+  line_text = (lines[diagnostic[:line] - 1] || "").chomp
+  puts "  #{line_text}"
+  puts "  #{(' ' * column)}#{'^' * length}"
+end
+
 case command
 when "check"
   diagnostics = Chibirigor.check(source)
   if diagnostics.empty?
     puts "型エラーはありません"
   else
-    diagnostics.each { |d| puts "#{file}:#{d[:line]}: #{d[:message]}" }
+    lines = source.lines
+    diagnostics.each { |d| render_diagnostic(d, file, lines) }
     exit 1
   end
 when "annotate"

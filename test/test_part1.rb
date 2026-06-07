@@ -20,6 +20,11 @@ assert.call('valid addition has no diagnostics', Chibirigor.check('1 + 2'), [])
 assert.call('type mismatch is reported', Chibirigor.check('1 + true').size, 1)
 assert.call('unknown call stays silent', Chibirigor.check('foo.bar'), [])
 
+# 診断は位置（行・列・長さ）を持つ ― CLI のキャレット表示に使う
+diag = Chibirigor.check('1 + true').first
+assert.call('diagnostic carries line and column', [diag[:line], diag[:column]], [1, 0])
+assert.call('diagnostic carries a span length', diag[:length].positive?, true)
+
 # annotate
 types = Chibirigor.annotate("42\n1 + 2\nfoo.bar\n").map { |a| a[:type].to_s }
 assert.call('annotate infers literal type', types[0], '42')

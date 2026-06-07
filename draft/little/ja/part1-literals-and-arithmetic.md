@@ -225,6 +225,33 @@ RUBY
 
 ---
 
+## 1-4b. 診断を読みやすく ― 位置とキャレット
+
+診断は `行` だけでなく **`列`・`長さ`** も持たせると、どこが問題かを*指せ*ます。`diagnostic` を
+ひとさじ拡張します（Prism のノードは位置情報 `location` を持っています）：
+
+```ruby
+def diagnostic(node, message)
+  location = node.location
+  { line: location.start_line, column: location.start_column, length: location.length, message: message }
+end
+```
+
+すると CLI（`exe/chibirigor`）は、該当行の下に **キャレット `^^^`** を引けます：
+
+```console
+$ ruby exe/chibirigor check bad.rb
+bad.rb:2:1: Integer が必要ですが "bad" が渡されました
+  1 + "bad"
+  ^^^^^^^^^
+```
+
+たったこれだけで「どの行の・どの語が」一目で分かります。実 Rigor の診断はここをさらに作り込み、
+SARIF や GitHub の注釈に変換されます（ADR-51）。なお `baseline`（前編 Part 9）の照合は**行と
+メッセージだけ**で行い、列は含めません ― 同じ行を編集して桁がズレても baseline が外れないように。
+
+---
+
 ## 1-5. この章のまとめ
 
 作ったもの：型 `Const`／`Dynamic`／`Nominal`、関数 `type_of`／`check`／`annotate`。
