@@ -63,7 +63,7 @@ accepts(Nominal[:Integer], Const["x"])    # => :no   （"x" は入らない）
 
 ## 6-3. 「たぶん」が出るとき ― untyped が混ざる
 
-さて本題。`Dynamic`（untyped）が絡んだら、白黒つけません。**`:maybe` を返します。**
+さて、ここからが本題です。`Dynamic`（untyped）が絡んだら、白黒つけません。**`:maybe` を返します。**
 
 ```ruby
 def accepts(expected, actual)
