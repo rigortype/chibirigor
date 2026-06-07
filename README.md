@@ -36,8 +36,8 @@ $ chibirigor annotate FILE   # 推論した型を見せる
 $ ruby exe/chibirigor check examples/ok.rb
 型エラーはありません
 
-$ ruby exe/chibirigor check examples/ng.rb
-examples/ng.rb:4: 整数に true は足せません
+$ ruby exe/chibirigor check examples/type_error.rb
+examples/type_error.rb:4: 整数に true は足せません
 ```
 
 `annotate` は推論した型を見せます（リテラルは値そのもの、足し算は Integer に丸め、
