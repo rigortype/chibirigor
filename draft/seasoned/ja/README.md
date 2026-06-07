@@ -54,6 +54,16 @@
 > 各章は前編の実装を起点にします。前編が `lib/` の最小版で動いているのに対し、後編は
 > *拡張版*や*別実装*を扱うので、コードは「前編からの差分」または「設計スケッチ」の形になります。
 
+## 動く設計スケッチ
+
+中核アルゴリズムは、単体で走る最小の Ruby として [`examples/`](examples/README.md) に置いて
+あります（前編と同じ「コードは実際に動かして検証」の流儀）。`ruby <file>` で自己チェックが緑に
+なります：
+
+- [`examples/subtype.rb`](examples/subtype.rb) … Part 2：幅／深さ部分型・**引数反変／戻り共変**。
+- [`examples/mu_typeeq.rb`](examples/mu_typeeq.rb) … Part 4：μ 型の畳/展開・α 同値・**余帰納で停止**。
+- [`examples/subst.rb`](examples/subst.rb) … Part 6：型代入の**シャドーイング**と**変数捕獲回避**。
+
 ## 読む順番
 
 前編（The Little chibirigor）を読み終えてから来てください。後編の各章は「前編のあの実装は、

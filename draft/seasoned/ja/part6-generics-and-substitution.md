@@ -73,11 +73,43 @@ freshTypeAbs(params, body):
 ```
 
 `@`（や `#`）のような*プログラマが書けない文字*＋カウンタで、ぶつからない名前を作ります。
-これで `bar` の `U` と `arg2` の `U@1` が別物として保たれ、捕獲が起きません。
+動く Ruby で、シャドーイング・捕獲回避まで入れた `subst` はこうなります（`TypeAbs` が型抽象
+`<...>`）：
 
+```ruby
+def subst(ty, x, repl)
+  case ty
+  in Symbol then ty
+  in Var then ty.name == x ? repl : ty
+  in Arrow then Arrow.new(ty.params.map { subst(_1, x, repl) }, subst(ty.ret, x, repl))
+  in TypeAbs
+    return ty if ty.params.include?(x)        # ① シャドーイング → 中は置換しない
+    body = ty.body
+    new_params = ty.params.map do |p|         # ② 束縛変数を fresh に α 変換…
+      np = fresh_name(p)                       #    （fresh_name → :"#{p}@#{n}"）
+      body = subst(body, p, Var.new(np))
+      np
+    end
+    TypeAbs.new(new_params, subst(body, x, repl))  # ③ それから外側の置換 → 捕獲しない
+  end
+end
 ```
-正: <U>() => (arg1: U, arg2: <U@1>(x: U, y: U@1) => bool) => bool
+
+単体で走る設計スケッチ [`examples/subst.rb`](examples/subst.rb) で、3 つの肝が**緑**になります
+（実機検証済み）：
+
+```text
+PASS: shadowing leaves the inner T untouched
+      subst(<T>(T)->Bool, T:=Num)        => <T>(T) -> Bool            （①）
+PASS: non-shadowing substitutes T, freshens U
+      subst(<U>(T,U)->Bool, T:=Num)      => <U@1>(Num, U@1) -> Bool   （②）
+PASS: capture is avoided
+      subst(foo_body, T:=U)              => (U, <U@1>(U, U@1) -> Bool) -> Bool
+                                            ↑先頭 U は bar 由来、内側は U@1 で別物（③）
 ```
+
+最後のケースが捕獲回避そのものです ― `bar` 由来の `U` と、`arg2` の内側 `<U>` を `U@1` に
+付け替えた別物が、混線せずに保たれています。
 
 > **参考書メモ**：『しくみ』9 章は、まず*間違った* `subst`（`poly_bug.ts`）を見せ、シャドーイングと
 > 捕獲を具体例で炙り出し、`freshTypeAbs` で直す ― この章の構成をそっくり追っています。
