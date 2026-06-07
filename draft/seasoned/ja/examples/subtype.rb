@@ -17,7 +17,7 @@ def subtype(s, t)
   return true if t == TOP
 
   case [s, t]
-  in [Symbol, Symbol] then s == t # 基底は不変（反射律のみ）
+  in [Symbol, Symbol] then s == t # 基底は反射のみ（非自明な部分型なし）
   in [Obj, Obj] # 幅＋深さ：t の各キーが s にあり、値は共変
     t.fields.all? { |k, tv| s.fields.key?(k) && subtype(s.fields[k], tv) }
   in [Arrow, Arrow] # 引数は反変・戻りは共変

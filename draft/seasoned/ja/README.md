@@ -2,10 +2,15 @@
 
 `chibirigor` チュートリアルの**後編**。前編 [The Little chibirigor](../../little/ja/README.md)
 で *動く*最小版（`check`＋`annotate`）を作り切ったあと、その先にある**高度な型理論と作り込み**へ
-進みます。Scheme の名著にならって：
+進みます。まえがき（二巻共通）は [`../../preface.md`](../../preface.md) を参照。Scheme の名著に
+ならって：
 
 - **前編 = The Little chibirigor** … やさしい導入。動く最小版（完成）。
 - **後編 = The Seasoned chibirigor** … 熟練編。理論の形式化と、実装の作り込み（本ディレクトリ）。
+
+> **後編は「作る」より「読み解く」巻です。** 前編で*無意識に*作ったものに正式な名前を与え、
+> その裏側を形式の言葉で読み解きます。コードより概念が主役で、各章は前編の実装を起点にした
+> *解説＋設計スケッチ集*です（動くスケッチは各章の `examples/` にあります）。
 
 > ステータス：**着手（ドラフト）**。前編は「とても易しく・専門用語は後出し」でしたが、後編は
 > *用語と形式*を正面から扱います。前編で**わざと避けた**もの（双方向型付けの形式化・変性・
@@ -61,7 +66,9 @@
 なります：
 
 - [`examples/subtype.rb`](examples/subtype.rb) … Part 2：幅／深さ部分型・**引数反変／戻り共変**。
+- [`examples/unification.rb`](examples/unification.rb) … Part 3：制約＋**単一化**（型再構築の骨子）。
 - [`examples/mu_typeeq.rb`](examples/mu_typeeq.rb) … Part 4：μ 型の畳/展開・α 同値・**余帰納で停止**。
+- [`examples/fact_invalidation.rb`](examples/fact_invalidation.rb) … Part 5：**再代入で事実が消える**（不変 FactStore）。
 - [`examples/subst.rb`](examples/subst.rb) … Part 6：型代入の**シャドーイング**と**変数捕獲回避**。
 
 ## 読む順番

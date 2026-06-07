@@ -75,9 +75,50 @@ end
 **(3) 単一化（unification）で解く**。`id` のように制約が残らなければ、その型変数は*そのまま
 ジェネリック*になります（`(X) -> X`）。
 
-> **参考書メモ**：TAPL 22 章が制約生成と単一化を丁寧に展開します。『しくみ』はここを*扱わず*、
-> 9 章演習で「型引数推論は副読本にも無い・正解を知らない」と解答を付けませんでした。後編が
-> ここを埋めるのは、まさにその空白に踏み込むためです。
+この「制約を集めて単一化で解く」核を、動く最小スケッチにしたのが
+[`examples/unification.rb`](examples/unification.rb) です。型変数 `TVar` と基底型 `TCon` だけの
+世界で、単一化はこれだけ：
+
+<!-- include: unification.rb#unify -->
+```ruby
+# 代入 subst で type をたどり、これ以上たどれない形まで解決する
+def resolve(type, subst)
+  type.is_a?(TVar) && subst.key?(type.name) ? resolve(subst[type.name], subst) : type
+end
+
+class UnifyError < StandardError; end
+
+# a と b を等しくする代入を返す（できなければ UnifyError）
+def unify(a, b, subst)
+  a = resolve(a, subst)
+  b = resolve(b, subst)
+  return subst if a == b
+  return subst.merge(a.name => b) if a.is_a?(TVar) # 変数 a を b に束縛
+  return subst.merge(b.name => a) if b.is_a?(TVar) # 変数 b を a に束縛
+
+  raise UnifyError, "#{a.name} と #{b.name} は一致しない"
+end
+
+# 制約（= 等しくしたい型のペア）を順に単一化していく
+def solve(constraints)
+  constraints.reduce({}) { |subst, (a, b)| unify(a, b, subst) }
+end
+```
+
+`ruby unification.rb` で、`id` は制約ゼロ → `X` が自由（ジェネリック）、`inc` は `N = Integer` に
+解け、矛盾する制約は `UnifyError` になる、が**緑**になります：
+
+<!-- run: unification.rb -->
+```text
+PASS: id has no constraint (X stays generic)
+PASS: inc resolves N to Integer from n + 1
+PASS: conflicting constraints raise UnifyError
+```
+
+> **参考書メモ**：TAPL 22 章が制約生成と単一化を丁寧に展開します。ここで作るのは
+> 「単一化＋制約」までで、**ML の `let` 多相**（束縛ごとに型を一般化する話）は 22 章の主題では
+> なく、System F 由来で 23 章の領分です（後編 Part 6）。『しくみ』はこの推論を*扱わず*、9 章演習で
+> 「型引数推論は正解を知らない」と解答を付けませんでした ― 後編がここを埋めます。
 
 ---
 
@@ -131,6 +172,15 @@ Part 1 の地図で言えば、引数推論は **合成 `⇒` の守備範囲を
 - 道 B：型変数＋制約＋単一化（型再構築・HM の骨子）。残った変数はジェネリックに。
 - **全部はやらない**：自明な範囲だけ。怪しければ `untyped`（決定性・誤検知・RBS 境界のため）。
 - 推論を足しても、診断は照合位置でしか出ない ― 脅かさない構造は不変。
+
+## 演習
+
+1. **単一化をトレース**：`examples/unification.rb` で `solve([[X, Integer], [Y, X]])` を手で
+   たどり、最終的な `subst` を書け（`X` と `Y` がそれぞれ何に解けるか）。
+2. **道 A で能力を集める**：`def f(x); x.name + "!"; end` から、`x` に要求される能力（構造的
+   インターフェース）を書き出せ。`x.name` の戻りに付く制約も一言で。
+3. **なぜ全部やらないか**：`def g(x); x; end` を「大域 HM で型を解く」のと「引数＝`untyped` に
+   倒す」のとで、`g(foo.bar)` の呼び出しに対する診断の出方がどう変わるかを述べよ（誤検知の観点で）。
 
 **次章（Part 4）**：型が*自分自身*を参照する再帰型（JSON・木・ストリーム）。μ 型と、等価判定を
 止める余帰納、そして Rigor の別解 HKT/`App`＋fuel へ。

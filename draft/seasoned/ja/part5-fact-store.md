@@ -21,8 +21,10 @@
 - `x` と `y` は同じ値（`x == y` の後）
 
 これらは「型」というより、その地点で*成り立っている命題*です。FactStore は、型環境を
-**フロー感応な事実の集合**へ一般化したものです。各事実は概ね
-`(対象, 述語, 極性, 安定性)` の組で持ちます。
+**フロー感応な事実の集合**へ一般化したものです。本物の Rigor では、各事実（`FactStore::Fact`）は
+**`bucket`・`target`（対象）・`predicate`（述語）・`payload`・`polarity`（極性）・`stability`
+（安定性）** を持ちます。本章ではこのうち `bucket`・`target`・`predicate` の 3 つに絞って
+最小化します。
 
 ---
 
@@ -37,9 +39,27 @@
 5. **dynamic_origin** … `untyped` の出どころ（どこで型を見失ったか）。
 6. **relational** … 変数*間*の関係（`x == y` など）。
 
+```text
+   FactStore（不変）
+   ├ local_binding    : x は non-nil          ┐
+   ├ captured_local   : ブロックが書く y       │ どこの事実か（対象のスコープ）
+   ├ object_content   : obj.name は設定済み    │ で 5 つに分ける
+   ├ global_storage   : $cfg は Hash           │
+   ├ relational       : a == b                 ┘
+   └ dynamic_origin   : z は ◯◯行で untyped 化  ← 他5つと毛色が違う（由来追跡）
+```
+
+> ▼ 図 5-1　FactStore の 6 バケツ。上 5 つは「事実が*どの対象*に付くか」で分ける。
+> `dynamic_origin` だけは対象スコープではなく「`untyped` が*どこで生まれたか*」を追う毛色違い。
+
 なぜ分けるか ― **無効化（invalidation）のタイミングが違う**からです。ローカルへの再代入は
 その local_binding の事実だけを消せばよいが、メソッド呼び出しは object_content を広く疑う
-必要がある、というように。
+必要がある、というように。バケツ名は本物の Rigor の内部仕様（`inference-engine.md`）の
+正式名と一致します。[^buckets]
+
+[^buckets]: 6 バケツのうち `local_binding`/`captured_local`/`object_content`/`global_storage`/
+`relational` は「事実が付く対象」で分かれるのに対し、`dynamic_origin` だけは「`untyped` の
+*由来*を追う」別系統です。位置づけが違うことに注意（実 spec でも 6 つ目として並ぶが役割は別）。
 
 ---
 
@@ -56,6 +76,46 @@
 （緩める側に倒す）― 古い事実を信じて誤検知を出すより、事実を捨てて `untyped` に戻る方が
 安全だからです。前編 Part 4 の「絞り込みは事実を足すだけ・間違えたら緩める」を、寿命まで
 含めて精密化したものです。
+
+この「不変ストア＋バケツ指定の無効化」を、動く最小スケッチにしたのが
+[`examples/fact_invalidation.rb`](examples/fact_invalidation.rb) です。`with_fact`/
+`invalidate_target` は*新しい*ストアを返します（不変）：
+
+<!-- include: fact_invalidation.rb#factstore -->
+```ruby
+# 不変な事実の束。with_fact / invalidate_target は *新しい* ストアを返す。
+class FactStore
+  def initialize(facts = [])
+    @facts = facts.freeze
+  end
+
+  def with_fact(bucket, target, predicate)
+    FactStore.new(@facts + [Fact.new(bucket, target, predicate)])
+  end
+
+  # target に関する事実を消した新ストア。buckets を指定すると、そのバケツだけ消す。
+  def invalidate_target(target, buckets: nil)
+    kept = @facts.reject do |f|
+      f.target == target && (buckets.nil? || buckets.include?(f.bucket))
+    end
+    FactStore.new(kept)
+  end
+
+  def predicates_for(target)
+    @facts.select { |f| f.target == target }.map(&:predicate)
+  end
+end
+```
+
+`ruby fact_invalidation.rb` で、**再代入で `x` の事実が消える**こと、そして**メソッド呼び出しは
+`object_content` だけ落として `local_binding` は残す**ことが**緑**になります：
+
+<!-- run: fact_invalidation.rb -->
+```text
+PASS: fact is present after narrowing
+PASS: reassignment clears x's local_binding fact
+PASS: method call drops object_content but keeps local_binding
+```
 
 ---
 
@@ -117,6 +177,17 @@ FactStore の `join` は、二つの入り口の事実集合の*共通部分*だ
 - **クロージャ捕獲**：ブロックが外側を書くと事実を無効化。呼ばれ方（即時／遅延）で扱いを変える。
 - **join**：分岐合流では両枝で成り立つ事実だけ残す。
 - 不変・フロー感応・「事実を足すだけ」は前編から不変。
+
+## 演習
+
+1. **再代入で事実が消える**：`examples/fact_invalidation.rb` で、`x = nil; arr.each { |i| x = i }`
+   の後に `x` の「non-nil」事実がどのバケツでなぜ無効化されるべきかを述べよ（`local_binding` か
+   `captured_local` か）。
+2. **バケツ指定の無効化**：`obj.mutate!` が `obj` の `object_content` 事実だけを落とし、
+   `local_binding`（`obj` が User である、など）を残すのが安全な理由を 1 文で。逆に全部消すと
+   何が困るか。
+3. **join をトレース**：`if cond; x=1 else x="a" end` の合流後、`x` についてどんな事実が残るか
+   （両枝の積）。もし「片方で成り立つ事実」も残したら、なぜ誤検知になるかを述べよ。
 
 **次章（Part 6）**：前編 Part 7 の RBS で*なぞった*型変数を、本式に。型代入 `subst`・α 同値・
 変数捕獲を `fresh` 変数で避ける ― ジェネリクスの本丸へ。
