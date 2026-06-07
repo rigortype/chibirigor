@@ -1,0 +1,159 @@
+# 【試し書き】ちび Rigor 本編 Part 5 ― ハッシュと配列の型
+
+> 難度帯の網羅検証のための「中難度」サンプル（最易＝Part 1、難所＝Part 4、最難＝Part 6 は
+> 検証済み）。Part 5 の山は「open か closed か」＝本書とちょうど*逆向き*の設計判断を、やさしく
+> 書けるか。コードは実 Ruby で動作確認済み。
+
+この章のゴール：**ハッシュ・配列のリテラルに構造的な型をつける（`HashShape`／`Tuple`）。**
+そして、そこから値を読み出す型を求めます。Ruby のコードは「symbol キーのハッシュ」だらけ
+なので、ここをうまく扱えると一気に実用的になります。
+
+> 本書『型システムのしくみ』5 章「オブジェクト型」に対応します。あの本は同じものを
+> `{ tag: "Object", props }` という型で表しました。私たちもほぼ同じことを Ruby でやります ―
+> ただし最後に一つ、**本書とは正反対の判断**をします。
+
+---
+
+## 5-1. リテラルから型を起こす ― HashShape と Tuple
+
+`{ foo: 1, bar: "a" }` の型は何でしょう。「`Hash`」では大ざっぱすぎます。**どのキーに何の型が
+入っているか**まで覚えたい。それが `HashShape`：
+
+```ruby
+HashShape = Data.define(:fields) do   # fields: { foo: Const[1], bar: Const["a"] }
+  def to_s = "{" + fields.map { |k, v| "#{k}: #{v}" }.join(", ") + "}"
+end
+
+Tuple = Data.define(:elements) do     # 配列を「位置ごとの型」で覚える
+  def to_s = "[" + elements.map(&:to_s).join(", ") + "]"
+end
+```
+
+`type_of` に 2 つ case を足すだけ。Prism ではハッシュは `HashNode`（各ペアが `AssocNode`、
+symbol キーは `SymbolNode`）、配列は `ArrayNode`：
+
+```ruby
+when Prism::HashNode
+  fields = node.elements.to_h { |a| [a.key.unescaped.to_sym, type_of(a.value, scope, diag)] }
+  HashShape[fields]
+when Prism::ArrayNode
+  Tuple[node.elements.map { |el| type_of(el, scope, diag) }]
+```
+
+```ruby
+type_of(parse(%q[{ foo: 1, bar: "a" }]))   # => {foo: 1, bar: "a"}
+type_of(parse(%q[[1, "x"]]))               # => [1, "x"]
+```
+
+- **① 型理論**：複数の値をラベルでまとめた型＝レコード型（本書 5 章）。
+- **② Ruby だと**：symbol キーのハッシュが至る所に。配列もタプル的に使う（`[name, age]`）。
+- **③ Rigor だと**：`Hash` で丸めず、キーごと・位置ごとの型を覚える（Part 1 の「細かく覚える」
+  の延長）。
+
+---
+
+## 5-2. 読み出す ― `h[:foo]` と `a[0]`
+
+型に「どのキーが何の型か」が入っているので、読み出しは素直です。`h[:foo]` は Prism では
+`[]` というメソッド送信（`h.[](:foo)`）。引数が**リテラルの symbol/整数**なら、型から引けます：
+
+```ruby
+def read_index(recv_type, arg_node)
+  if recv_type.is_a?(HashShape) && arg_node.is_a?(Prism::SymbolNode)
+    key = arg_node.unescaped.to_sym
+    return recv_type.fields.fetch(key, Nominal[:NilClass])   # ★未知キーは nil
+  end
+  if recv_type.is_a?(Tuple) && arg_node.is_a?(Prism::IntegerNode)
+    return recv_type.elements.fetch(arg_node.value, Nominal[:NilClass])
+  end
+  Dynamic.new   # 動的なキー（変数など）は読めない → 脅かさない
+end
+```
+
+```ruby
+# h : {foo: 1, bar: "a"} のとき
+h[:foo]   # => 1          （Const[1]）
+h[:zzz]   # => NilClass   （★エラーにしない）
+a[0]      # => 1
+a[9]      # => NilClass
+```
+
+`h[:zzz]` で **エラーを出さない**のがポイントです。理由は単純で、**実際の Ruby が
+`{foo: 1}[:zzz]` で `nil` を返すから**。存在しないキーの読みは「バグ」ではなく「nil が返る」が
+*正しい*挙動。型もそれに合わせて `nil` を返します。決めつけません。
+
+---
+
+## 5-3. open か closed か ― 本書と逆を行く
+
+ここが Part 5 の山です。こういう Ruby を考えます：
+
+```ruby
+def greet(user)        # user は { name: ... } を期待しているとする
+  "Hello, #{user[:name]}"
+end
+
+greet({ name: "Alice", admin: true })   # ★ name 以外に admin も入っている
+```
+
+`greet` が欲しいのは `name` だけ。でも渡されたハッシュには `admin` も入っています。これ、
+**OK にすべき？ NG にすべき？**
+
+本書 5 章は **NG** にしました。「プロパティが*完全一致*していないとダメ」＝余分な `admin` が
+あると拒否する。理由は健全性（きっちり管理したい）。
+
+Rigor は逆に **OK** にします。理由は **Ruby の現実**です：
+
+- Ruby では「大きなオプションハッシュを作って、各メソッドが必要なキーだけ拾う」のが**定石**。
+- 余分なキーがあるたびに怒っていたら、**ちゃんと動いているコードが真っ赤**になる。
+
+つまり Rigor の HashShape は、期待する側から見ると **「*少なくとも* これらのキーがあればよい」**
+（open）。余分は気にしない。**「必要なキーが*無い*」ときだけ問題にする。** これが
+「動くコードを脅かさない」の、構造的な型での現れ方です。
+
+- **① 型理論**：レコードの部分型 ― キーが*多い*方が部分型（本書 5 章は完全一致でここを締めた）。
+- **② Ruby だと**：options ハッシュに余分なキーは日常。完全一致を強いると現実に合わない。
+- **③ Rigor だと**：期待は open（「少なくとも」）。余分は許し、不足だけ咎める ＝ 誤検知を避ける。
+
+> 「期待するキーが揃っているか」を実際に判定するのは、Part 6 の `accepts` の仕事です（型同士が
+> 合うかの三値判定）。ここでは「**余分を許す＝open という*方針***」を決めただけ。判定の実装は
+> Part 6 で HashShape を `accepts` に通すときに書きます。
+
+---
+
+## 5-4. この章のまとめ
+
+足したもの：型カリア `HashShape`／`Tuple`、`type_of` の 2 case、読み出し `read_index`。
+新しい判定ロジックはほぼ無く（読みは `fetch` の第 2 引数だけ）、難しさは概念 ―
+「open という方針」― に集約しました。
+
+この章の三題噺：
+
+| | 内容 |
+|---|---|
+| ① 型理論（本書 5 章） | 値をラベルでまとめる＝レコード型。キーが多い方が部分型 |
+| ② Ruby/RBS | symbol キーの options ハッシュが氾濫。完全一致は現実に合わない |
+| ③ Rigor 実装の問題 | 期待は open（少なくとも）。余分を許し不足だけ咎める＝**本書と逆向き**で誤検知回避 |
+
+**続編に送ったもの**：
+
+- キーワード引数（`def f(name:, **opts)`）の本格対応。本編はハッシュ値としての扱い止まり。
+- レコード部分型の*深さ*（値の型まで再帰的に比べる）・read-only など RBS record の細部。
+- `Struct`/`Data.define` から起こす型（実 Rigor の `DataClass`/`DataInstance`）。
+
+**次章予告（Part 6）**：いよいよ「型同士が*合う*か」を判定する `accepts` を作ります。
+`:yes`/`:no`/`:maybe` の三値で、ここで決めた「open」方針も実際に効いてきます。
+
+---
+
+> **検証メモ（この試し書きの自己評価）**
+> - 中難度の山「open か closed か」は、本書との*逆向き対比*として書くと、かえってやさしく
+>   なった（「本書は NG、Rigor は OK、なぜなら Ruby の現実」）。対比が説明の梃子になる。○
+> - 複雑さ予算：新カリア 2 つ（`HashShape`/`Tuple`）だが、*判定ロジックはほぼゼロ*（読みは
+>   `fetch` の既定値だけ）。重い `accepts` 連携は Part 6 に正しく逃がせた。1 step 1 難所を維持。○
+> - FP 規律が自然に出た：`h[:zzz]` → nil（エラーにしない）が「実 Ruby がそう返すから」で
+>   説明でき、③の誤検知回避と一直線。○
+> - 三題噺：①②③が綺麗に閉じ、特に③が②（options ハッシュの現実）から必然として出た。○
+> - 結論：**全難度帯（最易/難所/最難/中難度）で易しさ予算が成立**。設計は本実装に進んでよい。
+> - 注意：5-3 で「判定は Part 6」と前送りした。Part 5→6 の依存を step 一覧に明記（Part 4→6 と
+>   同様、HashShape も Part 6 の accepts で回収される）。

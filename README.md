@@ -66,6 +66,14 @@ $ ruby test/test_part1.rb
 > 高度な内容（双方向型付けの形式化、変性、再帰型、本物の型推論、健全性理論ほか）は
 > 続編「ちび Rigor 修行」に送ります。
 
+## ドキュメント
+
+設計・本文（チュートリアル）・副読本対応は、すべて [`docs/`](docs/README.md) に置いています
+（本家 Rigor とは**意図的に分離**：実装の*最小版*と*本物*を取り違えないため）。
+
+- 設計の作業スパイン：[`docs/20260607-chibirigor-tutorial-draft.md`](docs/20260607-chibirigor-tutorial-draft.md)
+- 各 Part の試し書きと、副読本『型システムのしくみ』との対応表は [`docs/`](docs/README.md) 参照。
+
 ## 必要環境
 
 Ruby 3.4 以降（Prism 同梱）。
