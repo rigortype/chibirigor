@@ -34,7 +34,7 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 ### Track V — v1 仕上げ（本線）
 - **V1（中）本文↔スナップショット連携**：基盤は 2026-06-09 に初期実装済み。`v1/ja/little/examples/` に段別 example（`dist/partN/lib` ロード）を整備、`check_docs.rb` で `<!-- run: -->` / `<!-- include: -->` を照合。**Part1 annotate デモ（`3: Integer`）を配線済み**。残課題：Part3–9 章の出力ブロックを `run:` / `include:` で配線（章の散文コードブロックは教材的に簡略のため `include:` 非対象）。
 - **V2（中・デザイナー）図版の本清書**：前編3図（0-1/2-1/4-1 相当）＋後編5図（双方向 ⇒/⇐・部分型格子・変性 S-Arrow・FactStore 6 バケツ・μ 畳/展開）。編集レンズ E 級・後編 B3。
-- **V3（中）再現性レンズを v1 で1巡**：型知識ゼロ読者が `v1/ja/little` だけで再実装→34項目採点（`lib/`・`impls/`・`test/` は隠す）。大改訂後の本丸検証で今回未実施。
+- **V3 ✅ 完了（2026-06-09）再現性レンズを v1 で1巡**：型知識ゼロ読者が `v1/ja/little` だけで再実装→**39/39 満点**（採点項目を 34→39 に増強）。推測 2 件（G1: Part5 is_a? 偽の枝、G2: Part7 expected-is-Union ルール）いずれも nitpick 相当。所見 `v1/ja/_reproducibility-review.md`。
 - **V4（小・要判断）旧 `draft/` 撤去**：v1 全章が安定したら `draft/little`・`draft/seasoned` を撤去判断。
 - **V5（任意・大）英語版 `v1/en/`**：TAPL を共通参照に（『しくみ』は日本語のみ）。
 
@@ -53,6 +53,7 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 
 | ファイル | レンズ | 主な未適用（任意・軸を保って選択適用） |
 |---|---|---|
+| [`../v1/ja/_reproducibility-review.md`](../v1/ja/_reproducibility-review.md) | 再現性 | G1(Part5 is_a? 偽枝 1文追加)・G2(Part7 expected-Union ルール明示) いずれも nitpick |
 | [`../v1/ja/_editorial-review.md`](../v1/ja/_editorial-review.md) | 技術書編集者 | 図版（V2）／後編 README↔§1-6 地図の二重（意図的残置） |
 | [`../v1/ja/_expert-review.md`](../v1/ja/_expert-review.md) | 型理論 | ERROR/REF は反映済み。nitpick 数件（occurs check 脚注 等） |
 | [`../v1/ja/_fidelity-review.md`](../v1/ja/_fidelity-review.md) | フィデリティ | 2 件反映済み。次マイルストーンで再チェック |
