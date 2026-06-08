@@ -213,13 +213,17 @@ Chibirigor.annotate(<<~RUBY).each { |a| puts "#{a[:line]}: #{a[:type]}" }
   1 + 2
   foo.bar
 RUBY
-# 1: 42
-# 2: "hello"
-# 3: Integer
-# 4: untyped
 ```
 
-`42` は `Const[42]` なので `42` と細かく出る。`1 + 2` は丸めたので `Integer`。`foo.bar` は
+<!-- run: part1_check_annotate.rb -->
+```text
+1: 42
+2: "hello"
+3: 3
+4: untyped
+```
+
+`42` は `Const[42]` なので `42` と細かく出る。`1 + 2` は定数畳み込みで `3`。`foo.bar` は
 わからないので `untyped`。**「`untyped` がどこに出るか」＝「Rigor が型を見失った場所」** で、
 これが見えること自体が `annotate` の値打ちです（実 Rigor の `sig-gen` の発想の芽）。
 

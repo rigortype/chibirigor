@@ -56,8 +56,7 @@
 - **B7（小）** スケッチ整合：`examples/check_docs.rb` で本文 run 出力と一致を保つ。
 
 ### Track C — 横断・インフラ
-- **C1** ドリフトチェック（`draft/seasoned/ja/examples/check_docs.rb`）を**前編にも展開**（lib の見せたい
-  関数を `# region … # endregion` で囲み、本文に `<!-- include: -->`。handoff #5）。CI に 1 行。
+- **C1** ✅ ドリフトチェックを前編に展開済み。`draft/little/ja/examples/check_docs.rb`（examples 3 本）＋ `Makefile`（`make` で両巻チェック）。`<!-- run: -->` ディレクティブ対応済み、`<!-- include: #region -->` も有効（パス汎用化済み）。Part1 の annotate 出力ドリフト（Integer→3）を検知・修正済み。
 - **C2** ✅ サイト統合準備（Astro + Starlight）：前編 10 章・後編 8 章に frontmatter 追加済み（`title`/`description`/`sidebar.order`、後編は `draft: true`）。H1 はそのまま残存。
 - **C3** 用語集（`draft/glossary.md`）の維持：後編で形式用語を導入したら初出章つきで追記。
 - **C4（任意）** 英語版 `draft/little/en/` の起こし（TAPL を共通参照に。『しくみ』は日本語のみ）。
