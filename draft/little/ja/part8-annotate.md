@@ -186,7 +186,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 - **引数の推論**（本体での使われ方から `x` の型を当てる＝ capability / duck 推論）。本編は
   引数＝`untyped` 止まり。これが『しくみ』 9 章演習「正解を知らない」と言った前線（TAPL なら 22 章「型再構築」が型推論の本拠地）。
 - 複数 `return`・early return・条件分岐をまたぐ戻り型の合流。
-- 生成した RBS の書き出し（`erasure`／sig-gen 本体）。
+- 生成した RBS の書き出し（erasure＝精密な内部型を RBS で表せる型に落とす境界操作／sig-gen 本体）。
 
 ## 演習
 
