@@ -58,8 +58,7 @@
 ### Track C — 横断・インフラ
 - **C1** ドリフトチェック（`draft/seasoned/ja/examples/check_docs.rb`）を**前編にも展開**（lib の見せたい
   関数を `# region … # endregion` で囲み、本文に `<!-- include: -->`。handoff #5）。CI に 1 行。
-- **C2** サイト統合準備（Astro + Starlight）：各章 md に frontmatter（`title`/`description`/`sidebar.order`）。
-  H1 のドラフトマーカーは前編で除去済み → frontmatter `title` へ移す（後編は H1 マーカーが残存）。
+- **C2** ✅ サイト統合準備（Astro + Starlight）：前編 10 章・後編 8 章に frontmatter 追加済み（`title`/`description`/`sidebar.order`、後編は `draft: true`）。H1 はそのまま残存。
 - **C3** 用語集（`draft/glossary.md`）の維持：後編で形式用語を導入したら初出章つきで追記。
 - **C4（任意）** 英語版 `draft/little/en/` の起こし（TAPL を共通参照に。『しくみ』は日本語のみ）。
 
@@ -72,7 +71,7 @@
 
 1. **後編を別セッションで主進行**（Track B）：指示文は前編担当が用意済み（`_editorial-review.md` ＋
    `_expert-review-findings.md` を読ませる）。まず **B1（査読反映）→ B3（図）→ B2（演習）**。
-2. **並行して前編担当**は軽量タスク：**A1（校閲留保の適用）** と **C2（frontmatter 準備）**。
+2. **並行して前編担当**は軽量タスク：**A1（校閲留保の適用）✅** と **C2（frontmatter 準備）✅** は完了。次は **A3（局所整理）** または **C1（ドリフトチェック前編展開）**。
 3. 大きな節目で **D1（フィデリティ・チェック）**。
 
 ## 注意（運用）
