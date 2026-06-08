@@ -216,6 +216,7 @@ Chibirigor.annotate(<<~RUBY).each { |a| puts "#{a[:line]}: #{a[:type]}" }
 RUBY
 ```
 
+<!-- run: examples/part1.rb -->
 ```text
 1: 42
 2: "hello"

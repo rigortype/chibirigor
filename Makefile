@@ -1,7 +1,7 @@
 # chibirigor — CI チェックリスト
 # make          : 全チェック（テスト + ドリフト検出 + 段スナップショット検証）
 # make test     : lib テストのみ
-# make drift    : 本文ドリフトチェックのみ
+# make drift    : 本文ドリフトチェックのみ（draft 前後編 + v1 前編）
 # make fix      : --fix モード（include ブロックを region から再生成）
 # make impls        : 段スナップショット（impls/dist/partN）を steps から生成
 # make impls-verify : 生成 ＋ 各段の test_stage.rb を実行
@@ -16,14 +16,17 @@ test:
 	@for f in test/test_part*.rb test/test_plugin.rb; do ruby $$f; done
 
 drift:
-	@echo "=== drift check: 前編 ==="
+	@echo "=== drift check: draft 前編 ==="
 	ruby draft/little/ja/examples/check_docs.rb
-	@echo "=== drift check: 後編 ==="
+	@echo "=== drift check: draft 後編 ==="
 	ruby draft/seasoned/ja/examples/check_docs.rb
+	@echo "=== drift check: v1 前編 ==="
+	ruby v1/ja/little/examples/check_docs.rb
 
 fix:
 	ruby draft/little/ja/examples/check_docs.rb --fix
 	ruby draft/seasoned/ja/examples/check_docs.rb --fix
+	ruby v1/ja/little/examples/check_docs.rb --fix
 
 impls:
 	@echo "=== 段スナップショット生成 ==="
