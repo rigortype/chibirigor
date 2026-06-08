@@ -32,7 +32,7 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 ## 次セッションの作業候補（優先度つき）
 
 ### Track V — v1 仕上げ（本線）
-- **V1（中）本文↔スナップショット連携**：v1 章のコードブロックを `<!-- include: ../../impls/dist/partN/...#region -->` で**スナップショットから直接引く**。本文↔スナップショット↔段テストが一源化しドリフトが原理的に消える。**前編 examples ドリフト配線の再設計もここで**（v1 Part1 は「丸めて Integer」、畳み込み例は実 lib で `3`＝意図的乖離。段の lib に寄せて「章の挙動＝段の lib」で検証）。
+- **V1（中）本文↔スナップショット連携**：基盤は 2026-06-09 に初期実装済み。`v1/ja/little/examples/` に段別 example（`dist/partN/lib` ロード）を整備、`check_docs.rb` で `<!-- run: -->` / `<!-- include: -->` を照合。**Part1 annotate デモ（`3: Integer`）を配線済み**。残課題：Part3–9 章の出力ブロックを `run:` / `include:` で配線（章の散文コードブロックは教材的に簡略のため `include:` 非対象）。
 - **V2（中・デザイナー）図版の本清書**：前編3図（0-1/2-1/4-1 相当）＋後編5図（双方向 ⇒/⇐・部分型格子・変性 S-Arrow・FactStore 6 バケツ・μ 畳/展開）。編集レンズ E 級・後編 B3。
 - **V3（中）再現性レンズを v1 で1巡**：型知識ゼロ読者が `v1/ja/little` だけで再実装→34項目採点（`lib/`・`impls/`・`test/` は隠す）。大改訂後の本丸検証で今回未実施。
 - **V4（小・要判断）旧 `draft/` 撤去**：v1 全章が安定したら `draft/little`・`draft/seasoned` を撤去判断。
@@ -40,7 +40,7 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 
 ### Track I — 段スナップショット拡張
 - **I1 ✅ 完了（2026-06-09）**：Part3–9 の steps 充填・全段 test_stage.rb 緑・dist/part9 = lib/ に機能収束。
-- **I2（小）CI ゲート**：`make impls-check` を GitHub Actions に（dist 手編集を弾く）。
+- **I2 ✅ 完了（2026-06-09）**：`.github/workflows/ci.yml`（`make test` + `make impls-check`）を追加。
 - **I3（小）V1 と一体**：本文 include 連携（上記 V1）。
 
 ### Track L — lib 機能（ROADMAP フェーズ3）
@@ -62,7 +62,7 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 
 ## 着手の入口（推奨スライス）
 
-1. **V1＋I3（本文↔スナップショット連携）** → ドリフトを原理的に消す。続けて **I1（Part3–9 steps）** で最終段を `lib/` に収束。
+1. **V1 続き（本文↔スナップショット連携の完成）** → Part3–9 章の出力ブロックに `run:` を配線。各 `partN.rb` に region を足して `<!-- include: -->` も順次。
 2. または **V3（再現性レンズ）** で大改訂後の本丸検証（再現性は最強の品質ゲート・今回未実施）。
 3. lib を進めるなら **L1（generics 5a から）**。
 4. 大きな節目で **フィデリティ再チェック**（`v1/ja/_fidelity-review.md` を更新）。
