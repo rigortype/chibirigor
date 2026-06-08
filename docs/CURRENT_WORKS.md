@@ -5,7 +5,7 @@
 > 一致させること（AGENTS.md §「Rigor を真実の源として参照する」）。
 > 一過性のメモ ― 大きな区切りで更新する。
 
-## 現状（2026-06-09）
+## 現状（2026-06-09 更新）
 
 ### ★本線：v1 清書版 `v1/ja/`（draft の外・リポジトリ直下）
 原稿 `draft/` を**二巻維持・大胆再構成**で再編した清書ツリー。**ここが今後の編集対象**。
@@ -20,7 +20,7 @@
 chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book/impls) 風に各 Part の到達状態を完全ツリーで展開。**手コピーでなく単一ソース→生成物→検証ゲート**（詳細 `impls/README.md`、方針 `ROADMAP.md`「本のインフラ」）。
 - `impls/steps/partN/`（源：変わったファイルだけ＋`test_stage.rb`）→ `tools/gen_impls.rb` が前方 compose → `impls/dist/partN/`（生成物・手編集禁止）。
 - `make impls` / `impls-verify`（段テスト）/ `impls-check`（手編集検出）。`make all` 同梱。
-- **現状 Part 1–2 のみの試作**（仕組み実証）。Part3–9 は未充填。
+- **Part 1–9 すべて充填済み**（2026-06-09）。`make impls-verify` で全段グリーン。最終段 dist/part9 は lib/ と機能的に収束。
 
 ### lib 実装 `lib/chibirigor/`（Part 1–9・完成形）
 - `test/test_part1〜9.rb` 緑・CLI 動作。ROADMAP フェーズ1–2 実装済み、**フェーズ3＝ジェネリクスのみ未着手**。
@@ -39,7 +39,7 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 - **V5（任意・大）英語版 `v1/en/`**：TAPL を共通参照に（『しくみ』は日本語のみ）。
 
 ### Track I — 段スナップショット拡張
-- **I1（中）Part3–9 の steps 充填**：各章「変わったファイル＋`test_stage.rb`」を足す。**最終段 == `lib/`** に収束させるのが条件。
+- **I1 ✅ 完了（2026-06-09）**：Part3–9 の steps 充填・全段 test_stage.rb 緑・dist/part9 = lib/ に機能収束。
 - **I2（小）CI ゲート**：`make impls-check` を GitHub Actions に（dist 手編集を弾く）。
 - **I3（小）V1 と一体**：本文 include 連携（上記 V1）。
 
