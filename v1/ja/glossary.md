@@ -29,28 +29,9 @@
   リテラル由来」といった*述語で絞り込まれた型*。`Nominal` のサブクラスではなく、フロー事実から
   自動的に生まれる。`unless s.empty?` を通った後の `s` は `non-empty-string` になる。
   「値そのもの」の `Const[42]` とは別概念 ― `Const` は特定の値、refinement carrier は
-  *述語を満たす値の集合*。個別パターンは付録 a2（ナローイング・パターン集）にまとめてあります。
-
-  Rigor の主な組み込み refinement carrier と、PHPStan の対応語彙：
-
-  | Rigor | PHPStan | 意味 |
-  |---|---|---|
-  | `non-empty-string` | `non-empty-string` | 空でない文字列 |
-  | `numeric-string` | `numeric-string` | 数値に変換できる文字列（`"42"` 等） |
-  | `literal-string` | `literal-string` | ソースコードリテラルのみから構成された文字列 |
-  | `non-empty-literal-string` | ― | 上 2 つの交差 |
-  | `positive-int` | `positive-int` | 0 より大きい整数 |
-  | `negative-int` | `negative-int` | 0 より小さい整数 |
-  | `non-zero-int` | `non-zero-int` | 0 でない整数 |
-  | `non-negative-int` | `non-negative-int` | 0 以上の整数 |
-  | `int<m, n>` | `int<m, n>` | 範囲指定の整数（例：`int<1, 9>`） |
-  | `non-empty-array` | `non-empty-array<T>` | 要素が 1 つ以上の配列 |
-  | `non-empty-hash` | ― | キーが 1 つ以上のハッシュ |
-  | `lowercase-string` | `lowercase-string` | ASCII 小文字のみの文字列 |
-  | `uppercase-string` | ― | ASCII 大文字のみの文字列 |
-
-  PHPStan との語彙の対応は意図的で、「同じ述語を異なる言語チェッカーが同じ名前で表現する」
-  ことで学習コストを下げる設計です（後編 P6 §6-1 参照）。
+  *述語を満たす値の集合*。`non-empty-string`・`positive-int`・`literal-string` などがあり、
+  多くは PHPStan と同名（学習コストを下げる意図的な命名対応）。**組み込み carrier の一覧（PHPStan
+  対応表）と「なぜ集合差か」の解説は付録 a2-6 が正本**。個別の絞り込みパターンも付録 a2。後編 P6 §6-1。
 
 - **`literal-string`**〔Rigor 固有〕… 文字列リテラルおよびリテラル同士の演算から
   *のみ*構成された文字列を表す refinement carrier。「ユーザー入力が混入していない」ことを
