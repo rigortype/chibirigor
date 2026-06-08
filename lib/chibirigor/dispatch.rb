@@ -53,7 +53,8 @@ module Chibirigor
     end
 
     def dispatch(receiver_type, name, arg_types, node, diagnostics)
-      signature = METHODS[[class_of(receiver_type), name]]
+      key = [class_of(receiver_type), name]
+      signature = Plugin.registry[key] || METHODS[key]
       return Type::Dynamic.new unless signature # 知らないメソッド → 脅かさない
 
       if arg_types.size != signature[:params].size

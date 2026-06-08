@@ -50,6 +50,57 @@ ADR を 1 本開く**のがいちばん早い ― どれも「なぜそう設計
 
 ---
 
+### 8-2-a 発展ノート ― 極小プラグインフック（`Chibirigor.register_method`）
+
+上の表の「プラグイン機構」だけを chibirigor に**最小実装**してみましょう。
+本物の Rigor ADR-2 が「拡張 API をコアから分離する」という設計判断をした理由が、
+腹落ちするはずです。
+
+**何をするか**　`Dispatch::METHODS` は `Rbs.load` で生成される読み取り専用のカタログです。
+ここに直接書き込むと、テスト間の干渉・ライブラリ固有の型情報の混入など、
+_コアを汚す_ 問題が起きます。代わりに、**外から合成するレジストリを 1 つ**用意します。
+
+```ruby
+Chibirigor.register_method(
+  :String, :shout,
+  params:  [],
+  returns: Chibirigor::Type::Nominal[:String]
+)
+
+Chibirigor.annotate('"hello".shout')
+#=> 最後の式の型は String（登録した戻り型が効いている）
+```
+
+**仕組み（`lib/chibirigor/plugin.rb` 抜粋）**
+
+```ruby
+module Plugin
+  @registry = {}
+
+  module_function
+
+  def register_method(klass, name, params:, returns:)
+    @registry[[klass, name]] = { params: Array(params), returns: returns }
+  end
+
+  def registry = @registry
+  def reset! = @registry.clear
+end
+```
+
+`Dispatch#dispatch` は `Plugin.registry[key] || METHODS[key]` の順で参照します。
+これだけで「プラグインが優先、コアは不変」が成り立ちます。
+
+**FP ゼロの保証**　`Plugin.registry` にないメソッドは従来通り `METHODS` に委ねます。
+`METHODS` にもなければ `Dynamic`（untyped）に倒れる ― 前編の「知らなければ静かに untyped」
+という約束はここでも守られます。
+
+**実 Rigor との対比**　chibirigor の「1 点のレジストリ」は、Rigor ADR-2 の拡張 API の
+骨格に対応します。本物は DSL・ライフサイクル・プラグイン間連携（ADR-9・37）が加わりますが、
+「コアのカタログとプラグイン由来の情報を分けて持つ」という設計軸は同じです。
+
+---
+
 ## 8-3. 設計判断は ADR に残る
 
 実用ツールは、無数の**設計判断**の積み重ねです。Rigor はそれを **ADR（Architecture Decision
