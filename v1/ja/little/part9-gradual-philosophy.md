@@ -28,9 +28,10 @@ def union(types)
 end
 ```
 
-```console
-x = c ? 1 : foo.bar   # => untyped   （片方が未知なら、全体が未知）
-x = c ? 1 : "a"       # => 1 | "a"   （未知が無ければ union のまま）
+<!-- run: examples/part9.rb -->
+```text
+c ? 1 : foo.bar  ->  untyped
+c ? 1 : "a"      ->  1 | "a"
 ```
 
 理屈は素直です。一部でも型を見失っているなら、その合併について断言はできない。`1 | untyped`

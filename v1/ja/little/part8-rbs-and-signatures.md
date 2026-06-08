@@ -218,6 +218,10 @@ end
 
 ```console
 $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/stdin
+```
+
+<!-- run: examples/part8.rb -->
+```text
 1: def greet: () -> String
 ```
 
@@ -229,10 +233,12 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 ## 8-6. `untyped` がどこに出るか＝推論の弱点
 
-引数を `untyped` にしているので、それが戻りまで流れると `untyped` が顔を出します：
+引数を `untyped` にしているので、それが戻りまで流れると `untyped` が顔を出します
+（`n が untyped → n * 2 も untyped` のように伝播する）：
 
-```console
-1: def double: (untyped) -> untyped     # n が untyped → n * 2 も untyped
+<!-- run: examples/part8.rb -->
+```text
+1: def double: (untyped) -> untyped
 1: def mystery: (untyped) -> untyped
 ```
 
