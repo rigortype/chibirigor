@@ -156,7 +156,33 @@ App[:"json::value", []]
   → Value = Literal | Array[Value] | Hash[String, Value]   （再帰 union へ還元）
 ```
 
-ここで余帰納の `seen` に当たるのが **fuel（燃料）予算**です。還元は無限に展開し得るので、
+ここで余帰納の `seen` に当たるのが **fuel（燃料）予算**です。
+
+> **コラム：`symbolize_names: true` をリテラルで渡すと型が変わる**
+>
+> `JSON.parse` の型は引数オプションに依存します。とくに `symbolize_names:` キーが
+> リテラル `true` で渡されると、Rigor は還元後の型を切り替えます：
+>
+> ```ruby
+> JSON.parse(s)
+> # => App[:"json::value", []]
+> #    還元: Literal | Array[json::value] | Hash[String, json::value]
+>
+> JSON.parse(s, symbolize_names: true)
+> # => App[:"json::symbolized_value", []]
+> #    還元: Literal | Array[json::symbolized_value] | Hash[Symbol, json::symbolized_value]
+>                                                               ^^^^^^
+>                                                               キーが Symbol に変わる
+> ```
+>
+> これが可能なのは、RBS シグネチャで `symbolize_names:` の型を `true` の
+> リテラル型（`Const[true]`）で宣言し、それが HKT の型引数として渡されるからです。
+> 呼び出し地点で `true` のリテラルが確認できた場合だけ `App[:"json::symbolized_value", []]`
+> が選ばれ、`false` や変数（`untyped`）なら汎用版にフォールバックします。
+>
+> このように「引数のリテラル値が型を決める」は前編の `Const` が生きている例です。
+> `HashShape` のキー読み出し（`h[:foo]` の `:foo` がリテラル）と同じ仕組みが、
+> HKT の型引数選択にも使われています。還元は無限に展開し得るので、
 **fuel（既定 64）＋進捗追跡**で安全側に打ち切ります。
 
 > **参考書メモ**：HKT（型を取って型を返す型）の一次根拠は、再帰型の 20/21 章ではなく **TAPL 29
@@ -168,6 +194,25 @@ App[:"json::value", []]
 > *理論的*に（余帰納で正しく等価判定）、Rigor は*工学的*に（fuel で安全に打ち切り）答えて
 > います。前者は「正しく止める」、後者は「危なくなったら止める」。実用チェッカーが後者を選ぶのは、
 > 「分からなくなったら `untyped` に倒す」という gradual の地に足が着いているからです。
+
+> **コラム：HKT 条件型の判定も `:yes/:no/:maybe` の三値**
+>
+> `App[F, A]` を「`T` と互換か」と問われたとき、Rigor は **fuel 内で還元を試み**、
+> 結果が分かれば `:yes` か `:no`、fuel が尽きれば `:maybe` を返します。
+>
+> これは前編 Part 6 で実装した `accepts` の三値（`:yes/:no/:maybe`）と**まったく同じ
+> 枠組み**です。通常の型では「知識不足 → `:maybe`」だったものが、HKT では
+> 「fuel 不足 → `:maybe`」に変わるだけで、判定ロジックの外側から見ると区別できません。
+>
+> | 判定ができない理由 | `accepts` の返値 |
+> |---|---|
+> | `untyped` が混入している | `:maybe` |
+> | 型シグネチャが未登録 | `:maybe` |
+> | HKT 還元の fuel 切れ | `:maybe` |
+>
+> Rigor は「分からなければ黙って通す」を一貫して `:maybe` という単一の語で表現します。
+> HKT の複雑さが漏れ出さず、`accepts` の呼び出し元は三値の意味だけを考えればよい、
+> という設計のきれいさです。
 
 ---
 

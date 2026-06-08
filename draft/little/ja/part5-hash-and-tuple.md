@@ -118,6 +118,23 @@ Rigor は逆に**適合**にします。理由は **Ruby の現実**です：
 - **② Ruby だと**：options ハッシュに余分なキーは日常。完全一致を強いると現実に合わない。
 - **③ Rigor だと**：期待は open（「少なくとも」）。余分は許し、不足だけ咎める ＝ 誤検知を避ける。
 
+> **コラム：`HashShape` の系譜 ― Hack → PHPStan → Rigor**
+>
+> 「キーと値の型を覚えた構造的なハッシュ型」は Rigor の発明ではなく、型チェッカーが
+> dynamic なハッシュを扱うたびに同じ問題にぶつかってきた歴史の産物です。
+>
+> - **Hack（Facebook）**：PHP に静的型を足した言語。`shape('name' => string, 'age' => int)`
+>   という型を導入し、「キーを明記する代わりに余分は許す（open）」という設計を採りました。
+>   当初から options ハッシュとの共存を意識した設計です。
+> - **PHPStan / Psalm**：PHP のチェッカーが同じ問題にぶつかり、`array{name: string, age: int}`
+>   という表記で同型を導入。語彙は Hack を踏襲し、open/closed を明示できるものもあります。
+> - **Rigor**：Ruby の RBS `{ name: String, age: Integer }` から型を起こし、
+>   同じく open を採用。「少なくとも」で受け取る。
+>
+> 3 ツールとも、朴訥な join（`Hash[Symbol, String | Integer]` のような幅の広い型）では
+> キーごとの情報が失われてしまうため、キーを個別に覚える型が必要でした。
+> chibirigor の `HashShape` はこの系譜の最小実装です。
+
 > 「期待するキーが揃っているか」を実際に判定するのは、Part 6 の `accepts` の仕事です（型同士が
 > 合うかの三値判定）。ここでは「**余分を許す＝open という*方針***」を決めただけ。判定の実装は
 > Part 6 で HashShape を `accepts` に通すときに書きます。
@@ -141,6 +158,10 @@ Rigor は逆に**適合**にします。理由は **Ruby の現実**です：
 **続編に送ったもの**：
 
 - キーワード引数（`def f(name:, **opts)`）の本格対応。本編はハッシュ値としての扱い止まり。
+- **`map` vs `filter_map` の型の差**：Rigor では `tuple.map { |x| f(x) }` は
+  位置ごとの型を*保ちます*（`f` の戻り型をそれぞれ適用）。一方 `filter_map` は
+  結果サイズが述語次第で変わるため、位置ごとの情報を保てず `Array[T]` に**強制 wide**します。
+  「位置を変えない操作だけが Tuple の精度を保てる」という型理論の自然な帰結です。
 - レコード部分型の*深さ*（値の型まで再帰的に比べる）・read-only など RBS record の細部。
 - `Struct`/`Data.define` から起こす型（実 Rigor の `DataClass`/`DataInstance`）。
 

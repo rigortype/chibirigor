@@ -34,6 +34,22 @@ draft: true
 （安定性）** を持ちます。本章ではこのうち `bucket`・`target`・`predicate` の 3 つに絞って
 最小化します。
 
+> **`predicate` の `payload` が運ぶもの ― refinement carrier**
+>
+> 「`arr` は空でない」という事実の `payload`（FactStore が*その変数の型*として供給する値）は、
+> Rigor では **`non-empty-array`** という特殊な型キャリアになります。
+> `unless s.empty?` を通った文字列は `non-empty-string`、
+> `if n > 0` を通った整数は `positive-int`、といった具合です。
+>
+> これらは前編 Part 1 の `Const[42]`（「値が 42」という超精密な型）とは異なります ―
+> refinement carrier は「述語を満たす値の*集合*」を表す型で、値は 1 つに決まっていません。
+> FactStore の `payload` フィールドがこれを運ぶことで、「述語を通った後は
+> より精密な型で推論できる」という絞り込みが実現します。
+>
+> PHP のチェッカー PHPStan も全く同名の型（`non-empty-string`・`positive-int`・`literal-string`
+> など）を持ちます（用語集「refinement carrier」参照）。同じ命名は偶然ではなく、
+> 動的言語チェッカーが同じ問題に同じ答えを出してきた結果です。
+
 ---
 
 ## 5-2. 6 つの「置き場」（バケツ）
@@ -65,9 +81,87 @@ draft: true
 必要がある、というように。バケツ名は本物の Rigor の内部仕様（`inference-engine.md`）の
 正式名と一致します。[^buckets]
 
+> **コラム：ivar の型は「すべての代入の union」**
+>
+> `object_content` バケツには ivar（インスタンス変数）の型が入ります。Rigor はクラス内の
+> `@x` への代入を**すべて収集**し、その型の union を `@x` の型とします：
+>
+> ```ruby
+> class Foo
+>   def initialize
+>     @x = 1          # Const[1]
+>   end
+>
+>   def reset
+>     @x = nil        # Const[nil]
+>   end
+>
+>   def use
+>     @x              # => Integer | nil （すべての代入の union）
+>   end
+> end
+> ```
+>
+> `@x` に書く場所が `initialize` だけなら `Integer`、`reset` が加わると
+> `Integer | nil` になります。「どこかで `nil` が代入され得るなら、どこで読んでも
+> `nil` を含む」― これは保守的ですが ivar の可視性（どのメソッドから書けるか）が
+> ファイルを跨ぐと完全には追えないため、**すべての可視な代入の union** が安全な近似です。
+>
+> したがって `@x` を `nil` で初期化してすぐ設定するパターンでは `nil?` ガードが
+> 必要になります。`object_content` バケツに `non-nil` 事実を追加する、つまり
+> `@x` を読む前に `@x.nil?` で分岐するのが Rigor での定石です。
+
 [^buckets]: 6 バケツのうち `local_binding`/`captured_local`/`object_content`/`global_storage`/
 `relational` は「事実が付く対象」で分かれるのに対し、`dynamic_origin` だけは「`untyped` の
 *由来*を追う」別系統です。位置づけが違うことに注意（実 spec でも 6 つ目として並ぶが役割は別）。
+
+> **コラム：`&&` チェーンで事実が積み上がる**
+>
+> `&&` 演算子は左から右へ**逐次評価**されるため、FactStore の事実も左から順に積み上げ
+> られます：
+>
+> ```ruby
+> if x.is_a?(Integer) && x > 0
+>   # ここでは local_binding に 2 つの事実が積まれている
+>   #   1. x is_a? Integer   （is_a? ナローイング）
+>   #   2. x > 0             （比較述語）
+>   # 合成されると x : positive-int と読める
+> end
+> ```
+>
+> 左側の `is_a?(Integer)` が通過した時点で `x` の型が `Integer` に絞られ、その状態で
+> 右側の `x > 0` が評価されます。「`Integer` かつ `> 0`」が積み重なるので、Rigor は
+> これを **`positive-int` リファインメント**として扱えます。
+>
+> 逆に `||` チェーンは「どちらか一方が成立した場合」なので、合流点で join（共通事実のみ
+> 残す）が走り、片方にしかない事実は消えます（§5-5 の合流の話）。`&&` が*足す*、
+> `||` が*削る* ― FactStore が左右を対称に扱わない理由です。
+
+> **コラム：正規表現の名前付きキャプチャもナローイングする**
+>
+> Ruby の `=~` と名前付きキャプチャ（`(?<name>...)`）は、**マッチ成功時にローカル変数へ
+> `String` を束縛する**という、他の言語にほぼ無い独自の挙動を持ちます：
+>
+> ```ruby
+> if /(?<year>\d{4})-(?<month>\d{2})/ =~ str
+>   # year, month が String として束縛されている
+>   year.upcase   # OK（year は String）
+> end
+> ```
+>
+> Rigor はこれを**名前付きキャプチャ・ナローイング**として認識します。`if` ブロック内で
+> `year` と `month` の `local_binding` に `String` 事実を追加します（マッチ失敗なら
+> nil なので、`if` 外ではどちらも `String | nil`）。
+>
+> Prism では `=~` の左辺が `RegexpNode` かつ名前付きキャプチャを含む場合、Rigor は
+> 捕獲グループ名を読み出して FactStore に直接事実を挿入します。`is_a?` の型述語や
+> `nil?` の nil ガードと同じ仕組みで、ただし**変数名が正規表現の本文から来る**点が特殊です。
+>
+> | パターン | ナローイング対象 | 追加される事実 |
+> |---|---|---|
+> | `is_a?(String)` | 左辺の変数 | `String` |
+> | `nil?` 否定 | 左辺の変数 | `non-nil` |
+> | `=~` 名前付きキャプチャ | キャプチャ名の変数 | `String` |
 
 ---
 
@@ -124,6 +218,30 @@ PASS: fact is present after narrowing
 PASS: reassignment clears x's local_binding fact
 PASS: method call drops object_content but keeps local_binding
 ```
+
+> **コラム：エスケープするブロックは「いつ呼ばれるか分からない」**
+>
+> `each` や `map` のブロックは即時呼び出しなので、ナローイングの事実はブロック終了後まで
+> ほぼ保持できます。問題は**エスケープするブロック** ― ブロックが呼び出し元の外に「脱出」する
+> 場合です：
+>
+> ```ruby
+> if x.is_a?(Integer)
+>   # ここで x の local_binding に "is Integer" が入る
+>   Thread.new { x.some_integer_method }   # ← x を捕獲して別スレッドへ
+> end
+> # Thread がいつ走るかは不明 → x の narrowing を保持し続けるのは危険
+> ```
+>
+> `Thread.new` に渡したブロックは*任意のタイミング*で動きます。その時点で `x` が
+> 再代入されていたり、すでに別の型になっている可能性を排除できません。
+> FactStore はこの「エスケープ」を検知すると、そのブロックが**捕獲した変数すべての
+> `captured_local` 事実を保守的に無効化**します。
+>
+> `define_method` や `Proc#curry`、`Enumerator` のような「ブロックをオブジェクトとして
+> 保存する」パターンも同様に扱います。「即時呼び出しか」「後で呼ばれるか」の判定は
+> Rigor が RBS のシグネチャアノテーション（`&block` が `Proc` か `yield` か、等）から
+> 推定します。判断できない場合はエスケープと見なして**迷ったら消す**です。
 
 ---
 

@@ -9,11 +9,49 @@
   `Dynamic`/`Union`/`HashShape`/`Tuple` など。
 - **`Const`（リテラル型）**〔前編 P1〕… 「その値そのもの」を表す型。例：`Const[1]`。
 - **`Nominal`（名前的型）**〔前編 P1〕… 名前付きクラスを表す型。例：`Nominal[:Integer]`。
-- **`Dynamic`／untyped**〔前編 P1〕… 「型を見失った」印。gradual の要。
+- **`Dynamic`／untyped**〔前編 P1〕… 「型を見失った」印。gradual の要。他言語対応表は前編 P1 コラム参照。
 - **`Union`（合併型）**〔前編 P4〕… 「`A` か `B` のどちらか」。例：`Integer | String`。
-- **`HashShape`（レコード型）**〔前編 P5〕… キーごとの型を覚えるハッシュの型。
-- **丸め／正規化（normalization）**〔前編 P1〕… 細かい型（`Const[3]`）を大ざっぱな型
+- **`HashShape`（レコード型）**〔前編 P5〕… キーごとの型を覚えるハッシュの型。Hack の `shape(...)` を起点とし PHPStan/Psalm を経て Rigor に至る設計（前編 P5 コラム参照）。
+- **`partial_of[T]`**〔Rigor 固有〕… `T` と同じキー構造を持つが、各キーの値型は変えない「部分ハッシュ」型。`partial_of[{name: String, age: Integer}]` は `{name: String}` や `{age: Integer}` などを含む。重要な点は**値型を `nil` に広げない**こと ― 値は「省略されうる（キーが無くてもよい）」だけで、「あれば確実に `T` の値型を持つ」。`Partial<T>` に相当する TypeScript との違いは、TS の `Partial<T>` が全キーを `T | undefined` にするのに対し、Rigor の `partial_of[T]` は省略されたキーには触れず存在するキーの値型を保ちます。
+- **丸め／正規化（normalization）**〔前編 P1〕… 細かい型（`Const[3]`）を大ざっぐな型
   （`Integer`）に戻すこと。TAPL 12 章。
+- **`Difference` 型**〔Rigor 内部〕… 「`A` から `B` を除いた値の集合」を表す型キャリア。
+  `non-empty-string` は内部的に `String - ""` として実装される（`String` の値の集合から
+  空文字列 `""` を差し引いた集合）。名前は付いていても、実体は**集合差（set difference）**。
+  union（合併）・intersection（交差）と並ぶ集合論的型演算の一つ。chibirigor では扱わないが、
+  refinement carrier の「なぜその名か」の答えはここにある。
+- **refinement carrier（細粒度キャリア）**〔後編 P5 / Rigor 固有〕… 「空でない・正の値・
+  リテラル由来」といった*述語で絞り込まれた型*。`Nominal` のサブクラスではなく、フロー事実から
+  自動的に生まれる。`unless s.empty?` を通った後の `s` は `non-empty-string` になる。
+  「値そのもの」の `Const[42]` とは別概念 ― `Const` は特定の値、refinement carrier は
+  *述語を満たす値の集合*。
+
+  Rigor の主な組み込み refinement carrier と、PHPStan の対応語彙：
+
+  | Rigor | PHPStan | 意味 |
+  |---|---|---|
+  | `non-empty-string` | `non-empty-string` | 空でない文字列 |
+  | `numeric-string` | `numeric-string` | 数値に変換できる文字列（`"42"` 等） |
+  | `literal-string` | `literal-string` | ソースコードリテラルのみから構成された文字列 |
+  | `non-empty-literal-string` | ― | 上 2 つの交差 |
+  | `positive-int` | `positive-int` | 0 より大きい整数 |
+  | `negative-int` | `negative-int` | 0 より小さい整数 |
+  | `non-zero-int` | `non-zero-int` | 0 でない整数 |
+  | `non-negative-int` | `non-negative-int` | 0 以上の整数 |
+  | `int<m, n>` | `int<m, n>` | 範囲指定の整数（例：`int<1, 9>`） |
+  | `non-empty-array` | `non-empty-array<T>` | 要素が 1 つ以上の配列 |
+  | `non-empty-hash` | ― | キーが 1 つ以上のハッシュ |
+  | `lowercase-string` | ― | ASCII 小文字のみの文字列 |
+  | `uppercase-string` | ― | ASCII 大文字のみの文字列 |
+
+  PHPStan との語彙の対応は意図的で、「同じ述語を異なる言語チェッカーが同じ名前で表現する」
+  ことで学習コストを下げる設計です（後編 P5 §5-1 参照）。
+
+- **`literal-string`**〔Rigor 固有〕… 文字列リテラルおよびリテラル同士の演算から
+  *のみ*構成された文字列を表す refinement carrier。「ユーザー入力が混入していない」ことを
+  型レベルで証明できるため、SQL インジェクション・XSS 対策の審査に使われる（Python の
+  `LiteralString`（PEP 675）と同じ役割）。Rigor では文字列補間 `"#{a}#{b}"` で両辺が
+  `literal-string` なら結果も `literal-string` として伝播する。
 
 ## 推論と型チェック
 

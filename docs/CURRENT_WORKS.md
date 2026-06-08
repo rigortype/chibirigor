@@ -46,24 +46,36 @@
   P5 FactStore のバケツ名を実 Rigor の spec と照合（`docs/internal-spec/` 等）。
 - **B2（中）** 各章末に `## 演習`（**前編フォーマットをミラー**。後編は証明・トレース・規則導出系）。
 - **B3（中・デザイナー）** 図 5 枚：双方向 `⇒`/`⇐`・部分型格子・変性 S-Arrow・FactStore 6 バケツ・μ 畳/展開。
-- **B4（小）** TypeProf 対比を Part 3（本物の型推論）で明示：whole-program 抽象解釈で呼び出し元から
-  引数を逆算する TypeProf と、ローカル＋カタログの Rigor の差（mametter）。出典：`rigor/docs/handbook/appendix-typeprof.md`。
-- **B5（小）** 健全性の回収：Part 7 で「前編 Part 9 の*わざと見逃す 4 箇所*を progress 放棄として言い直す」と
-  明示接続（前編側は前振り済み）。
-- **B6（小）** 最終章 Part 8：プラグイン/キャッシュ/LSP/CI の駆け足列挙を「実 Rigor のどの ADR から
-  読むか」の具体へ（`rigor/docs/adr/README.md` を参照）。
-- **B7（小）** スケッチ整合：`examples/check_docs.rb` で本文 run 出力と一致を保つ。
+- **B4（小）** ✅ TypeProf 対比を Part 3 §3-4a に追加済み（2026-06-08）：whole-program 抽象解釈 vs
+  local+catalog の対比表・mametter の指摘を反映。出典：`rigor/docs/handbook/appendix-typeprof.md`。
+- **B5（小）** ✅ 健全性の回収：後編 Part 7 §7-4 に 4 箇所×progress/preservation 対応表あり。前編 Part 9 §9-2
+  との相互参照も両側に存在（確認・補強 2026-06-08）。
+- **B6（小）** ✅ 最終章 Part 8 §8-2・§8-3 に具体 ADR 番号付き参照表あり（2026-06-08 補強）。
+  ADR-0・ADR-4 の入口案内を §8-3 冒頭に追加済み。
+- **B7（小）** ✅ スケッチ整合確認済み（2026-06-08）：前編・後編とも `check_docs.rb` がグリーン。
 
 ### Track C — 横断・インフラ
 - **C1** ✅ ドリフトチェックを前編に展開済み。`draft/little/ja/examples/check_docs.rb`（examples 3 本）＋ `Makefile`（`make` で両巻チェック）。`<!-- run: -->` ディレクティブ対応済み、`<!-- include: #region -->` も有効（パス汎用化済み）。Part1 の annotate 出力ドリフト（Integer→3）を検知・修正済み。
 - **C2** ✅ サイト統合準備（Astro + Starlight）：前編 10 章・後編 8 章に frontmatter 追加済み（`title`/`description`/`sidebar.order`、後編は `draft: true`）。H1 はそのまま残存。
 - **C3** 用語集（`draft/glossary.md`）の維持：後編で形式用語を導入したら初出章つきで追記。
+- **C5** ✅ appendix・handbook コンテンツ盛り込み完了（2026-06-08）：
+  - appendix 12 ファイルから★★★（3 件）・★★（3 件）・★（3 件）を抽出し各章に挿入。
+  - handbook ch.01–12 から 16 トピックを抽出し優先順で挿入完了：
+    A（Difference 型）・G（再代入でナローイングリセット）・F（Union サイズ予算→強制 wide）・
+    B（dispatch 5 段カスケード）・P（filter_map が Tuple を wide）・
+    I（`rigor check --explain`）・M（`rigor type-of file:line:col`）・
+    D（エスケープブロックでナローイング消滅）・E（`&&` チェーンで事実積み上げ）・
+    H（正規表現名前付きキャプチャ→ String）・C（HKT 条件型も三値）・
+    J（`param:` 2 効果）・K（`partial_of[T]` 値型を nil に広げない）・
+    L（`JSON.parse symbolize_names: true` → HKT 型引数）・
+    N（ivar = 全代入の union）・O（`assert: self is T` 手動事実挿入）・
+    Q（Sorbet `T.assert_type!` と gradual consistency）。
 - **C4（任意）** 英語版 `draft/little/en/` の起こし（TAPL を共通参照に。『しくみ』は日本語のみ）。
 
 ### Track D — フィデリティ維持（AGENTS.md §「Rigor を真実の源に」）
-- **D1** マイルストーンごとに**フィデリティ・チェック**のサブエージェントを 1 本：本文の「Rigor だと…」
-  主張を拾い、`rigor/docs/`（handbook / type-specification / internal-spec / adr）・`lib/rigor/` と突き合わせ、
-  ズレを `draft/_*-review.md` に記録 → 軸を保って選択適用。
+- **D1** ✅ フィデリティ・チェック実施済み（2026-06-08）：`draft/_fidelity-review.md` に記録。
+  重大ズレ 3 件を修正済み（baseline 照合キー・Nominal 型引数変性・推論予算実装状況）。
+  次のマイルストーンで再実施。
 
 ## 着手の入口（推奨スライス）
 
