@@ -1,0 +1,35 @@
+# frozen_string_literal: true
+
+# Part 5 到達段階のスモークテスト。
+# ナローイング：nil? / is_a? が枝ごとに型を絞る。
+
+require 'chibirigor'
+
+failures = []
+check = lambda do |desc, actual, expected|
+  if actual == expected
+    puts "PASS: #{desc}"
+  else
+    failures << desc
+    puts "FAIL: #{desc} (expected #{expected.inspect}, got #{actual.inspect})"
+  end
+end
+
+# nil チェックで else 枝が nil を除く
+check.call('nil-check narrows the else branch',
+           Chibirigor.check("x = c ? 1 : nil\nif x.nil?\n  0\nelse\n  x + 1\nend\n"), [])
+
+# is_a? は「あり得る枝」を絞る
+check.call('is_a? narrows a reachable branch',
+           Chibirigor.check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n  x + 1\nend\n").size, 1)
+
+# is_a? は disjoint な型を絞らない → 誤検知しない
+check.call('is_a? leaves the dead branch alone',
+           Chibirigor.check("x = 1\nif x.is_a?(String)\n  x + 1\nend\n"), [])
+
+if failures.empty?
+  puts 'All Part 5 stage checks passed.'
+else
+  warn "Part 5 FAILURES: #{failures.size}"
+  exit 1
+end
