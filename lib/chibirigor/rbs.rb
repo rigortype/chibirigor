@@ -35,7 +35,8 @@ module Chibirigor
           current = m[1].to_sym
         elsif current && (m = DEF_LINE.match(line))
           params = m[2].split(',').map(&:strip).reject(&:empty?).map { |t| Type::Nominal[t.to_sym] }
-          table[[current, m[1].to_sym]] = { params: params.freeze, returns: Type::Nominal[m[3].to_sym] }
+          ret = m[3] == 'untyped' ? Type::Dynamic.new : Type::Nominal[m[3].to_sym]
+          table[[current, m[1].to_sym]] = { params: params.freeze, returns: ret }
         end
       end
       table.freeze

@@ -106,6 +106,16 @@ module Chibirigor
     nil
   end
 
+  # ⇐ subsumption（照合モード）: expected 型に actual を照合する。
+  # :no のときだけ診断を出す。untyped が絡んだら黙る（gradual の約束）。
+  # `⇐` が診断を出す最初の口。呼び出し引数照合（dispatch）も同じ原則で動いている。
+  def check_against(node, expected, actual, diagnostics)
+    return if expected.is_a?(Type::Dynamic) || actual.is_a?(Type::Dynamic)
+    return unless Accepts.call(expected, actual) == :no
+
+    diagnostics << diagnostic(node, "戻り型 #{expected} が宣言されていますが #{actual} を返します")
+  end
+
   # 診断は「どこの・何が問題か」。位置（行・列・長さ）はキャレット表示に使う。
   def diagnostic(node, message)
     location = node.location
