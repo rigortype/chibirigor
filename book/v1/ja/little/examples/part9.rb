@@ -3,7 +3,7 @@
 # Part 9 到達段階の挙動確認。
 # impls/dist/part9/lib を使う（Dynamic 支配・baseline・定数畳み込み）。
 
-$LOAD_PATH.unshift File.expand_path('../../../../impls/dist/part9/lib', __dir__)
+$LOAD_PATH.unshift File.expand_path('../../../../../impls/dist/part9/lib', __dir__)
 require 'chibirigor'
 
 # region untyped_dominance

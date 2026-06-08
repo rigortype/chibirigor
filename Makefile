@@ -21,12 +21,12 @@ drift:
 	@echo "=== drift check: draft 後編 ==="
 	ruby draft/seasoned/ja/examples/check_docs.rb
 	@echo "=== drift check: v1 前編 ==="
-	ruby v1/ja/little/examples/check_docs.rb
+	ruby book/v1/ja/little/examples/check_docs.rb
 
 fix:
 	ruby draft/little/ja/examples/check_docs.rb --fix
 	ruby draft/seasoned/ja/examples/check_docs.rb --fix
-	ruby v1/ja/little/examples/check_docs.rb --fix
+	ruby book/v1/ja/little/examples/check_docs.rb --fix
 
 impls:
 	@echo "=== 段スナップショット生成 ==="

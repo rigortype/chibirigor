@@ -17,7 +17,7 @@ Encoding.default_internal = Encoding::UTF_8
 
 HERE    = __dir__
 LITTLE  = File.expand_path('..', HERE)
-REPO    = File.expand_path('../../../../', HERE)
+REPO    = File.expand_path('../../../../../', HERE)
 FIX     = ARGV.include?('--fix')
 
 CHAPTERS = Dir[File.join(LITTLE, 'part*.md')].sort

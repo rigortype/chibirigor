@@ -3,7 +3,7 @@
 # Part 6 到達段階の挙動確認。
 # impls/dist/part6/lib を使う（段の挙動）。
 
-$LOAD_PATH.unshift File.expand_path('../../../../impls/dist/part6/lib', __dir__)
+$LOAD_PATH.unshift File.expand_path('../../../../../impls/dist/part6/lib', __dir__)
 require 'chibirigor'
 
 # region check_and_annotate
