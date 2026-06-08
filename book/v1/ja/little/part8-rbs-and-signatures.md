@@ -227,7 +227,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 `check` と `annotate` は**同じ推論エンジン**（`type_of`/`method_return_type`）を使います。
 推論が土台で、チェックも表示もその出力を使う ― これが Part 0 で言った「推論を土台にした
-検査器」の姿です。
+型チェッカー」の姿です。
 
 ---
 

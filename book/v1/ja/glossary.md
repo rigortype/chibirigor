@@ -14,7 +14,7 @@
   付録 a1（特別な型カタログ）参照。
 - **`Union`（合併型）**〔前編 P4〕… 「`A` か `B` のどちらか」。例：`Integer | String`。
 - **`HashShape`（レコード型）**〔前編 P6〕… キーごとの型を覚えるハッシュの型。Hack の `shape(...)` を起点とし PHPStan/Psalm を経て Rigor に至る設計（前編 P6 コラム参照）。
-- **`partial_of[T]`**〔Rigor 固有〕… `T` と同じキー構造を持つが、各キーの値型は変えない「部分ハッシュ」型。`partial_of[{name: String, age: Integer}]` は `{name: String}` や `{age: Integer}` などを含む。重要な点は**値型を `nil` に広げない**こと ― 値は「省略されうる（キーが無くてもよい）」だけで、「あれば確実に `T` の値型を持つ」。`Partial<T>` に相当する TypeScript との違いは、TS の `Partial<T>` が全キーを `T | undefined` にするのに対し、Rigor の `partial_of[T]` は省略されたキーには触れず存在するキーの値型を保ちます。
+- **`partial_of[T]`**〔Rigor 固有〕… `T` と同じキー構造を持つが、各キーの値型は変えない「部分ハッシュ」型。`partial_of[{name: String, age: Integer}]` は `{name: String}` や `{age: Integer}` などを含む。重要な点は**値型を `nil` に広げない**こと ― 値は「省略されうる（キーが無くてもよい）」だけで、「あれば確実に `T` の値型を持つ」。TypeScript の `Partial<T>` との違いは、それが全キーを `T | undefined` にするのに対し、Rigor の `partial_of[T]` は省略されたキーには触れず存在するキーの値型を保ちます。
 - **丸め／正規化（normalization）**〔前編 P1〕… 細かい型（`Const[3]`）を大ざっぱな型
   （`Integer`）に戻すこと。TAPL 12 章。
 - **`Difference` 型**〔Rigor 内部〕… 「`A` から `B` を除いた値の集合」を表す型キャリア。

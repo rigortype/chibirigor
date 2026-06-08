@@ -136,7 +136,7 @@ Rigor は逆に**適合**にします。理由は **Ruby の現実**です：
 > - **Rigor**：Ruby の RBS `{ name: String, age: Integer }` から型を起こし、
 >   同じく open を採用。「少なくとも」で受け取る。
 >
-> 3 ツールとも、朴訥な join（`Hash[Symbol, String | Integer]` のような幅の広い型）では
+> 3 ツールとも、素朴な join（`Hash[Symbol, String | Integer]` のような幅の広い型）では
 > キーごとの情報が失われてしまうため、キーを個別に覚える型が必要でした。
 > chibirigor の `HashShape` はこの系譜の最小実装です。
 
