@@ -1,3 +1,11 @@
+---
+title: "Part 6 ― ジェネリクスと型代入"
+description: "前編でなぞった型変数の置換を本式に組み直し、α 同値・変数捕獲・erasure を形式で扱う。"
+sidebar:
+  order: 6
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 6 ― ジェネリクスと型代入
 
 > 参考書（任意）：TAPL 22 章「型再構築」・23 章「全称型（System F）」／『しくみ』9 章。

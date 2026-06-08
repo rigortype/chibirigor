@@ -1,3 +1,11 @@
+---
+title: "Part 1 ― 双方向型付けの正体"
+description: "前編で作った `type_of`／`accepts` が「合成（⇒）」と「照合（⇐）」という双方向型付けの骨格だったことを明かす。"
+sidebar:
+  order: 1
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 1 ― 双方向型付けの正体
 
 > 後編の最初の章。**後編は「作る」より「読み解く」巻**です ― 前編で*無意識に*作っていた

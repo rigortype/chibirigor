@@ -1,3 +1,10 @@
+---
+title: "Part 9（最終章）― gradual の哲学"
+description: "`untyped` の伝播を仕上げ、chibirigor がわざと見逃す 4 箇所と gradual typing の哲学を整理する。"
+sidebar:
+  order: 9
+---
+
 # The Little chibirigor Part 9（最終章）― gradual の哲学
 
 この章のゴール：**`untyped` の伝播を仕上げ、「chibirigor がわざと見逃している所」を総括する。**

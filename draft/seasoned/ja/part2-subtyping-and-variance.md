@@ -1,3 +1,11 @@
+---
+title: "Part 2 ― 部分型と変性"
+description: "前編の三値受理判定を部分型 `<:` の理論で組み直し、戻り型の共変・引数の反変を形式的に扱う。"
+sidebar:
+  order: 2
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 2 ― 部分型と変性
 
 > 参考書（任意）：TAPL 15 章「部分型付け」・16 章「部分型付けのメタ理論」／『しくみ』7 章。

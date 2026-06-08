@@ -1,3 +1,11 @@
+---
+title: "Part 3 ― 本物の型推論：引数を埋める"
+description: "前編が `untyped` に倒していた引数の型を、本体での使われ方から導出する制約ベース推論を扱う。"
+sidebar:
+  order: 3
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 3 ― 本物の型推論：引数を埋める
 
 > 参考書（任意）：TAPL 22 章「型再構築」／『しくみ』9 章演習・おわりに。

@@ -1,3 +1,10 @@
+---
+title: "Part 0 ― はじめに：推論を土台にした検査器"
+description: "本編の入口。chibirigor が何で・何でないかを掴む章。実装の前提と全編を貫く約束ごとを共有する。"
+sidebar:
+  order: 0
+---
+
 # The Little chibirigor Part 0 ― はじめに：推論を土台にした検査器
 
 > 本編の入口。コードを書く前に、chibirigor が何で・何でないかを掴む章。実装の前提

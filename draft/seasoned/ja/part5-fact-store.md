@@ -1,3 +1,11 @@
+---
+title: "Part 5 ― 完全な FactStore"
+description: "前編の素朴な Scope と narrow を、Rigor の本物の FactStore（6 バケツ設計）へ拡張して読み解く。"
+sidebar:
+  order: 5
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 5 ― 完全な FactStore
 
 > 参考書（任意）：フロー解析の一般論（データフロー解析）。型理論の教科書（TAPL/『しくみ』）には

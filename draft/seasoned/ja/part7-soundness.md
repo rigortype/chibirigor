@@ -1,3 +1,11 @@
+---
+title: "Part 7 ― 健全性と正規化、そして「わざと unsound」"
+description: "型理論の中心定理（progress + preservation）を据え、なぜ chibirigor はわざと健全でないのかを形式で言い直す。"
+sidebar:
+  order: 7
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 7 ― 健全性と正規化、そして「わざと unsound」
 
 > 参考書（任意）：TAPL 8 章「型付き算術式」§8.3（安全性＝進行＋保存）・12 章「正規化」／

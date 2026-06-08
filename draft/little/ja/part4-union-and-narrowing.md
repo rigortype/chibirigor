@@ -1,3 +1,10 @@
+---
+title: "Part 4 ― Union と絞り込み"
+description: "型が一本に決まらない Union を導入し、`if` 分岐で型を絞り込む narrowing を実装する。"
+sidebar:
+  order: 4
+---
+
 # The Little chibirigor Part 4 ― Union と絞り込み
 
 この章のゴール：**型が一本に決まらないときの型 `Union` を導入し、`if` で型を「絞り込む」

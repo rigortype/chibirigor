@@ -1,3 +1,10 @@
+---
+title: "Part 5 ― ハッシュと配列の型"
+description: "ハッシュ・配列のリテラルに構造的な型（`HashShape`／`Tuple`）をつけ、部分一致を許す設計にする。"
+sidebar:
+  order: 5
+---
+
 # The Little chibirigor Part 5 ― ハッシュと配列の型
 
 この章のゴール：**ハッシュ・配列のリテラルに構造的な型をつける（`HashShape`／`Tuple`）。**

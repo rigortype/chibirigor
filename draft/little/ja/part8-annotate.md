@@ -1,3 +1,10 @@
+---
+title: "Part 8 ― annotate を仕上げる"
+description: "`def` を読み、本体から戻り型を合成して RBS 風シグネチャを出力する `annotate` を完成させる。"
+sidebar:
+  order: 8
+---
+
 # The Little chibirigor Part 8 ― annotate を仕上げる
 
 この章のゴール：**`def` を読み、本体から戻り型を合成して RBS 風シグネチャで見せる。**

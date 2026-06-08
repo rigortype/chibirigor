@@ -1,3 +1,10 @@
+---
+title: "Part 7 ― RBS ひとさじ"
+description: "手書きの `METHODS` 表を RBS テキストから読み込む `Rbs.load` に差し替え、ふるまいが変わらないことを確かめる。"
+sidebar:
+  order: 7
+---
+
 # The Little chibirigor Part 7 ― RBS ひとさじ
 
 この章のゴール：**手書きの `METHODS` 表を、RBS テキストから読み込んだ表に差し替える。**

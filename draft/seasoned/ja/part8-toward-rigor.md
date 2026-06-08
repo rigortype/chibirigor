@@ -1,3 +1,11 @@
+---
+title: "Part 8（最終章）― 本物の Rigor へ"
+description: "二巻を締める章。chibirigor と本物の Rigor の対応を整理し、次に読むべき ADR への道を示す。"
+sidebar:
+  order: 8
+draft: true
+---
+
 # 【ドラフト】The Seasoned chibirigor Part 8（最終章）― 本物の Rigor へ
 
 > 参考書（任意）：Rigor の ADR 群・spec（型理論の教科書には対応章なし ― ここは「学習用最小版」

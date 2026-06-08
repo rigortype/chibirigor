@@ -1,3 +1,10 @@
+---
+title: "Part 1 ― リテラルと算術"
+description: "値に型をつける最小の仕組みを作り、`check` と `annotate` を動かす。`Const` と `type_of` の導入。"
+sidebar:
+  order: 1
+---
+
 # The Little chibirigor Part 1 ― リテラルと算術
 
 この章のゴール：**値に型をつける一番小さな仕組みを作り、`check` と `annotate` を実 Ruby で
