@@ -167,18 +167,25 @@ String にならない）のに `x + 1` を String の足し算とみなして**
 `Dynamic → C` narrowing は誤検知が多いとして採らない）。
 
 ```ruby
-def possible?(current, klass)
-  return false if current.is_a?(Type::Dynamic)
-  members = current.is_a?(Type::Union) ? current.members : [current]
-  members.any? { |m| Dispatch.class_of(m) == klass }
-end
-# narrow_type の is_a? 節：klass && truthy && possible?(current, klass) のときだけ絞る
-```
-
-```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK（dead branch、誤検知しない）
 check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n x + 1\nend\n")  # String の足し算エラー（正しい）
 ```
+
+> **実装メモ ― `possible?` ガード**　「そのクラスがあり得るか」を `narrow` に判定させるには
+> 小さなヘルパが要ります。`Dynamic` は「あり得ないとは言えない」ので false、Union は
+> メンバを探索、それ以外はクラスが一致するかで判定します：
+>
+> ```ruby
+> def possible?(current, klass)
+>   return false if current.is_a?(Type::Dynamic)
+>   members = current.is_a?(Type::Union) ? current.members : [current]
+>   members.any? { |m| Dispatch.class_of(m) == klass }
+> end
+> # narrow_type の is_a? 節：klass && truthy && possible?(current, klass) のときだけ絞る
+> ```
+>
+> このガードを入れないと、`Integer` 単体に `is_a?(String)` を当てたとき dead branch を
+> `String` に絞ってしまい、`x + 1` が「String の足し算」として誤検知されます。
 
 ---
 
