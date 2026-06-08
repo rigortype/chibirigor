@@ -134,7 +134,7 @@ chibirigor は、最初から一貫してこの立場で作ってきました：
 | 4 | `Union`、`if`/三項、`nil?`/`is_a?` ナローイング（dead branch は絞らない） |
 | 5 | `HashShape`/`Tuple`、添字読み（未知キーは nil） |
 | 6 | `accepts`（三値）、`:no` だけ報告 |
-| 7 | `Rbs.load`（手書き表を RBS 由来へ differ 置換） |
+| 7 | `Rbs.load`（手書き表を RBS 由来へ差し替え：differ 置換） |
 | 8 | `def` の戻り型合成、RBS 風シグネチャ、`untyped` の可視化 |
 | 9 | `untyped` の伝播、わざと見逃す総括、baseline |
 
