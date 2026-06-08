@@ -7,6 +7,15 @@
 
 ## 現状（ship-readiness）
 
+- **v1 清書版 = `v1/ja/`（draft の外）**：原稿 `draft/` を**二巻維持・大胆再構成**で再編した清書ツリー（2026-06-08 着手）。
+  - 方針・対応表は [`../v1/ja/_reorg-proposal.md`](../v1/ja/_reorg-proposal.md)、移植の正典（相互参照リマップ・抜き差し）は
+    [`../v1/ja/_migration-guide.md`](../v1/ja/_migration-guide.md)。
+  - **前編 little/ Part 0–9**：Part1 を純化、旧 Part4 を Union(4)/ナローイング(5)に分割、旧 Part7+8 を RBS と型シグネチャ(8)に統合、
+    baseline と特別な型総括を Part9 へ集約。**後編 seasoned/ Part 1–8**：章順を新順序（1,2,旧6→3,4,旧3→5,旧5→6,7,8）へ組み替え、
+    gradual の2規律と停止の工学を Part7 集約、Part1↔Part7 ブックエンド。
+  - 横断トピックを**付録 a1–a4**（特別な型／ナローイング・パターン集／道具／参考書・ADR）へ括り出し。README・両巻 README・用語集を v1 番号で整備。
+  - 検証：内部リンク全 69 解決、後編ドリフトチェッカー緑（8章/5examples）。**未了：5レンズ査読1巡（前編 examples ドリフト配線は要再設計）**。
+  - 旧 `draft/little`・`draft/seasoned` は v1 安定まで残置（撤去は別判断）。
 - **前編 = The Little chibirigor**（`draft/little/ja/`、Part 0〜9）：**刊行ドラフトとして高完成度**。
   - 5 つの独立レビューを通過：初学者の再現性（本文だけで再実装→リファレンス挙動 **34/34 を 3 名**）、
     型理論エキスパート（ERROR ゼロ、参照 1 件修正）、技術書編集者、mametter（TypeProf 作者＋
