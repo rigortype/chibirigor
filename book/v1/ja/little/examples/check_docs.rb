@@ -3,21 +3,21 @@
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
-# check_docs.rb ― v1/ja/little/ の章コードと段スナップショットのドリフトを防ぐ。
+# check_docs.rb ― little/ の章コードと段スナップショットのドリフトを防ぐ。
 #
 # 仕組み:
 #   <!-- run: examples/partN.rb --> 付きの ```text ブロックの各行が、
-#   impls/dist/partN/lib をロードした partN.rb の実出力に含まれるか（subset 照合）。
+#   dist/partN/lib をロードした partN.rb の実出力に含まれるか（subset 照合）。
+#   dist/ は examples/ 内に同梱（make impls で生成）。
 #
-# 実行:
-#   ruby v1/ja/little/examples/check_docs.rb
-#   ruby v1/ja/little/examples/check_docs.rb --fix   # text ブロックを実出力で上書き
+# 実行（examples/ ディレクトリ単体で完結）:
+#   ruby check_docs.rb
+#   ruby check_docs.rb --fix   # text ブロックを実出力で上書き
 #
 # 依存ゼロ・stdlib のみ。
 
 HERE    = __dir__
 LITTLE  = File.expand_path('..', HERE)
-REPO    = File.expand_path('../../../../../', HERE)
 FIX     = ARGV.include?('--fix')
 
 CHAPTERS = Dir[File.join(LITTLE, 'part*.md')].sort

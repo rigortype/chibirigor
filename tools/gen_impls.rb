@@ -16,9 +16,10 @@
 
 require 'fileutils'
 
-ROOT      = File.expand_path('..', __dir__)
-STEPS_DIR = File.join(ROOT, 'impls', 'steps')
-DIST_DIR  = File.join(ROOT, 'impls', 'dist')
+ROOT         = File.expand_path('..', __dir__)
+STEPS_DIR    = File.join(ROOT, 'impls', 'steps')
+DIST_DIR     = File.join(ROOT, 'impls', 'dist')
+EXAMPLES_DIR = File.join(ROOT, 'book', 'v1', 'ja', 'little', 'examples', 'dist')
 
 steps = Dir[File.join(STEPS_DIR, 'part*')]
         .select { |d| File.directory?(d) }
@@ -29,6 +30,7 @@ verify = ARGV.include?('--verify')
 failed = []
 
 FileUtils.rm_rf(DIST_DIR)
+FileUtils.rm_rf(EXAMPLES_DIR)
 
 steps.each_index do |idx|
   cumulative = steps[0..idx]
@@ -49,6 +51,11 @@ steps.each_index do |idx|
       FileUtils.cp(f, target)
     end
   end
+
+  # book/v1/ja/little/examples/dist/partN/lib にも同期（examples 単体完結のため）
+  ex_dest = File.join(EXAMPLES_DIR, name, 'lib')
+  FileUtils.mkdir_p(ex_dest)
+  FileUtils.cp_r(File.join(dest, 'lib', '.'), ex_dest)
 
   files = Dir.glob(File.join(dest, 'lib', '**', '*')).count { |f| File.file?(f) }
   puts "generated #{name}: #{files} files -> #{dest.sub("#{ROOT}/", '')}"
