@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" role="img" aria-label="図 1-1 双方向型付け 合成⇒ と 照合⇐">
+<defs>
+ <marker id="fseasoned11_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="fseasoned11_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="fseasoned11_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="fseasoned11_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="fseasoned11_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="fseasoned11_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>図 1-1 双方向型付け 合成⇒ と 照合⇐</title>
+  <rect style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="40" y="18" width="250" height="56"></rect>
+  <text x="165" y="42" text-anchor="middle">期待型 T</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="165" y="60" text-anchor="middle">RBS・注釈・宣言された戻り型</text>
+
+  <line style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="165" y1="74" x2="165" y2="150" marker-end="url(#fseasoned11_aA)"></line>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:19px;fill:var(--rigor-accent,#7A2A2A);font-weight:600" x="150" y="118" text-anchor="end">⇐</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="182" y="106" text-anchor="start">照合 check：S &lt;: T か？</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-error,#B5302B)" x="182" y="124" text-anchor="start">合わなければ診断</text>
+
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="40" y="152" width="130" height="50"></rect>
+  <text x="105" y="182" text-anchor="middle">式 e</text>
+
+  <line style="fill:none;stroke:var(--rigor-info,#2D5C9E);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="170" y1="177" x2="448" y2="177" marker-end="url(#fseasoned11_aI)"></line>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:19px;fill:var(--rigor-info,#2D5C9E);font-weight:600" x="309" y="170" text-anchor="middle">⇒</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-info,#2D5C9E)" x="309" y="198" text-anchor="middle">合成 synthesize：式から型を組み立てる</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="450" y="152" width="130" height="50"></rect>
+  <text x="515" y="182" text-anchor="middle">型 S</text>
+
+</svg>

@@ -71,6 +71,7 @@ sidebar:
    └ dynamic_origin   : z は ◯◯行で untyped 化  ← 他5つと毛色が違う（由来追跡）
 ```
 
+![図 6-1　FactStore の 6 バケツ](../figures/svg/seasoned-6-1.svg)
 > ▼ 図 6-1　FactStore の 6 バケツ。上 5 つは「事実が*どの対象*に付くか」で分ける。
 > `dynamic_origin` だけは対象スコープではなく「`untyped` が*どこで生まれたか*」を追う毛色違い。
 

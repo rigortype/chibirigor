@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 350" role="img" aria-label="図 6-1 FactStore の 6 バケツ">
+<defs>
+ <marker id="fseasoned61_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="fseasoned61_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="fseasoned61_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="fseasoned61_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="fseasoned61_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="fseasoned61_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>図 6-1 FactStore の 6 バケツ</title>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="20" y="14" width="600" height="322"></rect>
+  <text x="40" y="44" text-anchor="start">FactStore（不変）</text>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="20" y1="58" x2="620" y2="58"></line>
+
+  <g>
+   <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="40" y="74" width="10" height="26"></rect>
+   <text x="66" y="93" text-anchor="start">local_binding</text>
+   <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="93" text-anchor="start">x は non-nil</text>
+   <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="40" y="110" width="10" height="26"></rect>
+   <text x="66" y="129" text-anchor="start">captured_local</text>
+   <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="129" text-anchor="start">ブロックが書く y</text>
+   <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="40" y="146" width="10" height="26"></rect>
+   <text x="66" y="165" text-anchor="start">object_content</text>
+   <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="165" text-anchor="start">obj.name は設定済み</text>
+   <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="40" y="182" width="10" height="26"></rect>
+   <text x="66" y="201" text-anchor="start">global_storage</text>
+   <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="201" text-anchor="start">$cfg は Hash</text>
+   <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="40" y="218" width="10" height="26"></rect>
+   <text x="66" y="237" text-anchor="start">relational</text>
+   <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="237" text-anchor="start">a == b</text>
+  </g>
+  <path style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" d="M590,74 q12,0 12,12 V219 q0,12 12,12" fill="none"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="556" y="160" text-anchor="end" transform="rotate(0)">対象スコープ</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="556" y="176" text-anchor="end">で分ける（5）</text>
+
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5;stroke-dasharray:4 4" x1="40" y1="262" x2="600" y2="262"></line>
+  <rect style="fill:none;stroke:var(--rigor-info,#2D5C9E);stroke-width:1.5" x="40" y="276" width="10" height="26"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-info,#2D5C9E)" x="66" y="295" text-anchor="start">dynamic_origin</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="295" text-anchor="start">z は ◯◯行で untyped 化</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-info,#2D5C9E)" x="556" y="295" text-anchor="end">由来追跡（毛色違い）</text>
+
+</svg>
