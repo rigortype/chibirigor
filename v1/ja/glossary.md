@@ -21,7 +21,10 @@
   `non-empty-string` は内部的に `String - ""` として実装される（`String` の値の集合から
   空文字列 `""` を差し引いた集合）。名前は付いていても、実体は**集合差（set difference）**。
   union（合併）・intersection（交差）と並ぶ集合論的型演算の一つ。chibirigor では扱わないが、
-  refinement carrier の「なぜその名か」の答えはここにある。
+  refinement carrier の一部（`non-empty-string` のような*点除去*型）の「なぜその名か」の答えはここにある。
+  ただし refinement carrier すべてが集合差ではない ― 実 Rigor は二層構成で、点除去は `Difference`、
+  `lowercase-string`/`numeric-string` のような*述語部分集合*は別キャリア `Refined`、範囲整数は
+  `IntegerRange` で表す（ADR-3）。
 - **refinement carrier（細粒度キャリア）**〔後編 P6 / Rigor 固有〕… 「空でない・正の値・
   リテラル由来」といった*述語で絞り込まれた型*。`Nominal` のサブクラスではなく、フロー事実から
   自動的に生まれる。`unless s.empty?` を通った後の `s` は `non-empty-string` になる。
@@ -43,7 +46,7 @@
   | `int<m, n>` | `int<m, n>` | 範囲指定の整数（例：`int<1, 9>`） |
   | `non-empty-array` | `non-empty-array<T>` | 要素が 1 つ以上の配列 |
   | `non-empty-hash` | ― | キーが 1 つ以上のハッシュ |
-  | `lowercase-string` | ― | ASCII 小文字のみの文字列 |
+  | `lowercase-string` | `lowercase-string` | ASCII 小文字のみの文字列 |
   | `uppercase-string` | ― | ASCII 大文字のみの文字列 |
 
   PHPStan との語彙の対応は意図的で、「同じ述語を異なる言語チェッカーが同じ名前で表現する」
@@ -79,7 +82,7 @@
 - **アルゴリズム的部分型付け**〔後編 P2〕… 宣言的な `<:` 規則を、型の形ごとに規則 1 つの決定
   手続きに組み直すこと。前編の `accepts` がこれ。TAPL 16 章。
 - **カインド（kind）**〔後編 P4〕… 「型の型」。`App[F, A]` のような型適用の正しさの根拠。TAPL 29 章。
-- **gradual consistency（整合）**〔後編 P7〕… `untyped` が絡むときの対称・非推移な関係。`<:` とは別。
+- **gradual consistency（整合）**〔後編 P2／本式 P7〕… `untyped` が絡むときの対称・非推移な関係。`<:` とは別。
 - **型代入（substitution）／System F**〔後編 P3〕… 型変数に型を入れる操作。TAPL 23 章。
 - **再帰型（μ型）／余帰納（coinduction）**〔後編 P4〕… 自分を参照する型と、その等価判定。TAPL 20–21 章。
 - **HKT（高階型）**〔後編 P4〕… 型を取って型を返す型。`App[F, A]`。TAPL 29 章。

@@ -217,5 +217,3 @@ chibirigor は、最初から一貫してこの立場で作ってきました：
 **続編「The Seasoned chibirigor」へ**：双方向型付けの形式化、変性、再帰型、本物の型推論（引数推論）、
 完全な FactStore、健全性理論、`erasure`/sig-gen 本体 ―『型システムのしくみ』の先と、Rigor の
 作り込みへ。前編で*手を動かして*作ったものに、後編で*理屈の名前*が付きます。
-</content>
-</invoke>

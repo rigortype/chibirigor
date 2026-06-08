@@ -188,7 +188,12 @@ Rigor は **refinement carrier（細粒度キャリア）** と呼びます。`u
 （用語集「`Difference` 型」）。「空でない」とは「全文字列の集合から、空文字列という値を
 *除いた* 残り」に他なりません。名前は付いていても、実体は union（合併）・intersection（交差）と
 並ぶ集合論的型演算の一つ ― **集合差（set difference）** です。chibirigor 本体では扱いませんが、
-refinement carrier の「なぜその名か」の答えはここにあります。
+この種の carrier の「なぜその名か」の答えはここにあります。
+
+> **ただし refinement carrier すべてが集合差ではありません。** 実 Rigor は二層構成（ADR-3）で、
+> `non-empty-string` のような**点除去**だけが `Difference`。`lowercase-string`/`numeric-string` の
+> ような**述語部分集合**は別キャリア `Refined`、`positive-int`/`int<m,n>` のような**範囲整数**は
+> `IntegerRange` で表します。下表の carrier はこの 3 種が混ざっています。
 
 - **事実が生まれる**：`unless s.empty?`／`if n > 0`／`&&` チェーン（a2-1）など、述語ガードを
   通過した枝で、その変数の `payload` がより精密な refinement carrier になる。
@@ -214,7 +219,7 @@ Rigor の主な組み込み refinement carrier と、PHP のチェッカー PHPS
 | `int<m, n>` | `int<m, n>` | 範囲指定の整数（例：`int<1, 9>`） |
 | `non-empty-array` | `non-empty-array<T>` | 要素が 1 つ以上の配列 |
 | `non-empty-hash` | ― | キーが 1 つ以上のハッシュ |
-| `lowercase-string` | ― | ASCII 小文字のみの文字列 |
+| `lowercase-string` | `lowercase-string` | ASCII 小文字のみの文字列 |
 | `uppercase-string` | ― | ASCII 大文字のみの文字列 |
 
 ---
