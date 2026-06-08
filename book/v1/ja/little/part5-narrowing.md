@@ -132,8 +132,15 @@ when Prism::IfNode
 # else 節 → x は Integer
 ```
 
+<!-- run: examples/part5.rb -->
+```text
+nil? narrowing: OK（エラーなし）
+String が必要ですが 1 が渡されました
+```
+
 `is_a?` でも同じ要領です（`if x.is_a?(String)` の then 節は `x` を `String` に絞る）。
 形が増えても `narrow` に分岐を足すだけ。
+**偽の枝はスコープをそのまま返す**（`is_a?` の条件が成り立たなかった側は、型を変えずに元の Scope を引き継ぐ）。
 
 ただし `is_a?` には落とし穴が一つ。`x` がもともと `Integer` のとき
 `if x.is_a?(String)` の中身を「`x` は `String`」と絞ると、その枝は*起き得ない*（Integer は

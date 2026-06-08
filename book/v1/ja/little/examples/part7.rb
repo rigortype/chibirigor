@@ -6,6 +6,8 @@
 $LOAD_PATH.unshift File.expand_path('dist/part7/lib', __dir__)
 require 'chibirigor'
 
-# region check_and_annotate
-# Part 7 の key behaviors（配線は今後 v1 章の更新に合わせて追加）
+# region accepts_demo
+no_errors = Chibirigor.check("x = c ? 1 : 2\n1 + x")
+puts "Integer | Integer: #{no_errors.empty? ? "OK（エラーなし）" : "NG"}"
+puts Chibirigor.check("x = c ? 1 : \"a\"\n1 + x").map { |d| d[:message] }.first
 # endregion

@@ -6,6 +6,6 @@
 $LOAD_PATH.unshift File.expand_path('dist/part6/lib', __dir__)
 require 'chibirigor'
 
-# region check_and_annotate
-# Part 6 の key behaviors（配線は今後 v1 章の更新に合わせて追加）
+# region hash_demo
+Chibirigor.annotate("h = {foo: 1, bar: \"a\"}\nh[:foo]\nh[:bar]\nh[:zzz]\n").each { |a| puts "#{a[:line]}: #{a[:type]}" }
 # endregion

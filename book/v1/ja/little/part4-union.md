@@ -94,6 +94,12 @@ type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => Integer | String
 | ② Ruby/RBS | 分岐で別々の型を返すのは日常。`x = cond ? 1 : "a"` も `User | nil` も普通に書く |
 | ③ Rigor 実装の問題 | 一本に決めつけず Union で持つ。決めつけない＝後で困らない |
 
+<!-- run: examples/part4.rb -->
+```text
+c ? 1 : "a"  ->  1 | "a"
+c ? 1 : nil   ->  1 | nil
+```
+
 ## 演習
 
 1. `rand < 0.5 ? 1 : 2` の型を `annotate` で確かめ、なぜ `Integer | Integer` ではなく

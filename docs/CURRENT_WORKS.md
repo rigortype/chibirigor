@@ -5,7 +5,7 @@
 > 一致させること（AGENTS.md §「Rigor を真実の源として参照する」）。
 > 一過性のメモ ― 大きな区切りで更新する。
 
-## 現状（2026-06-09 更新）
+## 現状（2026-06-09（構造整理）更新）
 
 ### ★本線：v1 清書版 `book/v1/ja/`（draft の外・リポジトリ直下）
 原稿 `draft/` を**二巻維持・大胆再構成**で再編した清書ツリー。**ここが今後の編集対象**。
@@ -15,6 +15,8 @@
 - 横断トピックを**付録 a1–a4**（特別な型／ナローイング・パターン集／道具／参考書・ADR）へ括り出し。README・両巻 README・用語集を v1 番号で整備。
 - **検証済み**：内部リンク全 69 解決・後編ドリフトチェッカー緑（8章/5examples）。
 - **6レンズ査読1巡＋バックログ整理 済み**（2026-06-08〜09。編集者・型理論・フィデリティ・校閲・Java/Ruby読者）。所見＝`book/v1/ja/_*-review.md`。型理論・フィデリティ両レンズが「公開水準」と評価。
+- **図版 8 点配置済み**（2026-06-09）：`book/v1/ja/figures/svg/`（日本語依存・v1 完結）。
+- **`examples/` 単体完結**（2026-06-09）：`book/v1/ja/little/examples/dist/` に段別 lib を同梱。ディレクトリをコピペするだけで動作する。
 
 ### ★新インフラ：段スナップショット `impls/`（2026-06-09 試作）
 chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book/impls) 風に各 Part の到達状態を完全ツリーで展開。**手コピーでなく単一ソース→生成物→検証ゲート**（詳細 `impls/README.md`、方針 `ROADMAP.md`「本のインフラ」）。
@@ -33,9 +35,9 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 
 ### Track V — v1 仕上げ（本線）
 - **V1（中）本文↔スナップショット連携**：基盤は 2026-06-09 に初期実装済み。`book/v1/ja/little/examples/` に段別 example（`dist/partN/lib` ロード）を整備、`check_docs.rb` で `<!-- run: -->` / `<!-- include: -->` を照合。**Part1 annotate デモ（`3: Integer`）を配線済み**。残課題：Part3–9 章の出力ブロックを `run:` / `include:` で配線（章の散文コードブロックは教材的に簡略のため `include:` 非対象）。
-- **V2（中・デザイナー）図版の本清書**：前編3図（0-1/2-1/4-1 相当）＋後編5図（双方向 ⇒/⇐・部分型格子・変性 S-Arrow・FactStore 6 バケツ・μ 畳/展開）。編集レンズ E 級・後編 B3。
+- **V2 ✅ 暫定完了（2026-06-09）図版配置**：8点を `book/v1/ja/figures/svg/` に配置済み。デザイナーによる本清書は別途。
 - **V3 ✅ 完了（2026-06-09）再現性レンズを v1 で1巡**：型知識ゼロ読者が `book/v1/ja/little` だけで再実装→**39/39 満点**（採点項目を 34→39 に増強）。推測 2 件（G1: Part5 is_a? 偽の枝、G2: Part7 expected-is-Union ルール）いずれも nitpick 相当。所見 `book/v1/ja/_reproducibility-review.md`。
-- **V4（小・要判断）旧 `draft/` 撤去**：v1 全章が安定したら `draft/little`・`draft/seasoned` を撤去判断。
+- **V4（小・要判断）旧 `draft/` 撤去**：保留中。v1 安定を待って判断。
 - **V5（任意・大）英語版 `book/v1/en/`**：TAPL を共通参照に（『しくみ』は日本語のみ）。
 
 ### Track I — 段スナップショット拡張
@@ -47,13 +49,13 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 - **L1（L・bounded）ジェネリクス／要素型**：後編 `unification.rb` を本実装へ昇格。**5a 要素型の読み → 5b ブロック仮引数へ ⇐ → 5c 戻り多相**（各段出荷可能・予算を脅かしたら止める）。詳細 `ROADMAP.md` §5。本のクライマックス（generics が lib で一本につながる）。
 
 ### Track S — サイト統合
-- **S1（中）Astro + Starlight**：v1 章の frontmatter（`title`/`description`/`sidebar.order`）採番を確認し、配信サイト（`rigor.typedduck.fail` の `/chibirigor/`）へ submodule 統合。
+- **S1 移譲済み**：Astro + Starlight 統合は `/Users/megurine/repo/site/rigor.typedduck.fail` へ移譲。
 
 ## レビュー資産（v1・未適用の指摘を引ける）
 
 | ファイル | レンズ | 主な未適用（任意・軸を保って選択適用） |
 |---|---|---|
-| [`../book/v1/ja/_reproducibility-review.md`](../book/v1/ja/_reproducibility-review.md) | 再現性 | G1(Part5 is_a? 偽枝 1文追加)・G2(Part7 expected-Union ルール明示) いずれも nitpick |
+| [`../book/v1/ja/_reproducibility-review.md`](../book/v1/ja/_reproducibility-review.md) | 再現性 | G1(Part5 is_a? 偽枝 1文追加)・G2(Part7 expected-Union ルール明示) いずれも nitpick ― **適用済み**（2026-06-09） |
 | [`../book/v1/ja/_editorial-review.md`](../book/v1/ja/_editorial-review.md) | 技術書編集者 | 図版（V2）／後編 README↔§1-6 地図の二重（意図的残置） |
 | [`../book/v1/ja/_expert-review.md`](../book/v1/ja/_expert-review.md) | 型理論 | ERROR/REF は反映済み。nitpick 数件（occurs check 脚注 等） |
 | [`../book/v1/ja/_fidelity-review.md`](../book/v1/ja/_fidelity-review.md) | フィデリティ | 2 件反映済み。次マイルストーンで再チェック |

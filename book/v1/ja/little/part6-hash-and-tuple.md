@@ -170,6 +170,14 @@ Rigor は逆に**適合**にします。理由は **Ruby の現実**です：
 - レコード部分型の*深さ*（値の型まで再帰的に比べる）・read-only など RBS record の細部。
 - `Struct`/`Data.define` から起こす型（実 Rigor の `DataClass`/`DataInstance`）。
 
+<!-- run: examples/part6.rb -->
+```text
+1: {foo: 1, bar: "a"}
+2: 1
+3: "a"
+4: nil
+```
+
 ## 演習
 
 1. ネストしたハッシュ `{ a: { b: 1 } }` の型は何になるか、`annotate` で確かめよ。

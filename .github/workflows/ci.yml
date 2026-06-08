@@ -21,3 +21,6 @@ jobs:
 
       - name: impls dist sync check
         run: make impls-check
+
+      - name: drift check
+        run: make drift

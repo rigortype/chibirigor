@@ -6,6 +6,8 @@
 $LOAD_PATH.unshift File.expand_path('dist/part5/lib', __dir__)
 require 'chibirigor'
 
-# region check_and_annotate
-# Part 5 の key behaviors（配線は今後 v1 章の更新に合わせて追加）
+# region narrowing_demo
+no_errors = Chibirigor.check("x = c ? 1 : nil\nif x.nil?\n  0\nelse\n  x + 1\nend\n")
+puts "nil? narrowing: #{no_errors.empty? ? "OK（エラーなし）" : "NG"}"
+puts Chibirigor.check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n  x + 1\nend\n").map { |d| d[:message] }.first
 # endregion
