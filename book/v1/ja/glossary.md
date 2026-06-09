@@ -15,7 +15,7 @@
 - **`Union`（合併型）**〔前編 P4〕… 「`A` か `B` のどちらか」。例：`Integer | String`。
 - **`HashShape`（レコード型）**〔前編 P6〕… キーごとの型を覚えるハッシュの型。Hack の `shape(...)` を起点とし PHPStan/Psalm を経て Rigor に至る設計（前編 P6 コラム参照）。
 - **丸め／正規化（normalization）**〔前編 P1〕… 細かい型（`Const[3]`）を大ざっぱな型
-  （`Integer`）に戻すこと。TAPL 12 章。
+  （`Integer`）に戻すこと。
 - **`Difference` 型**〔Rigor 内部〕… 「`A` から `B` を除いた値の集合」を表す型キャリア。
   `non-empty-string` は内部的に `String - ""` として実装される（`String` の値の集合から
   空文字列 `""` を差し引いた集合）。名前は付いていても、実体は**集合差（set difference）**。

@@ -1,88 +1,81 @@
-# chibirigor v1 査読メモ ― 型理論エキスパート視点
+# L1 真・型理論エキスパート 査読（2026-06-09）
 
-対象：v1/ja/little Part0–9、v1/ja/seasoned Part1–8、glossary.md、appendix a1–a4
-観点：形式的・技術的正確さ（gradual／双方向／変性／再帰型／HM／System F／健全性／HKT）
-背景：後編の大幅再構成（ジェネリクス＝Part3 を 推論＝Part5 の前へ前出し）直後の整合チェック。
-重大度：ERROR（形式的に誤り）／MISLEADING（誤解を招く）／REF（参照・章番号）／nitpick。
+対象：前編 `book/v1/ja/little/part0–part9`、付録 `a1–a5`、`glossary.md`、`README.md`。
+観点：形式的・技術的正確さ（gradual／双方向／変性／再帰型／HM／System F／健全性／HKT）。
+重大度：ERROR（型理論として誤り）／MISLEADING（条件付きでしか正しくない）／REF（参照番号・出典）／nitpick。
+各項に **〔事故的不正確さ〕**（無条件断言で理論的に誤り）／**〔意図的簡略化＝許容〕** を明記。
 
-凡例：honest な簡略化（各章「続編に送ったもの」）は咎めない方針。
+実装裏取り：`lib/chibirigor/{type,narrowing,dispatch,accepts,type_of}.rb` を実行確認。
+Rigor 一次情報：`rigor/docs/adr/1-types.md`・`adr/3-type-representation.md`・
+`type-specification/special-types.md` で `void`／`untyped`＝`Dynamic[Top]` の記述を裏取り。
 
 ---
 
 ## 総評（先に結論）
 
-再構成の論理順序は **健全**。型変数・型代入・α 同値の概念導入（Part 3）は、それを
-後方参照する 推論（Part 5）・再帰型（Part 4）より**前**に正しく置かれており、前方参照の
-未定義使用は見つからなかった。Part 3↔Part 4 の α 同値相互参照、Part 7 への gradual 2 規律・
-停止性工学（余帰納／fuel／予算）集約も、形式的に正確。TAPL の章番号（8.3・9・12・15・16・
-20・21・22・23・26・29・§11.5）はすべて正しい。a1 の Top/Bot 格子・双対・`untyped` の軸 A/軸 B
-分解も正確。
+**重点 5 箇所（Part1 コラム／Part8 `void` BC-break／Part5 null 安全・`remove_nil`／Part4 無タグ
+Union vs タグ付き variant／付録 a5・a1）は、型理論として*いずれも正しい*。** 事故的な ERROR は
+発見できなかった。本文⇔実装の不整合も無し（`remove_nil`・`narrow`・`accepts` の三値・`union` の
+untyped 伝播は、本文の主張どおりに実装が振る舞う ― 実行確認済み）。TAPL／『しくみ』の参照番号も
+標準目次と一致（前回 L1 査読の結論を再確認）。
 
-**実害のある不整合は 2 件**：
-1. **Part 2 の章末「次章」予告が再構成前のまま**（推論＝旧 Part 3 を指している）。
-2. **用語集の gradual consistency の初出タグが P7**（実際の初出は P2）。
-どちらも内容そのものの型理論的誤りではなく、再構成の取り残し（REF）。
+指摘はすべて **MISLEADING 1 件＋ nitpick 数件** にとどまる ― いずれも「無条件に断言すると一段
+強すぎる」種類で、軸（やさしい前編・gradual・脅かさない）を壊す要求ではない。最も実のあるのは
+**a1-2／a1-5 の `void`＝「トップ型の別名・トップそのもの」** が、Rigor／RBS 自身の表現
+（"top-**like** but context-limited"）よりわずかに強い点（下記 #1）。
+
+---
+
+## 重点 5 箇所の判定（要請に応じ個別に）
+
+| 重点 | 本文の主張 | 判定 | 裏取り |
+|---|---|---|---|
+| Part1 コラム「2 流派」 | `unknown`＝絞れ（慎重派）／`untyped`・`any`＝黙る（寛容派）。`untyped`≠トップ型 | **正しい** | a1-1 の軸 A（格子位置）／軸 B（チェック有無）分解は標準的かつ正確。`any` が「てっぺんと底に同時にいる」は TS `any` の通説的記述として妥当 |
+| Part8 `void` BC-break | `-> nil` は「nil を返す」を縛る／`void` は縛らない（実装が戻り値を変えても BC-break にならない） | **正しい** | Rigor `adr/1-types.md` L519「a `void` return contract … not to **propagate** a more precise inferred return」と一致。返り共変の観点でも `-> nil` 宣言は本体を縛る |
+| Part5 null 安全・`remove_nil`／`narrow` | nil は型で防げるバグ＝null 安全。`remove_nil` は `Const[nil]`/`Nominal[:NilClass]` の両方を剥がす | **正しい・実装一致** | `Dispatch.class_of(Const[nil]) == :NilClass` を実行確認。本文の明示的 reject と実装の `nil_type?`(class_of 経由) は*挙動同値*。`narrow` の FP 安全（偽枝は触らない・`possible?` ガード）も本文どおり |
+| Part4 無タグ Union vs タグ付き variant | 『しくみ』/TAPL が持つのはタグ付き variant、我々のは無タグ Union で別物 | **正しい** | TAPL §11.10 は Variants（タグ付き）。無タグ合併は両書が直接扱わない。a4-2 の「11 章 §11.10／両書はタグ付きのみ」も整合 |
+| 付録 a5・a1 | 名前的/構造的部分型・null 安全・HashShape 系譜（Hack→PHPStan→Rigor）・`untyped`=`Dynamic[Top]`・`void`=⊤・`never`=`Bot`・格子 | **おおむね正しい**（`void`＝⊤の*別名*だけ #1 で留保） | `untyped`=`Dynamic[Top]` は `adr/3` L174「`Untyped` resolves to `Dynamic[Top]`」と一致。`Bot <: T <: Top`・双対表・`Bot <: T` 正確 |
 
 ---
 
 ## 所見表
 
-| # | severity | 箇所 | 引用 | 問題 | 修正案 |
-|---|---|---|---|---|---|
-| 1 | **REF（要修正）** | seasoned/part2 末尾 L290–291 | 「**次章（Part 3）**：前編が `untyped` に倒していた*引数*の型を、本体での使われ方から*推論*します。『しくみ』が「正解を知らない」と投げ、TAPL 22 章が型再構築として扱う、推論の前線へ。」 | 再構成前の名残。Part 3 は実際には「ジェネリクスと型代入」。この予告文は **Part 5（本物の型推論）の内容** を「次章 Part 3」として説明しており、章順入れ替えの取りこぼし。直後の Part 3 冒頭は部分型→型代入の話で始まるので、読者は予告と本文の食い違いに直面する。 | 「**次章（Part 3）**：部分型 `<:` に*穴をあけて*中身を差し替える**ジェネリクス（型抽象・型代入）**へ。System F の `subst`、α 同値、変数捕獲（TAPL 23 章）を正面から作ります。」に差し替え。 |
-| 2 | **REF（要修正）** | glossary.md L82 | 「**gradual consistency（整合）**〔後編 P7〕… `untyped` が絡むときの対称・非推移な関係。」 | 用語集の凡例は「初出の章を併記」。だが gradual consistency `~` の**初出は後編 Part 2 §2-5**（用語と対称・非推移の定義がそこにある）。P7 は*集約・本式*。a1 L70 も「後編 Part 2 §2-5 で扱います」と P2 を指し、Part 7 自身が「Part 2 §2-5 から送られてくる論点」と書く。タグ P7 は初出規約と矛盾。 | 〔後編 P2（本式 P7）〕に修正。例：「**gradual consistency（整合）**〔後編 P2／本式 P7〕」。 |
-| 3 | nitpick | seasoned/part5 §5-3 L92–116 | `unify` スケッチに **occurs check が無い**（`unify(X, list[X])` 型の制約で無限ループ／循環代入し得る） | 形式的には HM の単一化に occurs check は必須。ただし本章は「(B) を初歩だけ」「型変数 `TVar` と基底型 `TCon` だけの世界」と明示し、テストも循環制約を含まない **honest な簡略化**。咎めない方針に合致。 | 任意。1 行脚注で「本式の単一化は `X` が相手に出現しないか確認する occurs check を持つ（ここでは省略）」と添えると完璧。必須ではない。 |
-| 4 | nitpick | seasoned/part7 §7-4 表 ① L85 | 「progress を放棄（**`~` が非推移＝subsumption が漏れる**）」 | 因果がやや圧縮されている。`~` の非推移性は「`untyped` を無制限の抜け穴にしない」**安全側**の性質であり、progress を放棄させる原因そのものではない。progress を手放すのは「`untyped` が照合を素通りする（`~` で `:maybe`→不処罰）」点。非推移性は*むしろ歯止め*。 | 「progress を放棄（`untyped` 絡みの照合を素通り＝subsumption の安全網が外れる）」程度に。`~` 非推移は §7-5 の「無秩序でない」側の論点なので、ここで併記すると役割が逆に読める。 |
-| 5 | nitpick | seasoned/part3 §3-5 L161–164 | erasure を「TAPL 23.7 の erasure 定理」とし「型注釈・型適用を消しても実行結果は変わらない」 | TAPL 23.7 の erasure は厳密には System F 項から**型抽象・型適用**を消す操作で、「型注釈」一般の消去とはやや別。本文の趣旨（意味論の定理／Java の型消去と別物）は正しく、教育的縮約として許容範囲。 | 任意。「型抽象・型適用を消しても」と限定するとより正確。 |
-| 6 | nitpick（確認のみ・問題なし） | seasoned/part4 §4-4 L138–141「正確には」box | 「`seen` 判定は `naive_eq`（展開しない）で、TAPL 21 章の本来の余帰納（展開後ペアの最大不動点）より弱い」 | これは**正しい自己申告**。簡約版であることを明示しており、健全（捕まえる「等しい」が少なめ＝偽陰性側）と正しく述べている。むしろ模範的。 | 修正不要。 |
+| # | severity | ラベル | 箇所 | 原文引用 | 何が（どう条件付きで）誤りか | 修正案 |
+|---|---|---|---|---|---|---|
+| 1 | **MISLEADING** | 事故的不正確さ（軽） | a1-2 §「⊤（トップ型）の別名」L81–83／a1-5 表 L198 | 「`void` は**トップ型（⊤）の別名**として扱われます」「`void` は格子上は**トップそのもの**」 | RBS／Rigor 自身は `void` を **"top-**like** but context-limited"**（`adr/1-types.md` L469・`special-types.md` L66–「`void` is **not** an ordinary value type … a result marker」）と位置づける。「別名（alias）／トップそのもの」と無条件に書くと、(a) `void` が値位置で素通りするトップ値であるかのように読め、(b) 同じ a1 が ADR を引いて「値位置に来たら *recover して `top`*・診断を出す」とする扱い（＝別名ではなく*マーカー*）と一段ズレる。本文自身 a1-5 で「`void` は格子に**トップとして自立する**／`untyped` は自立しない」と対比しており、その「自立する＝別名」断定がやや強い | 「格子上の**ふるまいはトップ型と同じ**（top-like）。ただし RBS では戻り位置に限られた*マーカー*で、値位置に出ると `top` に戻して診断する」程度に和らげる。「別名」→「トップ型扱い（top-like）」、「トップそのもの」→「格子上はトップと同じふるまい」。意図（込めたメッセージが違う）の対比はそのまま活かせる |
+| 2 | nitpick | 意図的簡略化＝許容（確認のみ） | a1-1 L39–41 | 「TypeScript の `any` は…格子の**てっぺんと底に同時にいる**ようにふるまう ― 部分型関係としては矛盾」 | TS `any` を「⊤かつ⊥」と描くのは*健全な*部分型格子に無理に載せたときの通説的説明で、厳密には `any` は consistency（gradual の `~`）の対象であって `<:` 格子の住人ではない。本文は「**ようにふるまう**」「部分型関係としては矛盾」と*効果*として正しく逃がしており、honest | 修正不要。あえて言えば「`<:` で見ると矛盾＝だから `<:` でなく gradual の整合 `~` で扱う」と一言添えると完璧だが、前編には過剰 |
+| 3 | nitpick | 意図的簡略化＝許容 | Part7 §7-3a ① L147 | 「Union のメンバ全員が通って初めて `:yes`（一番弱い結論を採る＝union-subtyping）」 | `actual` が Union のとき全メンバ要求は正しい（`A∨B <: T ⇔ A<:T ∧ B<:T`）。一方 `expected` が Union の「どれか 1 つで `:yes`」は、この素朴な型系では正しいが、一般には `T <: A∨B` の**十分条件**であって必要条件ではない（分配が要る場合がある）。前編の素朴部分型では問題にならない | 修正不要。後編で `expected`-Union 側の不完全性に触れる前提なら現状でよい |
+| 4 | nitpick | 意図的簡略化＝許容 | glossary「丸め／正規化」L18 | 「丸め／正規化（normalization）… `Const[3]` を `Integer` に戻すこと。**TAPL 12 章**。」 | TAPL 12 章「Normalization」は STLC の**項の正規化（強正規化定理）**であって、型の精度を粗くする「丸め（widening）」とは別概念。本書の「丸め」はむしろ widening／abstraction に近い。ただし用語集は「もう一段覗きたい人への道しるべ」であり、`normalization` という語の出典として 12 章を指す体裁。誤読リスクは小 | 任意。「丸め」の理論的な隣人は widening（抽象解釈）寄りなので、参照を外すか「※TAPL 12 章の項正規化とは別概念（こちらは型の粗化）」と一言。必須ではない |
+| 5 | nitpick（確認のみ・問題なし） | ― | Part5 §5-2 `remove_nil` L84 コメント／a1-3 L121–126 | 本文「nil は…`Const[nil]` か `Nominal[:NilClass]` で来る。両方剥がす」／a1-3「Integer かつ String ＝空集合＝ボトム」 | 実装は `class_of`==`:NilClass` で一括判定するが、`class_of(Const[nil])==:NilClass` を実行確認 ―**挙動同値**。a1-3 の `Integer ∩ String = ∅ = Bot` も正確で、かつ「chibirigor は Bot を型として作らず診断で扱う」と正しく自己申告 | 修正不要。模範的 |
 
 ---
 
-## 再構成の論理順序チェック（重点①）― 合格
+## 個別の追加メモ（ERROR/MISLEADING 無しの確認結果）
 
-- **型変数・型代入・α 同値の導入＝Part 3**。これを後方参照するのは：
-  - Part 4 §4-4 L120「Part 3 のジェネリクスで出た α 同値…と同じ技法」→ Part3<Part4、後方参照で正。
-  - Part 5 §5-3 L74,86「Part 3 で作った型変数の正道／型代入は Part 3 で作ったもの」→ Part3<Part5、正。
-- **前方参照の未定義使用は無し**。Part 3 §3-4 L154「次章 Part 4 の再帰型の等価判定でも同じ形」は
-  *予告*であり、Part 4 側が実体を持つので未定義使用ではない（相互参照として閉じている）。
-- README（seasoned）章立て表・a4-3 早見表は**新順序で正しく**並ぶ（Part3=ジェネリクス、Part5=推論）。
-  唯一 Part2 章末（所見#1）だけが旧順序を引きずる。
+- **Part0/Part9 「健全性より誤検知回避」**：soundness=progress+preservation（TAPL 8 章 §8.3）、
+  gradual はその先、という位置づけは正確。「sound でない＝わざと見逃す 4 箇所」（Part9）の列挙も
+  型理論的に筋が通る。
+- **Part6 レコード部分型の向き**：「キーが多い方が部分型（`{name:,age:} <: {name:}`）」は width
+  subtyping の正しい向き。『しくみ』が完全一致（closed）で締めたのと*逆*（open）にする、という
+  対比も妥当。
+- **Part7 Postel/robustness（返り厳・引数寛）**：返り共変・引数反変の置換可能性へ落ちる、という
+  脚注の予告は正しい方向。
+- **a1-4 格子・双対**：`Bot <: T <: Top`、双対表、`untyped`≠トップ型（軸 B を重ねた別物）の注意
+  書き ― すべて正確。
+- **a5-2 名前的/構造的部分型**：継承＝名前的、構造（キー一致）＝構造的、Go/TS が構造的 ― 正確。
+- **a5-5 missing arm vs unreachable arm**：網羅性（missing）と到達不能（unreachable）の方向の違いの
+  整理は正確で、健全性 vs 誤検知回避の軸に正しく結びつけている。
+- **glossary `Difference` 型**：`non-empty-string` = `String - ""`（集合差）は集合論的に正しく、
+  Rigor の二層構成（`Difference`／`Refined`／`IntegerRange`、ADR-3）の自己申告も誠実。
 
-## 集約の正確さ（重点②）― 合格
+## 参照番号（TAPL／『しくみ』）― 合格
 
-- **gradual 2 規律（Part 7 §7-5）**：
-  - consistency `~`：対称（`untyped ~ T` も `T ~ untyped`）・**非推移**（`Integer~untyped~String` でも
-    `Integer~String` でない）― 形式的に正確。三値畳み込み表（yes/maybe/no）も正しい。
-  - guarantee（Siek ら）：注釈量に対して挙動が連続、を正しく要約。consistency（型側）と
-    guarantee（注釈量側）の**役割分担**が明確で、混同なし。模範的。
-- **停止性工学（Part 7 §7-6）**：余帰納（正しく止める＝最大不動点）→ HKT fuel（危なくなったら
-  止める・実装済み・ADR-20）→ 推論予算（広義・ADR-41・未実装）の三段相似形。各 ADR の
-  実装状況（fuel=実装済み／予算=Proposed 未実装）も a4-4 と一致。
+前編で参照する TAPL 章：1・8 §8.3・9・§11.5・§11.7・§11.8・§11.10・12・15・22・23 ―
+標準目次と一致。§11.10＝Variants（タグ付き）で Part4 の「タグ付きのみ」主張と整合。誤りなし。
 
-## 双方向・変性・μ・System F・健全性の形式 ― 合格
+## 本文⇔実装の整合 ― 合格
 
-- 双方向（Part1）：subsumption `Γ⊢e⇒S, S<:T / Γ⊢e⇐T`、診断が `⇐` 位置のみ、の説明は正確。
-  「合成をわざと全域化（未知→untyped）＋照合が untyped を不処罰」の 2 点で「脅かさない」を
-  progress/preservation へ繋ぐ伏線・回収（§1-3↔§7-4）も論理的に閉じている。
-- 変性（Part2）：S-Arrow `A'<:A, B<:B' / (A)->B <: (A')->B'`、`subtype(tp,sp)` の入れ替え＝反変、
-  width/depth、可変コンテナの読み共変・書き反変・不変 ― すべて正確。実装注（現状一律共変・
-  宣言サイト変性は未実装）も誠実。
-- 再帰型（Part4）：μ の fold/unfold、iso/equi-recursive（TAPL 20.2）、余帰納 `seen`、HKT は
-  TAPL 29 章（20/21 でない）と明記 ― 正確。
-- System F（Part3）：シャドーイング停止条件（`params.include?(x)` なら潜らない）と捕獲回避
-  （fresh α 変換してから subst）の 2 落とし穴、`subst` 実装、α 同値の名前対応表 ― 形式的に正しい。
-- 健全性（Part7）：soundness=progress+preservation（TAPL 8.3）、正規化（Ch12、Ω が `A=A->B` を
-  要して単純型で付かない）― 正確。
-
-## 付録 a1（特別な型）格子・双対 ― 合格
-
-- `Bot <: T <: Top`、Top/Bot 双対表、`untyped`=`Top`＋`Dynamic` マーカー（軸 A 位置／軸 B チェック
-  オフの分解）、`void`=⊤の別名（格子位置は Top・意図は逆）、`never`=`Bot`（`Bot<:T`）― すべて
-  形式的に正確。他言語対応表（never↔`!`/Nothing/Void、any/unknown↔Dynamic）も妥当。
-- 注意書き「`untyped` はトップ型ではない（軸 B を重ねた別物）」も正しく、よくある混同を予防。
-
-## 参照章番号（TAPL／『しくみ』）― 合格
-
-TAPL：8.3（安全性）・9（STLC）・12（正規化）・15/16（部分型・メタ理論）・20/21（再帰型・
-メタ理論）・22（型再構築）・23＋23.7（System F・erasure）・26（有界量化）・29（kinding）・
-§11.5（let）― 全て標準目次と一致。誤りなし。
+実行確認：`accepts(Integer|String, Integer)=:yes`／`accepts(Integer, 1|2)=:yes`／
+`accepts(Integer, 1|"a")=:no`／`remove_nil(Const[nil]|Integer)=Integer`／
+`class_of(Const[nil])=:NilClass`。すべて本文の記述どおり。`union` の untyped 伝播（Part9）・
+`possible?` ガード（Part5）も実装と一致。

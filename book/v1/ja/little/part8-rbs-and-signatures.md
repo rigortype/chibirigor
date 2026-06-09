@@ -303,5 +303,5 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 **次章予告（Part 9・最終章）**：ここまでを `gradual` の哲学で締めます。`untyped` の伝播を
 仕上げ、`untyped`／`void`／`never` の「特別な型 3 種」を総括し、「chibirigor はわざと見逃すことで
-動くコードを脅かさない」を語り切ります。『しくみ』のおわりに
-（gradual typing への伏線）と接続して、本編を閉じます。
+動くコードを脅かさない」を語り切ります。『しくみ』が結びで発展先の一つに挙げた
+gradual typing へと接続して、本編を閉じます。

@@ -16,7 +16,7 @@ chibirigor の最小版と実 Rigor の差を「**本書では素朴／実物は
 > - 前編 **Part 2**（メソッド送信とディスパッチ）から：素朴な「表引き」一段に留めた dispatch を、
 >   実物は **5 段カスケード**で引きます → 本付録 §a3-3。
 > - 前編 **Part 9**（gradual の哲学）から：`rigor check --explain` が `Dynamic[Top]` の
->   *fall-soft* した箇所を一覧にする「地図」の仕組み → 本付録 §a3-1。
+>   *fail-soft* した箇所を一覧にする「地図」の仕組み → 本付録 §a3-1。
 > - 前編 **Part 1**（リテラルと算術）のコラム「実 Rigor の `rigor type-of`」から：位置指定で
 >   推論型を引くコマンドの詳細 → 本付録 §a3-2。
 
@@ -25,14 +25,14 @@ chibirigor の最小版と実 Rigor の差を「**本書では素朴／実物は
 
 ---
 
-## a3-1. `rigor check --explain` ― fall-soft の地図を出す
+## a3-1. `rigor check --explain` ― fail-soft の地図を出す
 
 通常の `rigor check` は、**証明できた問題だけ**を診断として報告し、`Dynamic[Top]`（本文の最小版
-`Dynamic` の内部表記＝`untyped`。付録 a1-1 参照）に *fall-soft* した箇所については黙っています（前編 Part 2「知らなければ黙る」、Part 9「わざと
+`Dynamic` の内部表記＝`untyped`。付録 a1-1 参照）に *fail-soft* した箇所については黙っています（前編 Part 2「知らなければ黙る」、Part 9「わざと
 見逃す」の実物）。これは誤検知を出さないための態度ですが、裏を返せば「**静かに見逃している**」
 でもあります。
 
-`--explain` を付けると、その **fall-soft した全箇所が `:info` 診断として現れます** ―
+`--explain` を付けると、その **fail-soft した全箇所が `:info` 診断として現れます** ―
 「ここで型を見失いました」という地図が出力されます。
 
 ```console
@@ -45,19 +45,19 @@ app/models/user.rb:51:3: info: fell soft to Dynamic[Top] here (param `opts` is u
 
 - 「このバグを見落としているのでは？」という疑問が出たとき、`--explain` の出力で
   「**どこで型が消えたか**」を遡る。
-- たどり着いた fall-soft 地点から、**RBS の不足・プラグイン未設定・型注釈の抜け漏れ**を発見できる。
+- たどり着いた fail-soft 地点から、**RBS の不足・プラグイン未設定・型注釈の抜け漏れ**を発見できる。
 
 ### なぜ「地図」が描けるのか ― `Dynamic[Top]` マーカーの回収
 
 この一覧が成り立つのは、前編 Part 1 で触れた **`Dynamic[Top]` の `Dynamic` マーカー**が、
-fall-soft した箇所に**消えずに残っている**からです。`untyped` を「ただの穴」ではなく
+fail-soft した箇所に**消えずに残っている**からです。`untyped` を「ただの穴」ではなく
 「`Dynamic` という印の付いた `Top`」として持つことで、「どこで黙ったか」が**構造として残ります**。
 だからこそ、後から `--explain` で一覧に起こせます。
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
 | `untyped` の正体 | `Type::Dynamic`（印だけ） | `Dynamic[Top]`（`Top` に `Dynamic` マーカー） |
-| fall-soft 地点 | 黙って `Dynamic` を返すだけ | 地点を構造に保持し、`--explain` で一覧化 |
+| fail-soft 地点 | 黙って `Dynamic` を返すだけ | 地点を構造に保持し、`--explain` で一覧化 |
 | 沈黙の可視化 | 仕組みなし（最小版の対象外） | `check --explain` が `:info` 診断で地図を出す |
 
 chibirigor の「知らなければ黙る」は誤検知を防ぎますが、`--explain` は**その沈黙そのものを
@@ -161,7 +161,7 @@ $ rigor type-of app/models/user.rb:10:5
 
 | 道具 | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
-| `rigor check --explain` | 仕組みなし（黙るだけ） | `Dynamic[Top]` マーカーを手がかりに fall-soft 地点を `:info` で地図化 | 前編 Part 9 |
+| `rigor check --explain` | 仕組みなし（黙るだけ） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
 | `rigor type-of file:line:col` | `annotate`（内部型のみ・行単位） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
 | dispatch 5 段カスケード | 1 段の表引き（`METHODS`） | ① 定数畳み込み → ② shape → ③ RBS → ④ in-source → ⑤ fallback | 前編 Part 2 |
 
