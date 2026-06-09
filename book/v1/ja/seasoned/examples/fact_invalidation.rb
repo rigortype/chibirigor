@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The Seasoned chibirigor Part 5 ― 「再代入で事実が消える」最小スケッチ（FactStore の核）。
+# The Seasoned chibirigor Part 6 ― 「再代入で事実が消える」最小スケッチ（FactStore の核）。
 # 依存ゼロ・単体で走る。`ruby fact_invalidation.rb` で自己チェックが緑になる。
 #
 # 本物の Rigor の FactStore は 6 バケツ＋payload＋polarity＋stability を持つが、ここでは

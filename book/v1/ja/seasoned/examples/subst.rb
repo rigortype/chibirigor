@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The Seasoned chibirigor Part 6 ― 型代入 subst（シャドーイング＋変数捕獲回避）の動く設計スケッチ。
+# The Seasoned chibirigor Part 3 ― 型代入 subst（シャドーイング＋変数捕獲回避）の動く設計スケッチ。
 # 依存ゼロ・単体で走る。`ruby subst.rb` で自己チェックが緑になる。
 #
 # 型：基底＝Symbol、Var＝型変数、Arrow＝関数、TypeAbs＝型抽象 <params...> body。

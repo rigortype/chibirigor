@@ -151,11 +151,11 @@ PASS: Num != Bool
 
 Rigor は、再帰型を μ＋余帰納で*直接*は実装していません。代わりに **軽量 HKT
 （higher-kinded type）** を使います（`Type::App`）。`JSON.parse` の戻りは
-`App[:"json::value", []]` という*不透明な*高階型適用で、必要なときに登録済みの本体へ**還元**
-されます：
+`App[:"json::value", [String]]` という*不透明な*高階型適用（key 型を引数に取る arity 1）で、
+必要なときに登録済みの本体へ**還元**されます：
 
 ```
-App[:"json::value", []]
+App[:"json::value", [String]]
   → Value = Literal | Array[Value] | Hash[String, Value]   （再帰 union へ還元）
 ```
 
@@ -171,20 +171,18 @@ App[:"json::value", []]
 >
 > ```ruby
 > JSON.parse(s)
-> # => App[:"json::value", []]
+> # => App[:"json::value", [String]]
 > #    還元: Literal | Array[json::value] | Hash[String, json::value]
 >
 > JSON.parse(s, symbolize_names: true)
-> # => App[:"json::symbolized_value", []]
-> #    還元: Literal | Array[json::symbolized_value] | Hash[Symbol, json::symbolized_value]
->                                                               ^^^^^^
->                                                               キーが Symbol に変わる
+> # => App[:"json::value", [Symbol]]   ← 同じ URI、key 型引数だけ Symbol に
+> #    還元: Literal | Array[json::value] | Hash[Symbol, json::value]
 > ```
 >
 > これが可能なのは、RBS シグネチャで `symbolize_names:` の型を `true` の
 > リテラル型（`Const[true]`）で宣言し、それが HKT の型引数として渡されるからです。
-> 呼び出し地点で `true` のリテラルが確認できた場合だけ `App[:"json::symbolized_value", []]`
-> が選ばれ、`false` や変数（`untyped`）なら汎用版にフォールバックします。
+> 呼び出し地点で `true` のリテラルが確認できた場合だけ key 型引数が `Symbol` になり
+> （`App[:"json::value", [Symbol]]`）、`false` や変数（`untyped`）なら既定の `String` 版に戻ります。
 >
 > このように「引数のリテラル値が型を決める」は前編の `Const` が生きている例です。
 > `HashShape` のキー読み出し（`h[:foo]` の `:foo` がリテラル）と同じ仕組みが、

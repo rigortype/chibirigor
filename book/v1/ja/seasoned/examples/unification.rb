@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The Seasoned chibirigor Part 3 ― 制約ベース推論（単一化）の最小スケッチ。
+# The Seasoned chibirigor Part 5 ― 制約ベース推論（単一化）の最小スケッチ。
 # 依存ゼロ・単体で走る。`ruby unification.rb` で自己チェックが緑になる。
 #
 # 型変数 TVar（未知）と、基底型 TCon（:Integer など）だけの世界で、
