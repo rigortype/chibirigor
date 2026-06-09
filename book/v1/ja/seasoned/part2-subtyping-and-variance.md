@@ -233,15 +233,15 @@ S-Arrow の「戻り共変・引数反変」は、同じ規則を 2 つの全く
 > **コラム：Sorbet の `T.assert_type!` も gradual consistency の地に立つ**
 >
 > Sorbet（Stripe 製の Ruby 型チェッカー）には `T.assert_type!(expr, T::Integer)` という
-> ランタイムアサーション API があります。静的解析時には `:yes/:no/:maybe` の判定が走り、
-> `:maybe` なら静的には黙って、実行時に実際の型を確かめます。これはまさに gradual consistency
-> の実装で、`untyped` が絡めば `~` 成立と見なして「静的には通す・実行時に確かめる」とし、
-> `untyped` が無く確実に合わなければ静的に `:no` を出します。
+> API があります。これは主に**静的アサーション**で、静的に型を確定させ以降の推論を絞ります。
+> 静的解析で型が合わないと判定できなければ（`untyped` が絡む場合など）実行時にも型チェックを
+> 行います。Rigor の `accepts` 三値で言えば、確実に合う（`:yes` 相当）なら静的に通し、確実に
+> 合わない（`:no` 相当）なら静的に弾き、不確か（`:maybe` 相当）なら実行時に委ねる ― という
+> gradual consistency の考え方と地続きです（※ `:yes/:maybe/:no` は Rigor の語彙で、Sorbet の
+> 公式用語ではありません）。なお `T.let`/`T.cast` はよりランタイム寄りの別 API です。
 >
-> Rigor は「ランタイム確認」を持たない（静的チェッカー専業）ので `:maybe` は黙るだけですが、
-> 同じ gradual consistency の枠組みで Sorbet と地続きです。`T.assert_type!` のような
-> ランタイムガードは、Rigor のチェックが `:maybe` だった箇所を「手動で `:yes` に変える」
-> 補完手段として相性がよいといえます。（`:yes/:maybe/:no` の意味づけの本式は後編 Part 7。）
+> Rigor は「ランタイム確認」を持たない（静的チェッカー専業）ので、Sorbet の `:maybe` 相当箇所を
+> `T.assert_type!` で補完するという組み合わせは相性がよいといえます。（`accepts` の本式は後編 Part 7。）
 
 ---
 
