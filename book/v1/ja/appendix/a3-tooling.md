@@ -27,8 +27,8 @@ chibirigor の最小版と実 Rigor の差を「**本書では素朴／実物は
 
 ## a3-1. `rigor check --explain` ― fall-soft の地図を出す
 
-通常の `rigor check` は、**証明できた問題だけ**を診断として報告し、`Dynamic[Top]`（`untyped`）に
-*fall-soft* した箇所については黙っています（前編 Part 2「知らなければ黙る」、Part 9「わざと
+通常の `rigor check` は、**証明できた問題だけ**を診断として報告し、`Dynamic[Top]`（本文の最小版
+`Dynamic` の内部表記＝`untyped`。付録 a1-1 参照）に *fall-soft* した箇所については黙っています（前編 Part 2「知らなければ黙る」、Part 9「わざと
 見逃す」の実物）。これは誤検知を出さないための態度ですが、裏を返せば「**静かに見逃している**」
 でもあります。
 

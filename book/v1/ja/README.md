@@ -120,8 +120,9 @@ $ ruby exe/chibirigor annotate path/to/file.rb   # 推論型の表示
 ### 付録
 
 - [a1 特別な型カタログ](appendix/a1-special-types.md) ― `untyped`/`void`/`never`/`Top`/`Bot`
-- [a2 ナローイング・パターン集](appendix/a2-narrowing-patterns.md)
+- [a2 ナローイング・パターン集](appendix/a2-narrowing-patterns.md)（後編 Part 6 の予習。前編だけなら飛ばし可）
 - [a3 道具](appendix/a3-tooling.md) ― `--explain`/`type-of`/dispatch カスケード
 - [a4 参考書・ADR 対応早見表](appendix/a4-bibliography.md)
+- [a5 他言語からの橋渡し](appendix/a5-other-languages.md) ― null安全/名前的・構造的部分型/HashShape系譜/無タグUnion
 
 では、Part 0 から始めましょう。
