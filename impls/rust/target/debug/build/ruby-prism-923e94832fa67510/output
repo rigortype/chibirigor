@@ -1,0 +1,1 @@
+cargo:rerun-if-changed=/Users/megurine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ruby-prism-1.9.0/vendor/prism-1.9.0/config.json
