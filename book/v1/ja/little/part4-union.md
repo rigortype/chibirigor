@@ -59,7 +59,7 @@ when Prism::IfNode
 `annotate`／`type_of` で確かめると、ちゃんと Union が出ます：
 
 ```ruby
-type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => Integer | String
+type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => 1 | "a"（両枝とも Const のまま union）
 ```
 
 - **① 型理論**：値が複数の型になり得るとき＝合併型（『しくみ』はあえて避けた領域）。
@@ -101,8 +101,8 @@ c ? 1 : nil   ->  1 | nil
 
 ## 演習
 
-1. `rand < 0.5 ? 1 : 2` の型を `annotate` で確かめ、なぜ `Integer | Integer` ではなく
-   `Integer` になるのか、`union` の小道具の動きで説明せよ。
+1. `rand < 0.5 ? 1 : 2` の型を `annotate` で確かめると `1 | 2` になる（両枝とも `Const` のまま）。
+   では `rand < 0.5 ? 1 : 1` なら何になるか ―『union』の小道具が*同じメンバ*をどう畳むかで説明せよ。
 2. else の無い `if cond\n  1\nend` の型を `annotate` で確かめると `1 | nil` になる
    （実際の Ruby が、else 無しの `if` が偽のとき `nil` を返すのに合わせている）。
    `union` がこの 2 つをどうまとめるか、メンバの並びで説明せよ。

@@ -80,7 +80,8 @@ end
 ```ruby
 def remove_nil(t)
   return t unless t.is_a?(Type::Union)
-  Type.union(t.members.reject { |m| m == Type::Nominal[:NilClass] })
+  # nil は nil リテラルなら Const[nil]、`x.nil?` の真の枝なら Nominal[:NilClass] で来る。両方剥がす。
+  Type.union(t.members.reject { |m| m == Type::Const[nil] || m == Type::Nominal[:NilClass] })
 end
 
 def narrow(scope, cond, truthy:)
