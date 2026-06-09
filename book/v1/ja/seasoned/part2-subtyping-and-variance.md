@@ -264,7 +264,8 @@ S-Arrow の「戻り共変・引数反変」は、同じ規則を 2 つの全く
   `accepts` がその上に三値・gradual consistency を載せる。
 - **変性**：現実装では Nominal の型引数を一律共変で処理（宣言サイト変性は設計済み・未実装）。
   `Tuple`/`HashShape` は要素ごと・キーごとに共変で受理判定する。
-  関数型は戻り共変・引数反変（S-Arrow）を実装済み。
+  関数（proc）型そのものは nominal `Proc` に erase される（第一級関数の部分型は持たない）。
+  戻り共変・引数反変（S-Arrow）は**メソッドの override 互換性検査**（ADR-35）として実装されている。
 - **join/meet**：前編が `if` の枝で `Union` に逃がしたところ ― 共通の上限（join）／下限（meet）―
   を、Rigor は正規化（`Combinator.union`）として日常的に計算します。『しくみ』7 章が「join/meet が
   要るから `if` を消す」と割り切った所を、Rigor は正面から実装しています。

@@ -18,6 +18,9 @@ end
 class UnifyError < StandardError; end
 
 # a と b を等しくする代入を返す（できなければ UnifyError）
+# 注：本スケッチは occurs-check を省略している（`unify(X, X->X)` のような自己参照が通ってしまう）。
+# TVar/TCon のみの世界では関数型を作らないため自己チェックは緑のまま動くが、
+# 本物の HM では occurs-check が停止性・健全性に必須。
 def unify(a, b, subst)
   a = resolve(a, subst)
   b = resolve(b, subst)
