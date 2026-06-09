@@ -54,24 +54,14 @@ end
 
 枝ごとに `x` の型を差し替えた**別の Scope**で本体を型付けし、最後に両枝の結果を union します。
 
-> **コラム：これは「ぬるぽ」を型で捕まえる話です**
+> **コラム：これは「nil で落ちる」を型で捕まえる話です**
 >
-> Java を書く人には、上の `User | nil` は見覚えがあるはずです。`find_user` が「見つかれば
-> `User`、なければ `nil`」を返す ― これは Java の「`User` か `null`」と同じ構図で、Ruby の
-> `nil` は Java の `null` に当たります。そして `x.name` を `x` が `nil` のまま呼べば、Ruby なら
-> `NoMethodError`、Java なら `NullPointerException`（**ぬるぽ**）― 同じ事故です。
->
-> ナローイングは、その事故を**型のレベルで先回りして捕まえる**仕組みです。`if x.nil?` の
-> else 節で「ここの `x` はもう `nil` じゃない」と型を狭める ― これは Java で `if (x != null) { … }`
-> と書いてからフィールドに触る、あの習慣を、**型チェッカーが自動で追ってくれる**のと同じこと。
-> 「`nil` を含む Union」を持ち歩き、ガードを通った所で `nil` を**剥がす**。剥がし切れていない
-> （`nil` がまだ型に残っている）場所で `.name` を呼べば、そこが「ぬるぽが出る場所」です。
->
-> Java の `NullPointerException` を「実行時にたまたま落ちるもの」と捉えていた人にとって、
-> ここは見方が変わる所です ― **null は型で表現でき、型で防げるバグ**だった。これが
-> 「null 安全（null safety）」と呼ばれる考え方の芯で、Kotlin の `User?`、TypeScript の
-> `User | null` も同じ発想です。Rigor／chibirigor では `nil` をただの Union のメンバとして
-> 持ち、ナローイングで剥がす ― 特別扱いの構文を足さずに null 安全の入口に立てるわけです。
+> `User | nil` は「`nil` を含む Union」です。ナローイングは、`if x.nil?` の else 節で「ここの
+> `x` はもう `nil` じゃない」と型から `nil` を**剥がす**仕組み ― 剥がし切れていない（`nil` がまだ
+> 型に残っている）場所で `.name` を呼べば、そこが「`nil` で落ちる場所」です。特別な構文を足さず、
+> `nil` をただの Union のメンバとして持ってガードで剥がすだけで、いわゆる「null 安全」の入口に
+> 立てます。（Java の `NullPointerException`＝「ぬるぽ」、Kotlin の `User?`、TypeScript の
+> `User | null` との対応は付録 [a5-1](../appendix/a5-other-languages.md) へ。）
 
 ---
 
