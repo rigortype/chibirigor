@@ -14,7 +14,6 @@
   付録 a1（特別な型カタログ）参照。
 - **`Union`（合併型）**〔前編 P4〕… 「`A` か `B` のどちらか」。例：`Integer | String`。
 - **`HashShape`（レコード型）**〔前編 P6〕… キーごとの型を覚えるハッシュの型。Hack の `shape(...)` を起点とし PHPStan/Psalm を経て Rigor に至る設計（前編 P6 コラム参照）。
-- **`partial_of[T]`**〔Rigor 固有〕… `T` と同じキー構造を持つが、各キーの値型は変えない「部分ハッシュ」型。`partial_of[{name: String, age: Integer}]` は `{name: String}` や `{age: Integer}` などを含む。重要な点は**値型を `nil` に広げない**こと ― 値は「省略されうる（キーが無くてもよい）」だけで、「あれば確実に `T` の値型を持つ」。TypeScript の `Partial<T>` との違いは、それが全キーを `T | undefined` にするのに対し、Rigor の `partial_of[T]` は省略されたキーには触れず存在するキーの値型を保ちます。
 - **丸め／正規化（normalization）**〔前編 P1〕… 細かい型（`Const[3]`）を大ざっぱな型
   （`Integer`）に戻すこと。TAPL 12 章。
 - **`Difference` 型**〔Rigor 内部〕… 「`A` から `B` を除いた値の集合」を表す型キャリア。
@@ -29,15 +28,9 @@
   リテラル由来」といった*述語で絞り込まれた型*。`Nominal` のサブクラスではなく、フロー事実から
   自動的に生まれる。`unless s.empty?` を通った後の `s` は `non-empty-string` になる。
   「値そのもの」の `Const[42]` とは別概念 ― `Const` は特定の値、refinement carrier は
-  *述語を満たす値の集合*。`non-empty-string`・`positive-int`・`literal-string` などがあり、
+  *述語を満たす値の集合*。`non-empty-string`・`positive-int` などがあり、
   多くは PHPStan と同名（学習コストを下げる意図的な命名対応）。**組み込み carrier の一覧（PHPStan
   対応表）と「なぜ集合差か」の解説は付録 a2-6 が正本**。個別の絞り込みパターンも付録 a2。後編 P6 §6-1。
-
-- **`literal-string`**〔Rigor 固有〕… 文字列リテラルおよびリテラル同士の演算から
-  *のみ*構成された文字列を表す refinement carrier。「ユーザー入力が混入していない」ことを
-  型レベルで証明できるため、SQL インジェクション・XSS 対策の審査に使われる（Python の
-  `LiteralString`（PEP 675）と同じ役割）。Rigor では文字列補間 `"#{a}#{b}"` で両辺が
-  `literal-string` なら結果も `literal-string` として伝播する。
 
 ## 推論と型チェック
 
