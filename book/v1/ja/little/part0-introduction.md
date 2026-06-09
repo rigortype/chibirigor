@@ -11,7 +11,7 @@ sidebar:
 > （Prism、`check`/`annotate`）と、全編を貫く 2 つの約束ごとを先に共有します。
 
 `chibirigor` は、**型を自分で推論する、最小限の Ruby 型チェッカー**です。本物の
-[Rigor](https://github.com/)（Ruby 向けの漸進的型チェッカー）のアーキテクチャの「最小版」を、
+[Rigor](https://github.com/rigortype/rigor)（Ruby 向けの漸進的型チェッカー）のアーキテクチャの「最小版」を、
 ステップバイステップで自分の手で作っていきます。[chibivue](https://github.com/chibivue-land/chibivue)
 が Vue を小さく作り直して学ぶように、私たちは Rigor を小さく作り直して学びます。
 

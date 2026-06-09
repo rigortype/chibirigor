@@ -9,7 +9,7 @@ sidebar:
 
 **最小の Ruby 型チェッカー `chibirigor` を、手を動かして作りながら学ぶ**オンライン
 チュートリアルです。[chibivue](https://github.com/chibivue-land/chibivue) が Vue を小さく
-作り直して学ぶように、私たちは本物の [Rigor](https://github.com/)（Ruby 向けの漸進的
+作り直して学ぶように、私たちは本物の [Rigor](https://github.com/rigortype/rigor)（Ruby 向けの漸進的
 （gradual）型チェッカー）を小さく作り直して学びます。
 
 > このディレクトリは**清書版 v1（日本語）**です。原稿は `draft/` にあります。
