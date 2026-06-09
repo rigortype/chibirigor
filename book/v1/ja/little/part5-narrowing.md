@@ -58,10 +58,12 @@ end
 >
 > `User | nil` は「`nil` を含む Union」です。ナローイングは、`if x.nil?` の else 節で「ここの
 > `x` はもう `nil` じゃない」と型から `nil` を**剥がす**仕組み ― 剥がし切れていない（`nil` がまだ
-> 型に残っている）場所で `.name` を呼べば、そこが「`nil` で落ちる場所」です。特別な構文を足さず、
-> `nil` をただの Union のメンバとして持ってガードで剥がすだけで、いわゆる「null 安全」の入口に
-> 立てます。（Java の `NullPointerException`＝「ぬるぽ」、Kotlin の `User?`、TypeScript の
-> `User | null` との対応は付録 [a5-1](../appendix/a5-other-languages.md) へ。）
+> 型に残っている）場所で `.name` を呼べば、そこが「`nil` で落ちる場所」です。ここで見方がひとつ
+> 変わります ― `nil` で落ちるバグは「実行時にたまたま落ちるもの」ではなく、**型で表現でき、型で
+> 防げるバグ**だった。この見方の転換が「**null 安全（null safety）**」と呼ばれるものです。特別な
+> 構文を足さず、`nil` をただの Union のメンバとして持ってガードで剥がすだけで、その入口に立てます。
+> （Java の `NullPointerException`＝「ぬるぽ」、Kotlin の `User?`、TypeScript の `User | null` との
+> 対応は付録 [a5-1](../appendix/a5-other-languages.md) へ。）
 
 ---
 
