@@ -93,3 +93,72 @@ unreachable arm/ADR-47・baseline キー・各 ADR の番号と Status は、突
 要確認 2 件（a2-3 のエスケープ例 `Enumerator`/`Proc#curry`、a2-6「二層」の語数）は
 骨格は正しく、例示・語の精度を一次情報に寄せれば解消する nitpick 寄り。いずれも本書の
 論旨・コード挙動には影響しない。
+
+---
+
+# L1 真・Rigorフィデリティ 査読・第2回（2026-06-10／対象＝今回*追加された*発展ノート）
+
+査読観点は第1回と同じ（本書の「実 Rigor では…／Rigor の中では…」という**事実記述**だけを
+一次情報と突き合わせる。意図的簡略化は乖離としない）。**対象は今回追加された発展ノートに
+限定**する：
+
+- 付録 a1 §a1-3x（ADR-47＝`flow.unreachable-clause`／FP envelope）
+- 付録 a3 §a3-1x（`--explain` が*あらゆる* fail-soft を一覧化）・§a3-2x（type-of 2 段・erasure・dispatch）
+- 付録 a2 §a2-6x（`non-empty-array` が `first` を非 nil に絞る／`unless arr.empty?` から生成・無効化）
+- 後編 part5 §5-6／5-6x（周辺の「Rigor の中では」記述との整合）
+
+一次情報：`/Users/megurine/repo/ruby/rigor/`（read-only）。
+
+## 重大度サマリ（第2回）
+
+- **乖離(ERROR)**：0 件。
+- **要確認**：1 件（§a2-6x の `[0]` ― `first` は spec の動機例で裏付くが、`[0]` の非 nil 化は
+  一次情報に明示が無い。骨格に影響しない nitpick）。
+- **OK（簡略化／検証済み一致）**：今回の主張はすべて一次情報と一致。とくに 4 つの裏取り依頼
+  （ADR-47 正式名・FP envelope／`non-empty-array#first`／§a3-1x の「あらゆる fail-soft」／
+  `Dynamic[Top]`・erasure・dispatch）はいずれも spec・実装・ADR で裏付き。
+- 第1回の ERROR #1（`fall-soft`）・#2（`int<m,n>`）は**本文で既に是正済み**を確認（a3 は
+  `fail-soft` に統一、a2-6 表の `int<m, n>` は PHPStan 列のみ）。
+
+## 要確認（第2回）
+
+| # | 本書の記述（原文ママ） | 一次情報での実態（出所） | 判定 | 備考 |
+|---|---|---|---|---|
+| A | §a2-6x「実 Rigor の `non-empty-array` リファインメントが `first`（**または `[0]`**）を `Elem`（非 nil）に絞る」 | `non-empty-array[T]` の意味は「`Array[T]` with at least one element」＝`Difference[Array[T], Tuple[]]`（`docs/type-specification/imported-built-in-types.md:63`・`docs/handbook/02-everyday-types.md:219`・`lib/rigor/type/difference.rb:17,137`）。`first` が**非 nil** になることは spec の動機例「'Array' is not enough to prove `arr.first.upcase` is safe; `non-empty-array[String]` is」で裏付く（`02-everyday-types.md:44-48`）。spec が明文化する projection は `size`/`length`/`count`→`positive-int`（`control-flow-analysis.md:69`）で、**`[0]` の添字読みを非 nil 化する明文規則は見当たらない**（`first` の非 nil 化は carrier 意味論からの含意、`[0]` も同様だが個別の文書化は無し） | **要確認**（nitpick） | `first` は OK。`[0]` は括弧での添え物・「効きは同じ」の例示であり骨格に影響しないが、厳密には一次情報に明示が無い。気になるなら `（または `[0]`）` を外し `first` 一本にすると確実。残すなら「`first`（や添字読み）」程度の含み表現で十分 |
+
+## OK（今回・検証して一致を確認した主な事実記述）
+
+| 本書の記述 | 一次情報での実態（出所） | 判定 |
+|---|---|---|
+| §a1-3x「実 Rigor の **ADR-47**（`flow.unreachable-clause`）の縮図。実物は narrowing が subject を `bot` に絞った節を dead と判定」 | ADR-47 タイトル「Narrowing-driven clause reachability (`flow.unreachable-clause`)」、「a clause is unreachable exactly when its computed `body_scope` narrows the subject to `bot`」（`docs/adr/47-…:1,3`、README 索引 ADR-47 行、`47-…:74-83`）。番号・正式名・主題すべて一致 | **OK** |
+| §a1-3x「ループ・ブロック・gradual(Dynamic) を除外する FP envelope を持つ」 | ADR-47 の FP envelope：「Skip inside loops / blocks」「never on `Dynamic[T]` … the gradual guarantee holds」「Fire on `Dynamic[T]` subjects — rejected」（`47-…:122,128,187-190`；WD1 でも「never `Dynamic`（gradual guarantee）… clauses inside loops/blocks skipped」`47-…:5`）。**ループ・ブロック・gradual の 3 除外がそのまま一致** | **OK** |
+| §a1-3x「chibirigor は閉じた既知型限定・葉クラスの互いに素・opt-in で最小化」（実物の縮図という位置づけ） | 実 Rigor も「concrete narrowed carrier を要求、`Dynamic` では撃たない」＝閉じた型限定の発想（`47-…:126-128`）。本書は最小版だと明記しており意図的簡略化。実物との対応づけは正確 | **OK（簡略化）** |
+| §a2-6x「実 Rigor の `non-empty-array` リファインメントが `first` を `Elem`（非 nil）に絞る」（`first` 部分） | `non-empty-array[T]` は実在の組み込み refinement（point-removal `Difference[Array[T], Tuple[]]`、`docs/adr/3-type-representation.md:110,132`・`imported-built-in-types.md:63`・`lib/rigor/type/difference.rb:17`・CHANGELOG `[0.0.4]`）。`first` が非 nil で読めることは handbook の動機例で明示（`02-everyday-types.md:44-48`）。`Tuple` 由来の chibirigor 版と「効きは同じ・出自は違う」とする本書の整理は正確 | **OK** |
+| §a2-6x「実 Rigor は `unless arr.empty?` のようなフロー事実から `non-empty-array` carrier を*生成*し、再代入やエスケープで*消す*」 | `Array#empty?`（偽辺）/`any?`（真辺）/`none?`（偽辺）が `Array[T]`→`non-empty-array[T]` に narrow（`docs/type-specification/control-flow-analysis.md:69`、`docs/handbook/03-narrowing.md:199`、ROADMAP:201）。handbook 各言語付録も「Rigor produces it from `unless arr.empty?`」と明記（`appendix-java-csharp.md:314` ほか）。再代入・エスケープでの無効化は FactStore の一般則（第1回 a2-5/a2-3 で確認済み）と整合 | **OK** |
+| §a3-1x「実 Rigor は `Dynamic[Top]` の `Dynamic` マーカーを構造に保持して*あらゆる* fail-soft（RBS 不足・未注釈引数・プラグイン未設定…）を一覧化」 | `--explain`＝「Surface **fail-soft** fallback events as `info` diagnostics」（`docs/manual/02-cli-reference.md:42`）。fail-soft policy は「every fail-soft fallback … MUST be recorded into the tracer」（`docs/internal-spec/inference-engine.md:79`）＝*あらゆる* fallback を記録、で一致。挙げた 3 例（RBS 不足・未注釈引数・プラグイン未設定）はいずれも実在の fail-soft 経路（RBS ミス→`391`、未注釈 param 既定 `Dynamic[Top]`→`391`、プラグイン未解決→`305`）。※ただし **Dynamic *レシーバ*が opaque call を伝播する分は「fail-soft ではない」として tracer に*記録しない*** 明示例外あり（`inference-engine.md:218`）。本書は「fail-soft を一覧化」と限定して書いており、この例外は対象外なので**過大主張ではない** | **OK** |
+| §a3-2x「type-of は内部精密型＋境界保守型の2段／境界の操作を **erasure** と呼ぶ」 | 「RBS **erasure** converts an internal Rigor type to a valid RBS type … MAY collapse refinements, literal unions, shapes」（`docs/type-specification/rbs-erasure.md:1-3`）。type-of の「2 段表示」は manual に明示が無く本書独自の橋渡し説明だが、erasure による二重構造の存在自体は事実（第1回でも「要確認の含みあるが許容」判定）。今回の §a3-2x も同じ整理で、過大主張なし | **OK（要確認の含み・第1回で既出）** |
+| §a3-3「dispatch 5 段カスケード（定数畳み込み→shape→RBS→in-source→fallback）」「③ RBS が ④ in-source に勝つ」 | 実ディスパッチャの tier 順（precise tiers→…→RBS→…→discovered-method→ancestor fallback、「first tier that returns non-`nil` wins」）と骨格順序が一致（`docs/internal-spec/inference-engine.md:156`）。多数 tier の圧縮は本書が明記する意図的簡略化。第1回で確認済みの事実が §a1-3x/§a3 でも保たれている | **OK（簡略化）** |
+| part5 §5-6/5-6x「ブロックの戻り型から型変数を解く」「解けない型変数は `Dynamic[Top]` に degrade」「capability role `_ToS`/`_Each[T]`」 | ジェネリクス具体化・HKT/capability-role は ADR-20（軽量 HKT、Status: partial implementation）の射程で、ブロック経由の型変数束縛・未解決時の `Dynamic[Top]` degrade は fail-soft policy（`inference-engine.md:63-79`）と整合。今回追加の付録 §a1-3x/§a2-6x/§a3 と**矛盾しない**（part5 は `fail-soft` 綴りも正しい） | **OK** |
+
+## 総評（第2回）
+
+今回*追加された*発展ノートの「実 Rigor」事実記述は、**事故的不正確さ（乖離 ERROR）ゼロ**。
+裏取り依頼の 4 点はいずれも一次情報で裏付いた：
+
+1. **ADR-47** ― 正式名 `flow.unreachable-clause`・主題（subject を `bot` に絞った節を dead 判定）・
+   **FP envelope の「ループ／ブロック／gradual(Dynamic) 除外」** がそのまま ADR 本文と一致
+   （`docs/adr/47-…:1,3,5,74-83,122,128,187-190`）。
+2. **`non-empty-array`** ― 実在の組み込み point-removal refinement で、`first` の非 nil 化は
+   spec の動機例で裏付き、`unless arr.empty?`（`empty?`/`any?`/`none?`）からの生成も明文（
+   `control-flow-analysis.md:69`・`03-narrowing.md:199`・handbook 各付録）。再代入・エスケープでの
+   無効化も FactStore 一般則と整合。
+3. **§a3-1x の「*あらゆる* fail-soft を一覧化」は過大主張でない** ― `--explain` が fail-soft
+   fallback を `:info` 化（`manual/02-cli-reference.md:42`）、かつ engine は「every fail-soft
+   fallback … MUST be recorded」（`inference-engine.md:79`）。本書が「fail-soft」に限定して書く
+   ため、Dynamic レシーバ伝播の非記録例外（`:218`）にも抵触しない。
+4. **`Dynamic[Top]`・erasure・dispatch カスケード** ― 第1回の確認済み事実と整合、矛盾なし。
+
+唯一の **要確認は §a2-6x の `[0]`**（`first` は OK、`[0]` の非 nil 化は一次情報に明示が無い
+含意レベル）で、括弧内の添え物ゆえ骨格・コード挙動に影響しない nitpick。意図的簡略化
+（chibirigor は `Tuple` の副産物で `non-empty-array` carrier 自体は続編送り、等）はいずれも
+各ノートに断りがあり **OK**。第1回の ERROR #1/#2 が本文で是正済みであることも併せて確認した。
