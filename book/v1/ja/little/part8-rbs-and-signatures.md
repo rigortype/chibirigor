@@ -278,6 +278,9 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 | ② Ruby/RBS | 型はコードに書かず別ファイル `.rbs` に書く／メソッドに注釈は無いが戻りは本体から分かる |
 | ③ Rigor 実装の問題 | RBS を真実の源に（differ 置換）／RBS 風 sig で見せ `untyped` で推論の弱点を可視化（sig-gen の芽） |
 
+前編で組んだのは「型は別ファイル・戻りは本体から」という骨格までです。残りは後編で*正式な
+名前*とともに扱い直す宿題 ― 前編の最後に、その行き先を一望しておきます。
+
 **続編／後の Part に送ったもの**：
 
 - **引数の推論**（本体での使われ方から `x` の型を当てる）。本編は引数＝`untyped` 止まり ―
