@@ -231,7 +231,7 @@ Rigor の主な組み込み refinement carrier と、PHP のチェッカー PHPS
 上表の `non-empty-array`（要素が 1 つ以上の配列）は、chibirigor にも**構造として**現れています ―
 新しいキャリアを足さずに、です。前編 Part 5 の `Tuple`（位置ごとに型を覚える配列）は、要素が
 1 つでもあれば「空でない」ことが**形から確定**しているからです。generics 5a の要素型の読み
-（付録 a3／後編 Part 3-6x）と合わせると、こう出ます：
+（後編 Part 3「3-6x」）と合わせると、こう出ます：
 
 ```console
 $ printf '[1, 2].first\n[].first\n' | ruby exe/chibirigor annotate /dev/stdin
@@ -242,7 +242,8 @@ $ printf '[1, 2].first\n[].first\n' | ruby exe/chibirigor annotate /dev/stdin
 `[1,2].first` は `Integer`（**nil を含まない**）。一般の `Array[Elem]#first` なら「要素が無いかも
 しれない」ので `Elem | nil` になるところを、chibirigor は `Tuple`（＝空でないと分かっている形）
 からの読みなので `nil` を混ぜません ― これは実 Rigor の `non-empty-array` リファインメントが
-`first` を `Elem`（非 nil）に絞るのと**同じ効き**です。逆に空配列 `[]` は要素も非空性も不明なので
+`first` を `Elem`（非 nil）に絞るのと**効きは同じ**です（出自は違う ― 後述）。逆に空配列 `[]` は
+要素も非空性も不明なので
 `first` は `untyped`（埋まらねば untyped）。
 
 ただし chibirigor のこれは**専用キャリアではなく `Tuple` の副産物**です。実 Rigor は

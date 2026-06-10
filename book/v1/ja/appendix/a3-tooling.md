@@ -213,7 +213,7 @@ demo.rb:2:7: 7
 |---|---|---|---|
 | `rigor check --explain` | 極小版あり（未知ディスパッチを `:info` 地図化・§a3-1x） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
 | `rigor type-of file:line:col` | `annotate` ＋ 極小 `type-of`（内部型 1 つ・§a3-2x） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
-| dispatch 5 段カスケード | 1 段の表引き（`METHODS`） | ① 定数畳み込み → ② shape → ③ RBS → ④ in-source → ⑤ fallback | 前編 Part 2 |
+| dispatch 5 段カスケード | 1 段の表引き（`METHODS`・極小版は設けず） | ① 定数畳み込み → ② shape → ③ RBS → ④ in-source → ⑤ fallback | 前編 Part 2 |
 
 いずれも、本書で手作りした骨格（`Dynamic` マーカー・`annotate`・`METHODS` 表）が、実 Rigor では
 **同じ骨格を拡大した形**で動いている、という対応で読めます。
