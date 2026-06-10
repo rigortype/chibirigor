@@ -236,3 +236,7 @@ meet（共通部分）に相当します。前編は `if` の結果型を `Type.
 それを正面から ― **健全性（soundness）と正規化**、そして Rigor が*わざと* unsound にする
 4 箇所を扱います。gradual の 2 つの規律（consistency と guarantee）と「余帰納 vs 予算」を
 一箇所にまとめ、後編 Part 1 の双方向の地図とブックエンドを成します。
+
+---
+
+> **この章の設計スケッチ** → [`examples/fact_invalidation.rb`](examples/fact_invalidation.rb)（`ruby fact_invalidation.rb` で自己チェック）

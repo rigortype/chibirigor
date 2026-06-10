@@ -296,3 +296,7 @@ $ printf '[1, 2].map { |x| x + 1 }\n[1, 2].map { |x| x.to_s }\n[1, 2].select { |
 
 **次章（Part 6）**：ナローイングで積んだ事実を貯め、再代入や副作用で*無効化*しながら持ち回る
 完全な **FactStore** へ。6 バケツ・stability・join で、フロー感応な絞り込みを実装する。
+
+---
+
+> **この章の設計スケッチ** → [`examples/unification.rb`](examples/unification.rb)（`ruby unification.rb` で自己チェック）

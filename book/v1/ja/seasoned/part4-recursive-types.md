@@ -248,3 +248,7 @@ HKT 版は URI 参照＋fuel で別実装になります。
 
 **次章（Part 5）**：前編の素朴な型推論を、Rigor の本物の**型推論**へ拡張します。呼び出し元から
 引数の型を埋め戻す単一化（unification）を扱い、ここで TypeProf との対比を一本化します。
+
+---
+
+> **この章の設計スケッチ** → [`examples/mu_typeeq.rb`](examples/mu_typeeq.rb)（`ruby mu_typeeq.rb` で自己チェック）
