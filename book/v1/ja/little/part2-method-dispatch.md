@@ -261,11 +261,11 @@ Part 1 で `1 + 2` を `Integer` に**丸めて**きました。でも `1` も `
 
 ```ruby
 # 両方が既知値の Const なら計算して畳む。予算（大きさ）を超えたら丸めに任せる。
-if recv.is_a?(Const) && arg.is_a?(Const)
+if recv.is_a?(Type::Const) && arg.is_a?(Type::Const)
   result = recv.value + arg.value
-  return Const[result] if result.abs <= 1_000_000   # 予算内 → 畳む
+  return Type::Const[result] if result.abs <= 1_000_000   # 予算内 → 畳む
 end
-return Nominal[:Integer]                              # 畳めない → 丸める
+return Type::Nominal[:Integer]                              # 畳めない → 丸める
 ```
 
 これで `annotate` はこう変わります：

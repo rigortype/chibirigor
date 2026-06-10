@@ -24,12 +24,14 @@ sidebar:
 入っているか**まで覚えたい。それが `HashShape`：
 
 ```ruby
-HashShape = Data.define(:fields) do   # fields: { foo: Const[1], bar: Const["a"] }
-  def to_s = "{" + fields.map { |k, v| "#{k}: #{v}" }.join(", ") + "}"
-end
+module Type
+  HashShape = Data.define(:fields) do   # fields: { foo: Const[1], bar: Const["a"] }
+    def to_s = "{" + fields.map { |k, v| "#{k}: #{v}" }.join(", ") + "}"
+  end
 
-Tuple = Data.define(:elements) do     # 配列を「位置ごとの型」で覚える
-  def to_s = "[" + elements.map(&:to_s).join(", ") + "]"
+  Tuple = Data.define(:elements) do     # 配列を「位置ごとの型」で覚える
+    def to_s = "[" + elements.map(&:to_s).join(", ") + "]"
+  end
 end
 ```
 
@@ -39,9 +41,9 @@ symbol キーは `SymbolNode`）、配列は `ArrayNode`：
 ```ruby
 when Prism::HashNode
   fields = node.elements.to_h { |a| [a.key.unescaped.to_sym, type_of(a.value, scope, diag)] }
-  HashShape[fields]
+  Type::HashShape[fields]
 when Prism::ArrayNode
-  Tuple[node.elements.map { |el| type_of(el, scope, diag) }]
+  Type::Tuple[node.elements.map { |el| type_of(el, scope, diag) }]
 ```
 
 ```ruby

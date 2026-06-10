@@ -19,12 +19,16 @@ Rigor へ接続します。前編はここで閉じます。
 `untyped`** にします：
 
 ```ruby
-def union(types)
-  flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
-  return Dynamic.new if flat.empty?
-  return Dynamic.new if flat.any?(Dynamic)   # ★ untyped が混じれば全体 untyped
-  return flat.first if flat.size == 1
-  Union[flat.freeze]
+module Type
+  module_function
+
+  def union(types)
+    flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
+    return Dynamic.new if flat.empty?
+    return Dynamic.new if flat.any?(Dynamic)   # ★ untyped が混じれば全体 untyped
+    return flat.first if flat.size == 1
+    Union[flat.freeze]
+  end
 end
 ```
 
@@ -113,7 +117,10 @@ baseline が外れにくい、という設計です。列を含めないのは c
 で、ふつうの型のように「値の形」を表しているのではありません（3 種を一覧で見比べる表は付録
 [a1-5](../appendix/a1-special-types.md) にあります）。
 
-そしてこの 3 つの足元には、格子の**上端 `Top`（⊤）と下端 `Bot`（⊥）**があります。`untyped` は
+そしてこの 3 つの足元には、型を大小で並べた**格子**（lattice）の両端があります ―
+**一番大きい（何でも入る）`Top`（⊤）と、一番小さい（住人ゼロで到達しない）`Bot`（⊥）**。
+`Top` は Java の `Object` に近い「てっぺん」ですが、チェックでの効き方は別物です。ここでは
+記号と位置関係だけ掴めば十分で、格子そのものの本式は後編に送ります。`untyped` は
 `Top` に「黙れ」のマーカー（`Dynamic`）を重ねたもの、`never` は `Bot` そのもの、`void` は
 *格子上のふるまい*としては `Top` の隣 ― という関係でした。
 

@@ -30,14 +30,18 @@ x = rand < 0.5 ? 1 : "a"
 決めず「`Integer` か `String` のどちらか」という型にします。これが **Union**：
 
 ```ruby
-Union = Data.define(:members) do
-  def to_s = members.map(&:to_s).join(" | ")   # 例: "Integer | String"
-end
+module Type
+  Union = Data.define(:members) do
+    def to_s = members.map(&:to_s).join(" | ")   # 例: "Integer | String"
+  end
 
-# 型をまとめる小さな道具。入れ子をならし、重複を消す
-def union(types)
-  flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
-  flat.size == 1 ? flat.first : Union[flat]
+  module_function
+
+  # 型をまとめる小さな道具。入れ子をならし、重複を消す
+  def union(types)
+    flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
+    flat.size == 1 ? flat.first : Union[flat]
+  end
 end
 ```
 
@@ -50,11 +54,21 @@ end
 もの**にします：
 
 ```ruby
+when Prism::NilNode
+  Type::Const[nil]            # nil リテラルの型。Union のメンバに普通に並ぶ
 when Prism::IfNode
   then_type = type_of(node.statements.body.last, scope, diagnostics)
-  else_type = type_of(node.subsequent.statements.body.last, scope, diagnostics)
-  union([then_type, else_type])
+  else_type =
+    if node.subsequent        # else（や elsif）があるか
+      type_of(node.subsequent.statements.body.last, scope, diagnostics)
+    else
+      Type::Const[nil]        # else が無ければ、偽のとき nil ― 実際の Ruby に合わせる
+    end
+  Type.union([then_type, else_type])
 ```
+
+`nil` も `Const[nil]` というふつうの型として扱い、else の無い `if` は「偽のとき `nil`」を
+そのまま Union に混ぜます。だから `c ? 1 : nil` も `if cond then 1 end` も、素直に `1 | nil` です。
 
 `annotate`／`type_of` で確かめると、ちゃんと Union が出ます：
 
