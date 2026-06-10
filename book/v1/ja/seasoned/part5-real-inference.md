@@ -243,7 +243,7 @@ Part 1 の地図で言えば、引数推論は **合成 `⇒` の守備範囲を
 
 ---
 
-## 5-6x. 発展：ブロック仮引数への押し下げは lib に入った（generics 5b）
+## 5-6x. 発展：ブロック仮引数への押し下げは lib に入った（generics 5b・5c）
 
 道 B の核 ― 要素型 `Elem` をブロック仮引数へ流し込む ― は、chibirigor 本体に昇格しました
 （`lib/chibirigor/type_of.rb` の `type_of_block`）。後編 Part 3「3-6x」の**読み（5a）**に続く
@@ -258,7 +258,8 @@ $ printf '[1, 2].map { |x| x + 1 }\n[1, 2].map { |x| x.to_s }\n[1, 2].select { |
 ```
 
 `map` のブロック仮引数 `x` が**要素型 `Integer`** に束縛され、本体 `x.to_s` が `String` だから
-`map` の戻りは `Array[String]`（戻り値も要素型つきの配列になる＝戻り多相）。ブロック本体は
+`map` の戻りは `Array[String]`（戻り値も要素型つきの配列になる＝**戻り多相**、これが 5c）。
+ブロック本体は
 `x : Elem` のもとで
 **型チェックされます** ― だから `[1,2].map { |x| x + true }` は「Integer に true は足せません」を
 1 件出します（押し下げが効いている証拠）。`each` はレシーバ（self）を返し、`select`/`reject`

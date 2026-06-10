@@ -243,14 +243,13 @@ $ printf '[1, 2].first\n[].first\n' | ruby exe/chibirigor annotate /dev/stdin
 しれない」ので `Elem | nil` になるところを、chibirigor は `Tuple`（＝空でないと分かっている形）
 からの読みなので `nil` を混ぜません ― これは実 Rigor の `non-empty-array` リファインメントが
 `first` を `Elem`（非 nil）に絞るのと**効きは同じ**です（出自は違う ― 後述）。逆に空配列 `[]` は
-要素も非空性も不明なので
-`first` は `untyped`（埋まらねば untyped）。
+要素も非空性も不明なので、`first` は `untyped` です（埋まらねば untyped）。
 
 ただし chibirigor のこれは**専用キャリアではなく `Tuple` の副産物**です。実 Rigor は
 `unless arr.empty?` のようなフロー事実から `non-empty-array` carrier を*生成*し、再代入や
 エスケープで*消し*ます（上の「事実が生まれる／消える」）。chibirigor の `Tuple` は
 リテラルの形から静的に空でなさを持つだけ ― 述語ガードで生まれる動的な refinement carrier は
-続編に送ります。
+後編（Part 6）に送ります。
 
 ---
 
