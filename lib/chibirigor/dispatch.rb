@@ -33,6 +33,7 @@ module Chibirigor
       case type
       when Type::Const   then type.value.class.name.to_sym
       when Type::Nominal then type.name
+      when Type::Generic then type.name # Array[Integer] → :Array
       end # Dynamic などは nil（＝ディスパッチできない）
     end
 

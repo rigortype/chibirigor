@@ -33,6 +33,12 @@ module Chibirigor
       def to_s = "[#{elements.map(&:to_s).join(', ')}]"
     end
 
+    # 型引数を持つ総称型。例: Array[Integer]（要素型 Elem を 1 つに丸めた配列）。
+    # 位置を忘れる代わりに「要素は Elem」とだけ言う（generics 5b/5c の戻り）。
+    Generic = Data.define(:name, :args) do
+      def to_s = "#{name}[#{args.map(&:to_s).join(', ')}]"
+    end
+
     module_function
 
     # 型の配列を 1 つの型にまとめる。入れ子の Union をならし、重複を消す。

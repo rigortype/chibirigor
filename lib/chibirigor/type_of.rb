@@ -98,6 +98,12 @@ module Chibirigor
     receiver = node.receiver ? type_of(node.receiver, scope, diagnostics) : Type::Dynamic.new
     arg_nodes = node.arguments&.arguments || []
 
+    # ブロック付き反復（generics 5b/5c）：既知の配列なら要素型をブロック仮引数へ押し下げる。
+    if node.block.is_a?(Prism::BlockNode)
+      blocked = type_of_block(receiver, node.name, node.block, scope, diagnostics)
+      return blocked if blocked
+    end
+
     # 構造的な型の添字読み（h[:k] / a[0]）はリテラルのキー/添字だけ特別扱い。
     if node.name == :[] && arg_nodes.size == 1
       indexed = read_index(receiver, arg_nodes.first)
@@ -114,16 +120,15 @@ module Chibirigor
   end
 
   # 要素型の読み（generics 5a）。読めなければ nil（通常ディスパッチに回す）。
-  # Tuple/HashShape という*既知の形*からだけ要素型を取り出す。生 Dynamic の受信は
-  # ここで拾わず untyped に倒す（埋まらねば untyped＝誤検知ゼロ）。
+  # Tuple/Array[Elem]/HashShape という*既知の形*からだけ要素型を取り出す。生 Dynamic の
+  # 受信はここで拾わず untyped に倒す（埋まらねば untyped＝誤検知ゼロ）。
   def element_read(receiver, name, arg_nodes)
-    case receiver
-    when Type::Tuple
+    if (elem = element_type_of(receiver))
       case name
-      when :first, :last then array_element_type(receiver) if arg_nodes.empty?
-      when :[] then array_element_type(receiver) if arg_nodes.size == 1
+      when :first, :last then elem if arg_nodes.empty?
+      when :[] then elem if arg_nodes.size == 1
       end
-    when Type::HashShape
+    elsif receiver.is_a?(Type::HashShape)
       case name
       when :values then hash_value_type(receiver) if arg_nodes.empty?
       when :keys then hash_key_type(receiver) if arg_nodes.empty?
@@ -131,10 +136,14 @@ module Chibirigor
     end
   end
 
-  # 配列の要素型 Elem ＝ 全要素の型を寄せ集めて 1 つに（リテラル精度は class に丸める）。
-  # 空配列は要素が分からないので untyped（FP 安全）。
-  def array_element_type(tuple)
-    Type.union(tuple.elements.map { |t| widen_element(t) })
+  # 配列の要素型 Elem。Tuple は全要素を寄せ集め（リテラル精度は class に丸める）、
+  # Array[Elem] はその型引数。空配列は要素が分からないので untyped（FP 安全）。
+  # 配列でなければ nil（＝「要素を読める形」ではない）。
+  def element_type_of(receiver)
+    case receiver
+    when Type::Tuple then Type.union(receiver.elements.map { |t| widen_element(t) })
+    when Type::Generic then receiver.args.first if receiver.name == :Array
+    end
   end
 
   def hash_value_type(shape)
@@ -149,6 +158,40 @@ module Chibirigor
   # 要素型では「この値そのもの（Const）」をクラスに広げる（`[1,2].first` は `1` でなく Integer）。
   def widen_element(type)
     type.is_a?(Type::Const) ? Type::Nominal[Dispatch.class_of(type)] : type
+  end
+
+  # 第1仮引数＝要素という関係が確実な反復子だけを扱う（FP 安全）。
+  # each_with_index（|x, i|）や reduce（|acc, x|）は仮引数の意味が違うので含めない。
+  ELEMENT_ITERATORS = %i[map collect each select filter reject find_all].freeze
+
+  # ブロック付き反復の型付け（generics 5b/5c）。既知の配列の要素型 Elem をブロック仮引数へ
+  # 押し下げ、本体を型チェックする。配列でない／未知の反復子なら nil（通常ディスパッチへ）。
+  #   map/collect → Array[本体の型]（5c の戻り多相）／each → レシーバ（self を返す）／
+  #   select/filter/reject/find_all → Array[Elem]（要素型は不変）。
+  def type_of_block(receiver, name, block, scope, diagnostics)
+    return nil unless ELEMENT_ITERATORS.include?(name)
+
+    elem = element_type_of(receiver)
+    return nil if elem.nil? # 既知の配列でなければ手を出さない（untyped に倒す＝FP なし）
+
+    body_type = type_of_body(block.body, bind_block_params(block, elem, scope), diagnostics)
+
+    case name
+    when :map, :collect then Type::Generic[:Array, [widen_element(body_type)].freeze]
+    when :each then receiver
+    else Type::Generic[:Array, [elem].freeze]
+    end
+  end
+
+  # ブロック仮引数を束縛したスコープを返す。第1仮引数＝要素型 Elem、以降は安全側で untyped。
+  def bind_block_params(block, elem, scope)
+    block_param_names(block).each_with_index.reduce(scope) do |s, (name, index)|
+      s.with_local(name, index.zero? ? elem : Type::Dynamic.new)
+    end
+  end
+
+  def block_param_names(block)
+    block.parameters&.parameters&.requireds&.map(&:name) || []
   end
 
   # 構造的な型からの読み出し。読めなければ nil（通常ディスパッチに回す）。

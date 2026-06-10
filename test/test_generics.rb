@@ -49,6 +49,29 @@ assert.call('読んだ要素型が check に流れる（Integer + true は 1 件
 assert.call('空配列の要素は untyped なので check は黙る（FP 安全）',
             Chibirigor.check("[].first + true\n").size, 0)
 
+# ── 5b：ブロック仮引数へ要素型を押し下げる（generics の山場） ─────────────────
+assert.call('map のブロック仮引数 x は要素型（map → Array[Elem]）',
+            ann.call("[1, 2].map { |x| x + 1 }\n").last, 'Array[Integer]')
+assert.call('map の戻りは本体の型（5c 戻り多相）',
+            ann.call("[1, 2].map { |x| x.to_s }\n").last, 'Array[String]')
+assert.call('select は要素型を保つ', ann.call("[1, 2, 3].select { |x| x }\n").last, 'Array[Integer]')
+assert.call('each はレシーバ（self）を返す', ann.call("[1, 2].each { |x| x + 1 }\n").last, '[1, 2]')
+assert.call('map の結果も配列なので first が読める（連鎖）',
+            ann.call("[1, 2].map { |x| x.to_s }.first\n").last, 'String')
+
+# ── 5b：ブロック本体が要素型で型チェックされる（押し下げの証拠） ──────────────
+assert.call('ブロック本体の型エラーを検出（Integer + true は 1 件）',
+            Chibirigor.check("[1, 2].map { |x| x + true }\n").size, 1)
+assert.call('each のブロック本体も型チェックされる',
+            Chibirigor.check("[1, 2].each { |x| x + \"a\" }\n").size, 1)
+assert.call('正しいブロックは診断ゼロ', Chibirigor.check("[1, 2].map { |x| x + 1 }\n").size, 0)
+
+# ── 5b：FP ゼロ（空配列・未知レシーバ・未知反復子） ──────────────────────────
+assert.call('空配列のブロックは要素 untyped → 本体も untyped → 黙る（FP 安全）',
+            Chibirigor.check("[].map { |x| x + true }\n").size, 0)
+assert.call('未知レシーバの map は untyped（配列と決めつけず本体も検査しない）',
+            ann.call("foo.map { |x| x + 1 }\n").last, 'untyped')
+
 # ─────────────────────────────────────────────────────────────────────────────
 if failures.empty?
   puts "\nAll checks passed."
