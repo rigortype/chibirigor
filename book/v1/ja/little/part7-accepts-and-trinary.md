@@ -258,3 +258,7 @@ Integer が必要ですが 1 | "a" が渡されました
 
 **次章予告（Part 8）**：手書きの `METHODS` 表を、本物の **RBS** から引くように差し替えます。
 「型は別ファイルに書く」という Ruby/RBS の世界観に初めて触れます。
+
+---
+
+> **この章の実装** → [`impls/dist/part7/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part7/lib)

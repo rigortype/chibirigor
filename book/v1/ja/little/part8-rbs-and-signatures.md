@@ -308,3 +308,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 仕上げ、`untyped`／`void`／`never` の「特別な型 3 種」を総括し、「chibirigor はわざと見逃すことで
 動くコードを脅かさない」を語り切ります。『しくみ』が結びで発展先の一つに挙げた
 gradual typing へと接続して、本編を閉じます。
+
+---
+
+> **この章の実装** → [`impls/dist/part8/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part8/lib)

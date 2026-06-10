@@ -300,3 +300,7 @@ SARIF や GitHub の注釈に変換されます（ADR-51）。
 メソッド送信なので、**「どのクラスのどのメソッドが何を返すか」を引く表（ディスパッチ）** が
 要ります。そして「知らないメソッドは `Dynamic` に逃がす」の続きと、§1-4 で予告した
 **定数畳み込み**（畳めれば畳む）を発展ノートで扱います。
+
+---
+
+> **この章の実装** → [`impls/dist/part1/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part1/lib)

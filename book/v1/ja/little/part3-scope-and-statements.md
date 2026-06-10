@@ -184,3 +184,7 @@ String が必要ですが 1 が渡されました
 `x.nil?` のような条件で型を絞る「ナローイング」を Part 5 で作ります。Scope がここで本領を
 発揮します。この「再代入で束縛を差し替える」不変スコープの発想は、後の章の*絞り込み*でも
 同じように効いてきます。
+
+---
+
+> **この章の実装** → [`impls/dist/part3/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part3/lib)

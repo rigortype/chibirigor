@@ -247,3 +247,7 @@ Rigor はもう一歩進めて、その枝を**「絶対に通らない余分な
 **次章予告（Part 6）**：ハッシュや配列のリテラルに型をつけます（`HashShape`/`Tuple`）。
 「symbol キーのオプションハッシュ」だらけの Ruby で、型を*完全一致で要求すると誤検知の嵐に
 なる*話に踏み込みます。
+
+---
+
+> **この章の実装** → [`impls/dist/part5/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part5/lib)

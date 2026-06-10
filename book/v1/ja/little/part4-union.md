@@ -116,3 +116,7 @@ c ? 1 : nil   ->  1 | nil
 じゃない」と型を狭める、あの当たり前を型でも追えるようにします。偽は `false`/`nil` の 2 つだけ・
 `narrow` の実装・`is_a?` の dead branch・絞り込みの 2 つの掟・再代入でのリセットまで、
 そこで扱います。
+
+---
+
+> **この章の実装** → [`impls/dist/part4/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part4/lib)
