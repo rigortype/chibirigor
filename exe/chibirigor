@@ -8,10 +8,18 @@ command = ARGV[0]
 args = ARGV[1..] || []
 explain = !args.delete("--explain").nil?         # fail-soft 地図を併載
 unreachable = !args.delete("--unreachable").nil? # 到達不能アーム診断を併載
+verbose = !args.delete("--verbose").nil?         # trace: enter/リテラルも全コマ出す
+json = !args.delete("--json").nil?               # trace: イベント列を JSON で出す
+delay = nil                                      # trace: 秒数指定で自動再生
+if (i = args.index("--delay"))
+  delay = args[i + 1]&.to_f
+  abort "usage: chibirigor trace --delay SEC FILE" if delay.nil?
+  args.slice!(i, 2)
+end
 arg = args[0]
 
-unless %w[check annotate type-of].include?(command) && arg
-  abort "usage: chibirigor <check [--explain] [--unreachable]|annotate> FILE | chibirigor type-of FILE:LINE:COL"
+unless %w[check annotate type-of trace].include?(command) && arg
+  abort "usage: chibirigor <check [--explain] [--unreachable]|annotate|trace [--delay SEC] [--verbose] [--json]> FILE | chibirigor type-of FILE:LINE:COL"
 end
 
 # type-of は FILE:LINE:COL。末尾 2 つを LINE/COL に、残りを FILE に（パス中のコロンに頑健）。
@@ -52,6 +60,14 @@ when "check"
   end
 when "annotate"
   Chibirigor.annotate(source).each { |a| puts "#{a[:line]}: #{a[:type]}" }
+when "trace"
+  events = Chibirigor.trace(source)
+  if json
+    require "json"
+    puts JSON.pretty_generate(events)
+  else
+    Chibirigor::Tracer.play(source, events, delay: delay, verbose: verbose)
+  end
 when "type-of"
   type = Chibirigor.type_at(source, line.to_i, col.to_i)
   abort "#{file}:#{line}:#{col}: その位置に式がありません" unless type
