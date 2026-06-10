@@ -150,6 +150,41 @@ chibirigor は戻り型を**本体から合成する**側（注釈を*検証*す
 > とどめます（実 Rigor の unreachable arm、ADR-47）。「脅かさない」方針では、空集合を律儀に
 > 伝播させるより「ここは通らないよ」と一言伝える方が現場で役に立つからです。
 
+### a1-3x. 発展：chibirigor にも到達不能アーム診断がある（opt-in）
+
+上の方針どおり、chibirigor にも**到達不能の検出**を足しました。`Bot` という型キャリアは作らず、
+「その枝の subject が空集合（＝`Bot`）になる」ことを直接判定して `:info` 診断を出します
+（`lib/chibirigor/narrowing.rb` の `unreachable_branch?`）。`check --unreachable` で opt-in します：
+
+```console
+$ printf 'x = 1\nif x.is_a?(String)\n  y = x + 1\nelse\n  z = x * 2\nend\n' > demo.rb
+$ ruby exe/chibirigor check --unreachable demo.rb
+demo.rb:3:3: info: この枝には到達しません（条件が必ず偽になります）
+    y = x + 1
+    ^^^^^^^^^
+```
+
+`x : Integer` に `if x.is_a?(String)` を当てた then 枝は「Integer かつ String」＝住人ゼロ＝`Bot`
+なので、到達しません。**既定（フラグ無し）では黙ります** ― 前編 Part 4/5 の「dead 枝は絞らず
+触らない（誤検知ゼロ）」という約束を崩さないためです。「ここは通らない」と知らせるのは、
+読者が**明示的に頼んだとき**（`--unreachable`）だけにしてあります。
+
+健全性のため、断言するのは**証明できるときだけ**です：
+
+- subject が**閉じた既知型**（`untyped` を一切含まない）のときに限る。少しでも `Dynamic` が
+  混じれば黙る（gradual）。
+- `is_a?` は **互いに素だと確実に言える具象クラス（葉）**同士でだけ「起き得ない」と断言します。
+  `is_a?(Numeric)` や `is_a?(Object)` のような**祖先関係**は祖先表を持たないので断言しません
+  ― `x : Integer` でも `x.is_a?(Numeric)` は真になり得るからです（誤検知回避）。
+
+これが実 Rigor の ADR-47（`flow.unreachable-clause`）の縮図です。実物は narrowing が subject を
+`bot` に絞った節を dead と判定し、ループ・ブロック・gradual を除外する FP envelope を持ちます。
+chibirigor は同じ着想を「葉クラスの互いに素」「閉じた型限定」「opt-in」の三点で最小化しています。
+
+> **網羅性（missing arm）とは逆向き**である点に注意（付録 a5-5）。Java/C# の網羅検査は
+> 「**足りない**枝」を咎めますが、unreachable arm は「**余分な（決して通らない）**枝」を指します。
+> 前者は*書け*と迫り、後者は*消せる*と教えるだけ ― 動くコードは止めません。
+
 ---
 
 ## a1-4. `Top`／`Bot` ― 格子の両端

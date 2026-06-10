@@ -5,7 +5,7 @@
 > 一致させること（AGENTS.md §「Rigor を真実の源として参照する」）。
 > 一過性のメモ ― 大きな区切りで更新する。
 
-## 現状（2026-06-09（構造整理）更新）
+## 現状（2026-06-10（Rigor 由来 5 機能を追加）更新）
 
 ### ★本線：v1 清書版 `book/v1/ja/`（draft の外・リポジトリ直下）
 原稿 `draft/` を**二巻維持・大胆再構成**で再編した清書ツリー。**ここが今後の編集対象**。
@@ -25,7 +25,17 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 - **Part 1–9 すべて充填済み**（2026-06-09）。`make impls-verify` で全段グリーン。最終段 dist/part9 は lib/ と機能的に収束。
 
 ### lib 実装 `lib/chibirigor/`（Part 1–9・完成形）
-- `test/test_part1〜9.rb` 緑・CLI 動作。ROADMAP フェーズ1–2 実装済み、**フェーズ3＝ジェネリクスのみ未着手**。
+- `test/test_part1〜9.rb` 緑・CLI 動作。ROADMAP フェーズ1–2 実装済み。
+- **2026-06-10：Rigor 由来 5 機能を追加**（計画＝[`../docs/20260610-v1-rigor-features-plan.md`](../docs/20260610-v1-rigor-features-plan.md)）。
+  すべて発展ノート方式で本文へ重ねた。`make test`/`drift`/`impls-verify` 緑。
+  1. **type-of 位置クエリ**（`type_at.rb`／`exe type-of FILE:LINE:COL`／`test_type_at.rb`）→ 付録 a3-2x。
+  2. **check --explain**（fail-soft 地図。`dispatch.rb`＋`checker.rb`／`test_explain.rb`）→ 付録 a3-1x・前編 P9。
+  3. **到達不能アーム診断**（ADR-47 縮小版・opt-in `check --unreachable`。`narrowing.rb`＋`type_of.rb`／
+     `test_unreachable.rb`）→ 付録 a1-3x・a5-5。健全性のため「閉じた既知型＋互いに素な葉クラス」限定。
+  4. **ジェネリクス 5a（要素型の読み）**（`type_of.rb` の `element_read`／`test_generics.rb`）→ 後編 P3「3-6x」。
+  5. **non-empty-array ブリッジ**（本文のみ。`Tuple`＝事実上の非空配列）→ 付録 a2-6x。
+- 残：**フェーズ3 の 5b（ブロック仮引数押し下げ＝`unification.rb` 昇格）・5c（戻り多相）**。
+- 補足：`Makefile` の `test` ターゲットを `test/test_*.rb` glob に変更（従来 `test_return_type_check.rb` が未実行だった）。
 
 ### draft（原稿・legacy 素材）
 - `draft/little`・`draft/seasoned`・`draft/preface.md`・`draft/glossary.md` は **v1 の移植元**。
@@ -46,7 +56,9 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 - **I3（小）V1 と一体**：本文 include 連携（上記 V1）。
 
 ### Track L — lib 機能（ROADMAP フェーズ3）
-- **L1（L・bounded）ジェネリクス／要素型**：後編 `unification.rb` を本実装へ昇格。**5a 要素型の読み → 5b ブロック仮引数へ ⇐ → 5c 戻り多相**（各段出荷可能・予算を脅かしたら止める）。詳細 `ROADMAP.md` §5。本のクライマックス（generics が lib で一本につながる）。
+- **L1（L・bounded）ジェネリクス／要素型**：**5a＝要素型の読み ✅ 実装済み（2026-06-10、`element_read`）**。
+  残り **5b ブロック仮引数へ ⇐（`unification.rb` 昇格）→ 5c 戻り多相**。詳細 `ROADMAP.md` §5。
+  5b が本のクライマックス（`map { |x| ... }` の `x` を `Elem` に＝generics が lib で一本につながる）。
 
 ### Track S — サイト統合
 - **S1 移譲済み**：Astro + Starlight 統合は `/Users/megurine/repo/site/rigor.typedduck.fail` へ移譲。

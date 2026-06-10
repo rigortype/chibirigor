@@ -63,6 +63,33 @@ fail-soft した箇所に**消えずに残っている**からです。`untyped`
 chibirigor の「知らなければ黙る」は誤検知を防ぎますが、`--explain` は**その沈黙そのものを
 可視化する道具**です。
 
+### a3-1x. 発展：chibirigor にも極小 `--explain` がある
+
+上の表は本書を「沈黙の可視化＝仕組みなし」としていますが、ここにも**極小版**を足しました。
+`check --explain` を付けると、推論が `untyped` に倒した地点（未知メソッドのディスパッチ）を
+`:info` 診断として併せて出します：
+
+```console
+$ printf 'x = mystery_call\ny = x + 2\n' > demo.rb
+$ ruby exe/chibirigor check --explain demo.rb
+demo.rb:1:5: info: ここで untyped に倒しました（`mystery_call` の型が引けません）
+  x = mystery_call
+      ^^^^^^^^^^^^
+demo.rb:2:5: info: ここで untyped に倒しました（`+` の型が引けません）
+  y = x + 2
+      ^^^^^
+```
+
+注目したいのは **2 行目**です。`mystery_call` の型がわからず `x` が `untyped` になり、その `x` に
+対する `+` も型を引けずに `untyped` へ倒れています ― **沈黙が伝播していく**様子が地図に出ます。
+`--explain` 無しなら（誤検知を出さないので）`型エラーはありません` と黙るだけ。`:info` は
+終了コードを汚さない（`exit 0`）ので、CI を止めずに「どこで型が消えたか」だけ覗けます。
+
+実物との差は、実 Rigor が `Dynamic[Top]` の `Dynamic` マーカーを構造に保持して*あらゆる* fail-soft
+（RBS 不足・未注釈引数・プラグイン未設定…）を一覧化するのに対し、chibirigor が拾うのは
+**未知ディスパッチ 1 種**だけ、という点です（実装は `lib/chibirigor/dispatch.rb` の
+`signature` が nil の枝で provenance を 1 行積むだけ）。沈黙を**地図にする**という発想は同じです。
+
 ---
 
 ## a3-2. `rigor type-of file:line:col` ― 位置指定で推論型を引く
@@ -92,6 +119,29 @@ $ rigor type-of app/models/user.rb:10:5
 | 型を引く粒度 | 文ごと（`annotate` が行単位で型を並べる） | `file:line:col` で式 1 つをピンポイント指定 |
 | 見せる型 | 内部型 1 つ | 内部の精密な型 ＋ 境界で丸めた保守的な型の 2 つ |
 | 用途 | 推論結果の確認 | 内部型と RBS 境界型の**食い違いの調査** |
+
+### a3-2x. 発展：chibirigor にも極小 `type-of` がある
+
+上の表は本書を「`annotate`（行単位）だけ」として実物と対比していますが、chibirigor にも
+**位置指定の極小版**を足してあります（`lib/chibirigor/type_at.rb`）。`annotate` の推論をそのまま
+位置引きに転用しただけの小さな道具です：
+
+```console
+$ printf 'x = 5\ny = x + 2\n' > demo.rb
+$ ruby exe/chibirigor type-of demo.rb:2:5   # 2 行目の `x`（参照）
+demo.rb:2:5: 5
+$ ruby exe/chibirigor type-of demo.rb:2:7   # 2 行目の `+`（式 `x + 2` 全体）
+demo.rb:2:7: 7
+```
+
+`file:line:col` で**その位置を含む最小の式**を 1 つ選び、推論型を表示します（`5` は `Const`、
+`7` は定数畳み込みの結果）。実装は、トップレベルの文を縫って scope を育てながら、位置を含む
+最深のノードを `type_of` に渡すだけです。
+
+ただし**実物との差は表のまま**です ― chibirigor が見せるのは**内部型 1 つ**だけ。実 Rigor の
+`type-of` は「内部の精密型 ＋ 境界で丸めた保守型」の **2 段**を並べ、その食い違い（erasure）を
+調べる道具でした。chibirigor には境界（RBS への erasure）が無いので 1 段で済んでいます。
+位置で式を指す**動詞**は同じ、見せる**段数**が実物では 2 になる、という対応で読めます。
 
 ---
 
@@ -161,8 +211,8 @@ $ rigor type-of app/models/user.rb:10:5
 
 | 道具 | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
-| `rigor check --explain` | 仕組みなし（黙るだけ） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
-| `rigor type-of file:line:col` | `annotate`（内部型のみ・行単位） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
+| `rigor check --explain` | 極小版あり（未知ディスパッチを `:info` 地図化・§a3-1x） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
+| `rigor type-of file:line:col` | `annotate` ＋ 極小 `type-of`（内部型 1 つ・§a3-2x） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
 | dispatch 5 段カスケード | 1 段の表引き（`METHODS`） | ① 定数畳み込み → ② shape → ③ RBS → ④ in-source → ⑤ fallback | 前編 Part 2 |
 
 いずれも、本書で手作りした骨格（`Dynamic` マーカー・`annotate`・`METHODS` 表）が、実 Rigor では
