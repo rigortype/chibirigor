@@ -34,7 +34,10 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
      `test_unreachable.rb`）→ 付録 a1-3x・a5-5。健全性のため「閉じた既知型＋互いに素な葉クラス」限定。
   4. **ジェネリクス 5a（要素型の読み）**（`type_of.rb` の `element_read`／`test_generics.rb`）→ 後編 P3「3-6x」。
   5. **non-empty-array ブリッジ**（本文のみ。`Tuple`＝事実上の非空配列）→ 付録 a2-6x。
-- 残：**フェーズ3 の 5b（ブロック仮引数押し下げ＝`unification.rb` 昇格）・5c（戻り多相）**。
+- **2026-06-10（続き）：5b＋5c も実装**（`type_of_block`／新カリア `Type::Generic`）。
+  `map { |x| ... }` の `x` を要素型に束縛＋本体を型チェック、`map`→`Array[本体型]`。直接代入で実装
+  （単一化は未知型変数の一般ケース用に概念のまま）。本文＝後編 Part 5「5-6x」・Part 3「3-6x」更新。
+  → **generics が lib で一本につながった（本のクライマックス到達）**。
 - 補足：`Makefile` の `test` ターゲットを `test/test_*.rb` glob に変更（従来 `test_return_type_check.rb` が未実行だった）。
 
 ### draft（原稿・legacy 素材）
@@ -56,9 +59,10 @@ chibivue [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book
 - **I3（小）V1 と一体**：本文 include 連携（上記 V1）。
 
 ### Track L — lib 機能（ROADMAP フェーズ3）
-- **L1（L・bounded）ジェネリクス／要素型**：**5a＝要素型の読み ✅ 実装済み（2026-06-10、`element_read`）**。
-  残り **5b ブロック仮引数へ ⇐（`unification.rb` 昇格）→ 5c 戻り多相**。詳細 `ROADMAP.md` §5。
-  5b が本のクライマックス（`map { |x| ... }` の `x` を `Elem` に＝generics が lib で一本につながる）。
+- **L1（L・bounded）ジェネリクス／要素型 ✅ 5a/5b/5c 実装済み（2026-06-10）**：
+  `element_read`（読み）＋`type_of_block`（押し下げ・`map`→`Array[Elem]`）。generics が lib で一本に
+  つながった＝**本のクライマックス到達**。残る発展：要素が未知型変数のときの本格単一化
+  （`unification.rb` 昇格）・bounded 量化・変性 ― demand 次第（当面は概念のまま）。
 
 ### Track S — サイト統合
 - **S1 移譲済み**：Astro + Starlight 統合は `/Users/megurine/repo/site/rigor.typedduck.fail` へ移譲。

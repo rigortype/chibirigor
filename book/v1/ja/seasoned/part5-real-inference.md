@@ -243,6 +243,35 @@ Part 1 の地図で言えば、引数推論は **合成 `⇒` の守備範囲を
 
 ---
 
+## 5-6x. 発展：ブロック仮引数への押し下げは lib に入った（generics 5b）
+
+道 B の核 ― 要素型 `Elem` をブロック仮引数へ流し込む ― は、chibirigor 本体に昇格しました
+（`lib/chibirigor/type_of.rb` の `type_of_block`）。後編 Part 3「3-6x」の**読み（5a）**に続く
+**押し下げ（5b）**で、generics がこれで lib のうえで一本につながります：
+
+```console
+$ printf '[1, 2].map { |x| x + 1 }\n[1, 2].map { |x| x.to_s }\n[1, 2].select { |x| x }\n' | ruby exe/chibirigor annotate /dev/stdin
+1: Array[Integer]
+2: Array[String]
+3: Array[Integer]
+```
+
+`map` のブロック仮引数 `x` が**要素型 `Integer`** に束縛され、本体 `x.to_s` が `String` だから
+`map` の戻りは `Array[String]`（5c の戻り多相も込み）。ブロック本体は `x : Elem` のもとで
+**型チェックされます** ― だから `[1,2].map { |x| x + true }` は「Integer に true は足せません」を
+1 件出します（押し下げが効いている証拠）。`each` はレシーバ（self）を返し、`select`/`reject`
+は要素型を保ちます。
+
+ここで使ったのは**単一化ではなく直接代入**です。chibirigor の配列は要素型が*具体*（`Tuple` か
+`Array[Elem]`）なので、`x := Elem` はまさに §5-3 の単一化の**自明な特例** ― 制約が `[[X, Integer]]`
+1 本だけ、という場合に相当します。`solve` を呼ぶまでもなく束縛が決まるので、配管を増やさず
+直接代入で済ませました（最小・予算優先）。`examples/unification.rb` の**本格的な制約解き**が
+要るのは、要素型が*未知の型変数*で、ブロックの使われ方からそれを*逆算*する一般の場合 ―
+そこは設計スケッチのままにしてあります（道 A/B の「全部はやらない」§5-4 の判断）。
+
+誤検知ゼロも不変です：空配列 `[].map { ... }` は要素が `untyped` なので本体も `untyped`、
+未知レシーバ `foo.map { ... }` は「配列と決めつけない」ので本体を検査せず `untyped` に倒します。
+
 ## 5-7. まとめ
 
 - 戻り型は合成で出るが、引数は「使われ方の逆算」が要る ― 推論の難所。

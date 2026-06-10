@@ -204,10 +204,12 @@ $ printf '[1, 2, 3].first\n{ a: 1, b: 2 }.values\n[].first\n' | ruby exe/chibiri
 untyped）。読んだ要素型はちゃんとチェックにも流れます ― `a = [1,2]; a.first + true` は
 「Integer に true は足せません」を 1 件出します。
 
-ここで lib が獲得したのは generics の**読み（5a）**までです。本章の主役だった**型代入 `subst`**と、
-要素型をブロック仮引数へ押し下げる**単一化**（`map { |x| ... }` の `x` を `Elem` にする＝
-[`examples/unification.rb`](examples/unification.rb)）は、まだ設計スケッチのまま ― これらを lib に
-織り込む **5b** が、generics を一本につなぐ続きの一歩です。
+ここで lib が獲得したのは generics の**読み（5a）**です。続く**押し下げ（5b）**＝要素型を
+ブロック仮引数へ流し込む（`map { |x| ... }` の `x` を `Elem` にする）も lib に入りました ―
+詳細と worked example は後編 Part 5「5-6x」へ。本章の主役だった**型代入 `subst`**と、要素型が
+*未知の型変数*のときに使われ方から逆算する**本格的な単一化**（[`examples/unification.rb`](examples/unification.rb)）
+は、一般の場合の道具として設計スケッチのまま残してあります（5b は具体要素の*自明な特例*＝
+直接代入で済むため）。
 
 ## 3-7. まとめ
 
