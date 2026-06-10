@@ -57,15 +57,30 @@ module Chibirigor
   def type_of_if(node, scope, diagnostics)
     type_of(node.predicate, scope, diagnostics) # 条件も型チェック（入れ子のエラー検出）
 
+    # 証明可能に到達不能な枝を記録（check(unreachable: true) のときだけ表に出る・既定は無害）。
+    if Narrowing.unreachable_branch?(scope, node.predicate, true)
+      diagnostics << unreachable_diagnostic(node.statements || node, true)
+    end
     then_type = type_of_body(node.statements, Narrowing.narrow(scope, node.predicate, true), diagnostics)
+
     else_type =
       if node.subsequent
+        if Narrowing.unreachable_branch?(scope, node.predicate, false)
+          diagnostics << unreachable_diagnostic(node.subsequent.statements || node.subsequent, false)
+        end
         type_of_body(node.subsequent.statements, Narrowing.narrow(scope, node.predicate, false), diagnostics)
       else
         Type::Const[nil] # else が無ければ偽のとき nil
       end
 
     Type.union([then_type, else_type])
+  end
+
+  # 到達不能アーム診断（ADR-47 の縮小版）。:info・kind :unreachable で持つ。
+  # truthy=true の枝は「条件が必ず偽」、false の枝は「条件が必ず真（else が死ぬ）」。
+  def unreachable_diagnostic(node, truthy)
+    reason = truthy ? "条件が必ず偽になります" : "条件が必ず真になります"
+    diagnostic(node, "この枝には到達しません（#{reason}）").merge(kind: :unreachable, severity: :info)
   end
 
   # 枝（文の並び）を評価し、最後の文の型を返す。枝の中でもスコープを縫う。
@@ -89,8 +104,51 @@ module Chibirigor
       return indexed if indexed
     end
 
+    # 要素型の読み（generics 5a）：既知の配列／ハッシュから要素型 Elem を読む。
+    # arr.first / arr.last / 非リテラル添字 arr[i] → 要素型、h.values / h.keys → 値・キー型。
+    element = element_read(receiver, node.name, arg_nodes)
+    return element if element
+
     arg_types = arg_nodes.map { |arg| type_of(arg, scope, diagnostics) }
     Dispatch.dispatch(receiver, node.name, arg_types, node, diagnostics)
+  end
+
+  # 要素型の読み（generics 5a）。読めなければ nil（通常ディスパッチに回す）。
+  # Tuple/HashShape という*既知の形*からだけ要素型を取り出す。生 Dynamic の受信は
+  # ここで拾わず untyped に倒す（埋まらねば untyped＝誤検知ゼロ）。
+  def element_read(receiver, name, arg_nodes)
+    case receiver
+    when Type::Tuple
+      case name
+      when :first, :last then array_element_type(receiver) if arg_nodes.empty?
+      when :[] then array_element_type(receiver) if arg_nodes.size == 1
+      end
+    when Type::HashShape
+      case name
+      when :values then hash_value_type(receiver) if arg_nodes.empty?
+      when :keys then hash_key_type(receiver) if arg_nodes.empty?
+      end
+    end
+  end
+
+  # 配列の要素型 Elem ＝ 全要素の型を寄せ集めて 1 つに（リテラル精度は class に丸める）。
+  # 空配列は要素が分からないので untyped（FP 安全）。
+  def array_element_type(tuple)
+    Type.union(tuple.elements.map { |t| widen_element(t) })
+  end
+
+  def hash_value_type(shape)
+    Type.union(shape.fields.values.map { |t| widen_element(t) })
+  end
+
+  # symbol キーのみ覚える（Part 5）ので、キー型は Symbol。空なら untyped。
+  def hash_key_type(shape)
+    shape.fields.empty? ? Type::Dynamic.new : Type::Nominal[:Symbol]
+  end
+
+  # 要素型では「この値そのもの（Const）」をクラスに広げる（`[1,2].first` は `1` でなく Integer）。
+  def widen_element(type)
+    type.is_a?(Type::Const) ? Type::Nominal[Dispatch.class_of(type)] : type
   end
 
   # 構造的な型からの読み出し。読めなければ nil（通常ディスパッチに回す）。

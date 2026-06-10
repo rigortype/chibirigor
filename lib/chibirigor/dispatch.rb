@@ -21,6 +21,11 @@ module Chibirigor
     INT_LIMIT = 1_000_000
     STR_LIMIT = 100
 
+    # ナローイングが特別扱いする述語（戻りは概念上 bool）。chibirigor は bool 型を持たないので
+    # Dynamic を返すが、これは「型を見失った」のではなく「述語をモデル化していない」だけ。
+    # よって fail-soft 地図（check --explain）には載せない（誤った沈黙地点を出さない）。
+    GUARD_PREDICATES = %i[nil? is_a? kind_of? instance_of?].freeze
+
     module_function
 
     # 型を「クラス名（シンボル）」に丸める。表のキー照合に使う。
@@ -55,7 +60,16 @@ module Chibirigor
     def dispatch(receiver_type, name, arg_types, node, diagnostics)
       key = [class_of(receiver_type), name]
       signature = Plugin.registry[key] || METHODS[key]
-      return Type::Dynamic.new unless signature # 知らないメソッド → 脅かさない
+      unless signature # 知らないメソッド → 脅かさない（ここが fail-soft 地点）
+        # untyped に倒した地点を provenance として記録（check --explain が地図化する）。
+        # 通常の check はこの :fail_soft を捨てるので、診断は増えない（挙動不変）。
+        # ナローイングの述語（is_a? 等）は型を見失ったわけではないので地図に載せない。
+        unless GUARD_PREDICATES.include?(name)
+          diagnostics << Chibirigor.diagnostic(node, "ここで untyped に倒しました（`#{name}` の型が引けません）")
+                                   .merge(kind: :fail_soft, severity: :info)
+        end
+        return Type::Dynamic.new
+      end
 
       if arg_types.size != signature[:params].size
         diagnostics << Chibirigor.diagnostic(

@@ -5,19 +5,35 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "chibirigor"
 
 command = ARGV[0]
-file = ARGV[1]
+args = ARGV[1..] || []
+explain = !args.delete("--explain").nil?         # fail-soft 地図を併載
+unreachable = !args.delete("--unreachable").nil? # 到達不能アーム診断を併載
+arg = args[0]
 
-unless %w[check annotate].include?(command) && file
-  abort "usage: chibirigor <check|annotate> FILE"
+unless %w[check annotate type-of].include?(command) && arg
+  abort "usage: chibirigor <check [--explain] [--unreachable]|annotate> FILE | chibirigor type-of FILE:LINE:COL"
+end
+
+# type-of は FILE:LINE:COL。末尾 2 つを LINE/COL に、残りを FILE に（パス中のコロンに頑健）。
+if command == "type-of"
+  parts = arg.split(":")
+  col = parts.pop
+  line = parts.pop
+  file = parts.join(":")
+  abort "usage: chibirigor type-of FILE:LINE:COL" if file.empty? || line.nil? || col.nil?
+else
+  file = arg
 end
 
 source = File.read(file)
 
-# 診断 1 件を「file:line:col: message」＋ 該当行＋キャレットで描く。
+# 診断 1 件を「file:line:col: [info: ]message」＋ 該当行＋キャレットで描く。
+# severity が :info（fail-soft 地図）なら "info:" を付け、終了コードは汚さない。
 def render_diagnostic(diagnostic, file, lines)
   column = diagnostic[:column] || 0
   length = [diagnostic[:length] || 1, 1].max
-  puts "#{file}:#{diagnostic[:line]}:#{column + 1}: #{diagnostic[:message]}"
+  tag = diagnostic[:severity] == :info ? "info: " : ""
+  puts "#{file}:#{diagnostic[:line]}:#{column + 1}: #{tag}#{diagnostic[:message]}"
   line_text = (lines[diagnostic[:line] - 1] || "").chomp
   puts "  #{line_text}"
   puts "  #{(' ' * column)}#{'^' * length}"
@@ -25,14 +41,19 @@ end
 
 case command
 when "check"
-  diagnostics = Chibirigor.check(source)
+  diagnostics = Chibirigor.check(source, explain: explain, unreachable: unreachable)
   if diagnostics.empty?
     puts "型エラーはありません"
   else
     lines = source.lines
     diagnostics.each { |d| render_diagnostic(d, file, lines) }
-    exit 1
+    # :info（fail-soft）だけなら成功扱い。本物のエラーがあるときだけ exit 1。
+    exit 1 if diagnostics.any? { |d| d[:severity] != :info }
   end
 when "annotate"
   Chibirigor.annotate(source).each { |a| puts "#{a[:line]}: #{a[:type]}" }
+when "type-of"
+  type = Chibirigor.type_at(source, line.to_i, col.to_i)
+  abort "#{file}:#{line}:#{col}: その位置に式がありません" unless type
+  puts "#{file}:#{line}:#{col}: #{type}"
 end

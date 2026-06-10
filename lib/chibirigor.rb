@@ -14,11 +14,13 @@ require_relative 'chibirigor/type_of'
 require_relative 'chibirigor/evaluator'
 require_relative 'chibirigor/checker'
 require_relative 'chibirigor/annotator'
+require_relative 'chibirigor/type_at'
 
 # chibirigor ― 最小限の Ruby 型推論器（教材）
 #
 # 提供機能:
-#   Chibirigor.check(source)    => 診断の配列
-#   Chibirigor.annotate(source) => 各文の推論型の配列
+#   Chibirigor.check(source)         => 診断の配列
+#   Chibirigor.annotate(source)      => 各文の推論型の配列
+#   Chibirigor.type_at(src, ln, col) => 位置指定の推論型（type-of）
 module Chibirigor
 end

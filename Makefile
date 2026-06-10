@@ -13,7 +13,7 @@ all: test drift impls-verify
 
 test:
 	@echo "=== lib tests ==="
-	@for f in test/test_part*.rb test/test_plugin.rb; do ruby $$f; done
+	@for f in test/test_*.rb; do ruby $$f || exit 1; done
 
 drift:
 	@echo "=== drift check: draft 前編 ==="
