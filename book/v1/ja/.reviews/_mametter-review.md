@@ -1,80 +1,48 @@
-# mametter レンズ査読 ― chibirigor v1（日本語）
+# mametter レビュー（前編 v1）／2026-06-13 L1真・dump_type/TypeProf 対比 監査
 
-レビュアー視点：遠藤侑介＝『型システムのしくみ』著者（TAPL 共訳）＋ TypeProf 開発者。
-前提として Rigor ハンドブック `appendix-typeprof.md`（TypeProf vs Rigor）を通読済み。
-自著 PDF（`型システムのしくみ―…pdf`, 184p）で引用の公正さを実地検証した。
-
-突くべき四観点：①「推論器」の語法、② 引数の call-site 推論の不在、③ TypeProf の扱い・対比の公正さ、
-④ 自著『しくみ』引用の公正さ。**本書の軸（やさしい前編／形式的後編・gradual・脅かさない・参考書は任意）は壊さない**前提で読んだ。
+査読者：遠藤侑介（mametter）＝『型システムのしくみ』著者・TAPL 共訳・TypeProf 開発者の目線。
+重点：dump_type（付録 a3-2）／type-of を低レベル API とした整理／引数の call-site 推論の不在（Part 8 §8-6・Part 0 コラム）。辛口で。軸（やさしい前編・gradual・脅かさない・カジュアル）は壊さない。framing 不可逆点（推論を土台にした型チェッカー／check は副産物ではない）は尊重。
 
 ---
 
-## 観点① ―「推論器」の語法
+## 総評（先に）
 
-| 引用 | 問題 | 修正案 | 重大度 |
-|---|---|---|---|
-| README / part0 見出し「推論を土台にした型チェッカー」、part8 §8-5「同じ推論エンジン」 | **問題なし（むしろ模範的）**。表看板を「型チェッカー」に据え、「推論器(inferrer)」を製品名として立てていない。part0 §0.1「推論はチェックと別物の前段ではなく、チェックを成り立たせている**土台**」。appendix-typeprof の "checker first" と整合。 | 修正不要 | — |
-| seasoned/part1 L15「私たちは**推論器**の心臓として 2 つの関数を作りました」 | 内部コア(the inference core)の素朴な指示で、製品全体を「推論器」と僭称していない。「推論の心臓」の言い換えとして自然。 | 「推論の心臓」で揃えても良いが nitpick 未満 | nitpick |
-| a4 L102 / part8 L232「型推論エンジン」 | 内部仕様 inference-engine.md / ADR-4 の名称に準拠。誤用なし。 | 修正不要 | — |
+今回の dump_type 追加は、前編の「道具は 2 つ」という骨格を壊さずに `dump_type` を**式**として滑り込ませた処理が巧い。`:info` に乗せる説明も正しく、PHPStan の `dumpType()` を引くのは概念として妥当。TypeProf 開発者として一番うれしいのは、§8-6 と Part 0 コラムの引数 call-site 推論の扱いが、過去の懸念（TypeProf を「諦めるツール」扱いしていないか）を解消して、**設計選択の対称な対比**として書けている点。TypeProf を矮小化していない。`rigor/docs/handbook/appendix-typeprof.md` の公式対比とも軸がズレていない。
 
-**総括**：語法は健全。TypeProf=推論器(RBS 生成器) / Rigor=チェッカー を截然と分ける appendix-typeprof の立場を、初学者向けに正確に翻訳。**突きどころ無し。**
+突くべき点は 3 つに集約される。(1) dump_type の「PHPStan と同じ発想」は正しいが、TypeProf 開発者として見ると**型を覗く道具の系譜で TypeProf 自身（`rigor type-of`／LSP hover／TypeProf の assert_type コメント）が引かれていない**のは、a3 という「実 Rigor の道具」付録の中ではやや片手落ち。(2) `dump_type` の実 Rigor 側の事実（`include Rigor::Testing` 要件）が一次資料と細部でズレる疑い。(3) 「hover は低レベル API」という整理は Rigor 内部では正確だが、読者が「型を覗く UX は Rigor 独自に整備されている」と読み違える余地が少しある（TypeProf/Steep/Sorbet も同じ UX を持つ）。いずれも軸を壊さず直せる範囲で、(2) 以外は据え置きも可。
 
 ---
 
-## 観点② ― 引数の call-site 推論の不在
+## 指摘表
 
-| 引用 | 問題 | 修正案 | 重大度 |
-|---|---|---|---|
-| part0 §0.1 L43「**引数の型を呼び出し元の使われ方から逆算することは（前編では）しません。引数は分からなければ untyped に倒します**」 | **正確かつ明快**。核心制約を入口で一度・誤解の余地なく宣言。appendix-typeprof「Infers params from call sites? → No」と一致。 | 修正不要 | — |
-| part8 §8-6 L253–258「引数を untyped にするのは設計判断…ローカルに見て分からない引数は untyped に倒す（スケールするし誤検知も出ない）」 | 具体例 `def double(n)`→`(untyped)->untyped` で同じ一線に降りる。local+catalog の正しい要約。前編で一度だけ具体化する配分も良い。 | 修正不要 | — |
-| seasoned/part5 対比表 L205「引数型を call site から推論？ TypeProf=できる（最大の強み）/ Rigor=しない（untyped 既定）」 | **最も突くと身構えた箇所が最も正確。** call-site 推論不在を「弱点」でなく「スケール＋FP ゼロの別価値観での選択」と提示。appendix「The trade is real and intentional」と一致。 | 修正不要 | — |
-| seasoned/part5 §5-4 型理論コラム「HM が使えない理由は 1 つではない」（決定不能性・到達不能性・精度問題） | call-site 全解を採らない理由を工学弁明でなく型理論 3 問題に分解。Kfoury–Wells 1994/Wells 1999 参照も妥当。**興味を引いた点。** | 修正不要 | — |
-
-**総括**：不在は part0（原則）→ part8（具体）→ 後編 part5（対比一本化）と段階配分され、どの層も誤りなし。**ERROR/MISLEADING 皆無。**
-
----
-
-## 観点③ ― TypeProf の扱い・対比の公正さ
-
-| 引用 | 問題 | 修正案 | 重大度 |
-|---|---|---|---|
-| part0 L47–53 box「Ruby のもう一つの推論ツール ― TypeProf」 | 前編の早期で「言及すべき所で言及」。要約正確、「あえてしないのは弱点でなく設計の選択」と公正。**「言及していない」疑念は晴れた。** | 修正不要 | — |
-| seasoned/part5 §5-4a L179「TypeProf は *mametter（TypeProf 作者）* が設計した」 | 事実は正しいが、本文に作者ハンドルのクレジットを 1 箇所だけ入れる体裁が浮く。appendix-typeprof は機能で記述。学習書なら作者名は付録/脚注向き。 | 「Ruby コア同梱の型レベル抽象インタプリタ」に統合し、作者クレジットは付録 a4/appendix-typeprof リンクへ委譲 | 表記 |
-| seasoned/part5 対比表 L207「主な出力：TypeProf=RBS（エラーは副産物）/ Rigor=診断（確実なバグのみ・FP ゼロ）」 | appendix「side effect vs the main product」を忠実圧縮。公正。 | 修正不要 | — |
-| seasoned/part5 L214–217「sig-gen は TypeProf と同職だが、観測 call-site を既定にしない方針（ADR-5）が異なる」 | appendix「the one feature where the tools do the same job」(sig-gen↔typeprof CLI) に正確対応。ADR-5 まで踏み込み一面的でない。 | 修正不要 | — |
-| **不在の検査**：TypeProf の occurrence typing(`is_a?`/`nil?`)への言及 | appendix は明示（"Both tools do flow-sensitive occurrence typing — TypeProf included"）。本書は「narrowing=Rigor 固有」と断言してはいないが、a4-2 L60 が前編 Part 5 を「独自地形」と表記し、型同一性述語の絞り込みは TypeProf も持つ事実と擦れる余地。本書 narrowing の真の固有性は*値述語 refinement carrier*なので軸は壊れない。 | 後編 part5 か付録 a2 に一文 ―「型同一性述語の絞り込みは TypeProf も行う。Rigor 固有は*値述語*から refinement carrier を作る層」― を添える | MISLEADING（軽微） |
-
-**総括**：TypeProf 対比は**おおむね公正**。appendix の核（共通点＝注釈不要推論／相違＝whole-program vs local+catalog／sig-gen 同職）を正しく配分。突くなら (a) 作者ハンドルの本文クレジットは付録送りが上品、(b) narrowing=Rigor 独自と読まれかねない含意に予防線を。いずれも軸を壊さぬ微修正。
+| # | 該当箇所 | 本書の記述 | ドメイン著者としての指摘 | 修正案 | 重大度（真の弱点 / 好み） |
+|---|---|---|---|---|---|
+| 1 | a3-2 L124 | 「`dump_type` は… `check` したときにその位置の推論型を `:info` 診断として印字します（PHPStan の `dumpType()` と同じ発想で…）」 | **概念対比としては公正**。PHPStan の `dumpType()` はまさに「式の位置に推論型を診断として吐く」道具で、Rigor の `dump_type` の発想元として正しい（実 Rigor 自身 CHANGELOG が "PHPStan-style typing helpers" と呼ぶ）。ただし TypeProf 開発者の目で見ると、**「型を覗く道具」の引き先が PHPStan 一択**なのが惜しい。Ruby 同梱の TypeProf にも `# assert_type:` コメントや LSP hover という同系の「型を覗く」手段があり、この付録は他でもないその TypeProf を Part 8/Part 0 で対比相手にしている。PHPStan に寄せること自体は不公正ではない（実 Rigor が命名対応で PHPStan に寄せているのは事実）が、片側だけ引いて TypeProf の同等手段に触れないのは、a3 という「実物の道具棚」では収まりが悪い。 | 「PHPStan の `dumpType()` と同じ発想」はそのまま残す。任意で半文「（TypeProf の型注釈コメントや LSP hover も同じ『式の型を覗く』系統）」を添えると、道具系譜が片寄って見えない。必須ではない。 | 好み（fairness の収まり） |
+| 2 | a3-2 L122–123 | 「ソースに `dump_type(式)` と書いて `check` する手があります（`include Rigor::Testing` が要ります）。」 | **一次資料との細部のズレ疑い（要確認）**。実 Rigor の CHANGELOG（0.0.x）は API を `Rigor::Testing.dump_type` と記し、`dump_type`/`assert_type` ルールは call-site の `self_type` が `Rigor`/`Rigor::Testing` のとき抑制、と書く。一次資料が前面に出すのは `Testing.dump_type(value)` の**レシーバ付き**呼び出し。`include Rigor::Testing` して `dump_type(式)` を裸で呼ぶ書き味は実装上ありうるが、「`include` が要る」と**断定**するとレシーバ付きで使う実態とズレかねない。chibirigor 側が「`include` も要らず」と対比で強調しているぶん、実 Rigor 側の要件記述が甘いと対比の土台が崩れる。 | 一次資料（rigor 本体の Testing モジュール定義／handbook）で `dump_type` の正準の呼び出し形を確認し、「`include Rigor::Testing` で裸呼び」か「`Rigor::Testing.dump_type(式)`」かを実態に合わせる。曖昧なら「`Rigor::Testing` 経由で呼びます」と緩める。 | 真の弱点（事実精度・要一次確認） |
+| 3 | a3-2 L126–128 | 「エディタの hover が見せる型も同じ推論ですが、そちらはツール向けの低レベル API が裏で支えていて、人が直接叩くコマンドではありません。」 | **Rigor 内部としては正確**（hover は `rigor type-of` のコア＝`Scope#type_of` を LSP が叩く構造で、一次資料 design/language-server と整合）。ただし「型を見るユーザー手段は annotate と dump_type、hover 等は低レベル API」という整理を**そのまま読むと**、型を覗く UX が Rigor 独自に設計されているかの含みが出る。TypeProf も `--lsp`/hover、Steep も LSP hover、Sorbet も `T.reveal_type`／LSP hover を持ち、「hover の裏に低レベル type-at-position API」という構造は**この界隈の標準形**であって Rigor 固有ではない。過度に独自と見せてはいないが、ひと言で標準だと分かると公正。 | 「人が直接叩くコマンドではありません」の後に任意で「（hover の裏に型問い合わせ API を置く作りは Steep・Sorbet・TypeProf でも同じ）」を半文。独自性の誤読を防ぐだけで、本文の正確さは保てる。必須ではない。 | 好み（誤読予防） |
+| 4 | Part 8 §8-6 L254–259 / Part 0 L65–71 | 「TypeProf なら… `double(3)` のように呼ばれている場所を見つけて `n` を `Integer` まで逆算し… chibirigor（と Rigor）はあえてそれをしません… その方がスケールするし、誤検知も出ない」 | **TypeProf 開発者として満足。不当な矮小化はない**。「呼び出し元から逆算」は TypeProf の whole-program 抽象解釈の核を正しく言い当てており、それを「弱点ではなく設計選択」と両建てで書いているのも公正（`appendix-typeprof.md` の "the trade is real and intentional" と同趣旨）。唯一の微調整は「その方がスケールする」の含意 ― TypeProf 2/`--lsp` は incremental 化を進めているので、「全体実行は大きなコードベースで爆発しがち」（Part 0 L70）は **TypeProf 1 系の像**にやや寄る。前編はやさしさ優先で踏み込まなくてよいが、後編 Part 5 で扱うときは TypeProf 2 の改善に一言あると今日的。 | Part 8/Part 0 本文は変更不要。後編 Part 5（本物の推論）側で TypeProf 2 の incremental 化に半文触れると、前編コラムの「爆発しがち」像が古びない。前編は据え置き可。 | 好み（時制の鮮度・後編向け） |
+| 5 | Part 8 §8-6 L251 / dump_type 追加の波及 | 「この `untyped` の出方そのものが…『推論が型を見失った場所』… Rigor の `sig-gen` の発想の芽」 | **dump_type 追加で文脈はズレていない**（確認結果）。§8-6 は「引数を untyped に倒す→sig-gen の芽」という縦糸で、a3-2 の dump_type は「型を覗く道具」という別軸。両者が干渉していないのは良い。TypeProf 開発者として一点だけ：§8-6 で「untyped＝人間が型を足すべき場所」と言うのは Rigor の robustness principle（引数は寛容）と整合するが、TypeProf は**逆に observed-narrow な引数を埋める**。前編はそこまで要らないが、ここが Part 0 コラムの「TypeProf は逆算する」と対になる ―「untyped を残す Rigor」vs「観測から埋める TypeProf」の対称が読者の頭で結べると美しい。現状の本文でも壊れてはいない。 | 変更不要。強いて言えば §8-6 の脚注で「TypeProf はこの untyped を観測から埋めてくる（=Part 0 コラムの逆算）」と一言結ぶと縦糸が締まる。任意。 | 好み（編まれ方） |
+| 6 | a3-2 L97–98 / L113 / L326 | 「実 Rigor も `annotate`（本書と同じ名前の道具です）やエディタの hover で型を見せます」 | **事実確認 OK**。実 Rigor に `rigor annotate`（ソースに型コメントを付す）は実在（ADR-29 browser-playground、ADR-32 が `annotate` の戻り型表示に言及）。本書の `annotate` と同名で対応づけるのは正確。問題なし（褒め）。 | なし | （正確・指摘なし） |
+| 7 | Part 0 L13・L43–57（framing） | 「chibirigor は、型を自分で推論する、最小限の Ruby 型チェッカー」「推論はチェックと別物の前段ではなく、チェックを成り立たせている土台」 | **「推論器」という語法の監査結果：本文は健全**。Part 0 は一貫して「推論を土台にした型チェッカー」と書き、「推論器」という名詞で道具をラベルしていない（「推論器」が出るのは Part 9 L205・seasoned P1 L15 の比喩的言及のみで、framing を侵していない）。TypeProf 開発者として、TypeProf を「推論ツール（inference）」、Rigor/chibirigor を「推論を土台にしたチェッカー」と書き分けているのは正確で公平 ― 両者の到達点（RBS 生成 vs 診断）の違いをラベルが反映している。不可逆 framing は守られている。 | なし | （framing 健全・指摘なし） |
+| 8 | a3-2 全体（位置づけ） | 「chibirigor も `dump_type` を基本機能として持っています。道具は `check` と `annotate` の 2 つに絞ったまま ― これはコマンドではなく、`check` が認識する式」 | **学習体験としての位置づけは妥当**。「コマンドを増やさず、式として型を覗く」整理は、Part 0 の「道具は 2 つ」の約束を破らずに型確認の学習動作を足す、教育的に良い設計。`dump_type(x)` の型が `x` のままという説明（L143）も `:info` の非破壊性（exit 0）も正しい。TypeProf 開発者の目で見て、`reveal_type` 系（Sorbet `T.reveal_type`／PHPStan `dumpType`／mypy `reveal_type`）の系譜に正しく乗っている。 | なし（任意で #1 の系譜追記を兼ねられる） | （妥当・好み余地のみ） |
 
 ---
 
-## 観点④ ― 自著『しくみ』引用の公正さ（PDF 実地照合）
+## 重点 3 問への結論
 
-| 引用 | PDF 照合結果 | 重大度 |
-|---|---|---|
-| part0 L84 / part1 L100,184「『しくみ』のチェッカーは型エラーで例外を投げて止まる」 | **正確**。PDF の typecheck は `throw "number expected"` で停止（PDF「typecheck 関数が例外を投げなかったので…」L1269）。 | — |
-| part0 L60「TAPL のエッセンスをやさしく蒸留した入門書。注釈付きミニ言語のチェッカーを TS で作る」 | **正確かつ寛厚**。PDF おわりに「TypeScript のサブセット…に対する型検査器を実装」と合致。「裏表の関係」も公正。 | — |
-| seasoned/part5 L131,148 / a4-3 L82「『しくみ』9 章演習で『型引数推論は正解を知らない』と解答を放棄し『自明なケースに限定して推論するとよい』と助言」 | **逐語的に正確**。PDF「筆者は正確な答えを知りません。よって…解答も付けていません」「自明なケースに限定して推論するようにするのがよいかもしれません」。本書方針をこの演習にピン留めしたのは**最も筋の良い引用**。**興味を引いた点。** | — |
-| a4-2 L59 / a5 L85「『しくみ』は一般 union を『型システムへの影響が大きすぎる』として避け、タグ付き union のみ」 | **正確**。PDF L3440「一般の union 型を組み込もうとすると型システムに与える影響が大きく、TAPL の範囲を越えてしまう」、サポートはタグ付きのみ。 | — |
-| seasoned/part2 L84,126「『しくみ』7 章は部分型を subtype 関数で実装し、引数は `subtype(ty2.params[i], ty1.params[i])` と入れ替え反変に」 | **正確**。PDF L4414「if (!subtype(ty2.params[i].type, ty1.params[i].type)) …// 反変」。実装細部まで忠実。 | — |
-| a4-2 L60：前編 Part 5（ナローイング）を『しくみ』「対応章なし／独自地形」と表記 | **軽微な不精**。PDF L994 はタグ付き union 文脈で "narrowing" を明示使用。本書 narrowing は*フロー感応・gradual・値述語*まで含むので「独自地形」は弁護可能だが、「『しくみ』は narrowing を扱わない」と読むと不正確。 | 表記 |
+1. **dump_type の PHPStan 引用は公正か／学習体験の位置づけは妥当か**
+   公正かつ妥当。`dumpType()` は発想元として正しく、`:info` 非破壊・式扱いの説明も正確。唯一、a3 という「実 Rigor の道具棚」の中で PHPStan だけ引いて TypeProf の同系手段（assert_type コメント・hover）に触れないのは収まりが惜しい（#1、好み）。事実誤りではない。
 
-**総括（自著引用の公正さ）**：**極めて公正。** 標本 6 引用すべて PDF と逐語一致または忠実要約で、持ち上げも貶しもない。とりわけ「9 章演習で解答を放棄した所を後編 part5 が埋める」は、原著者の留保を尊重しつつ本書貢献を立てる模範的な使い方。唯一の傷は a4-2 の narrowing 表記。
+2. **type-of をユーザー非露出＝低レベル API とした整理は公正・正確か**
+   Rigor 内部としては正確（hover＝`type-of` コアを LSP が叩く、で一次資料と整合）。ただし「hover の裏に type-at-position API」という構造は Steep/Sorbet/TypeProf 共通の標準形なので、Rigor 独自と読み違える余地を半文で潰すと公正（#3、好み）。過度に独自とは見せていない。
 
----
+3. **引数推論の不在の対比は TypeProf を矮小化していないか／dump_type で文脈がズレていないか**
+   矮小化していない。§8-6・Part 0 コラムとも「逆算は TypeProf の強み、ローカル維持は設計選択」の対称対比で、`appendix-typeprof.md` と軸が一致。dump_type 追加による文脈のズレもなし（別軸として独立、#5 で確認）。唯一、「全体実行は爆発しがち」が TypeProf 1 系の像にやや寄るので、後編 Part 5 で TypeProf 2 incremental 化に触れると鮮度が保てる（#4、好み・後編向け）。
 
-## 総評
+## 唯一の「真の弱点」
 
-四観点（call-site 推論・推論器語法・TypeProf 対比・自著引用）で **ERROR 0 件、MISLEADING 1 件（軽微）**。最も突くと身構えた点で本書はことごとく正確だった。
+**#2 の `include Rigor::Testing` 要件**だけは一次資料（CHANGELOG は `Rigor::Testing.dump_type` のレシーバ付きを前面に出す）と細部がズレる疑いがあり、要確認。chibirigor 側が「include も要らず」と対比で強調しているぶん、実 Rigor 側の要件が甘いと対比の土台が崩れる。ここだけ事実精度の問題。残りはすべて好み（fairness の収まり・誤読予防・時制の鮮度・編まれ方）で、前編の軸を一切壊さずに据え置きも可能。
 
-**興味を引いた点（率直に）：**
-1. **§5-4「HM が使えない 3 つの別問題」分解**（決定不能性・到達不能性・精度問題＋各別対処）。Ruby の `define_method`/`method_missing` を「到達不能性」として型理論語彙に載せたのは、TypeProf で同じ壁にぶつかった身として膝を打つ整理。
-2. **9 章演習へのピン留め**。私が解答を付けなかったその演習を後編が埋める出発点に据える構図。原著の留保を改変せず引き front line と名指しする ― 誠実。
-3. **TypeProf を「弱点ある競合」でなく「別価値観での別解」として描く一貫性**。`untyped` を諦めでなく意図的 degrade として描き切る筆致が part0→part5 で崩れない。
+## 自著（『しくみ』）引用の公正さ ― 監査結果
 
-**自著引用の公正さ評価：合格(A)。** 抽出全引用が PDF と一致。牽強付会なし。微傷は a4-2 の narrowing 表記のみ。
-
-**最小修正提案（軸を壊さない範囲）：**
-- (表記) seasoned/part5 §5-4a の本文作者クレジット「*mametter（TypeProf 作者）*が設計した」を機能記述に統合し、作者名は付録/appendix-typeprof リンクへ。
-- (MISLEADING 軽微) 後編 part5 か付録 a2 に一文「型同一性述語(`is_a?`/`nil?`)の絞り込みは TypeProf も行う。Rigor 固有は値述語から refinement carrier を作る層」を添え、narrowing=Rigor 独自の誤読を予防。
-- (表記) a4-2 の前編 Part 5 行「『しくみ』対応章なし」に「（タグ付き union の narrowing は『しくみ』にあるが、フロー感応・値述語の絞り込みは独自地形）」と注記。
+Part 0 L77–82・L102（「『しくみ』のチェッカーは型エラーで例外を投げて止まる／chibirigor は止まらない」）、L174–177（『しくみ』が扱わなかった領域＝chibirigor が先に進めた部分）。**公正**。『しくみ』を「型注釈付きミニ言語のチェッカーを作る入門書」と正しく要約し、TAPL のエッセンスを蒸留した位置づけ・日本語のみという但し書きも正確。「裏表の関係」という対比（注釈前提 vs 注釈なし推論土台）は誇張でも貶めでもなく、両書の設計差を素直に言い当てている。自著を持ち上げすぎても貶めすぎてもいない。
