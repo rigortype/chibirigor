@@ -63,6 +63,12 @@
   （Kfoury–Wells と Wells を分離）／§5-4a TypeProf＝抽象実行と明示（道 B との等値を解消）／§7-4 progress
   放棄の根拠から `~` 非推移を外す＋§7-5 に `~`/`consistent` 記法注記。type-of 除去の後編波及はゼロ
   （`type_of` 関数参照のみ）。所見＝`.reviews/_{expert,fidelity,mametter}-review-seasoned.md`。
+- **後編 seasoned の L2 伝レイヤー査読済み（2026-06-13）**：Java 中堅読者＋Ruby ジュニア読者で 8 章通読
+  （再現性レンズは「読み解く巻」ゆえ非該当）。後編の難しさは設計どおりと厳守し真の段差のみ選別。
+  橋渡し 6 件反映：Part3 関数型 `=>` の一行注記（唯一の BLOCK・Hash ロケット誤読）／Part5「ランク」「単一化」
+  の一行 gloss／Part1 `⊢` gloss／Part2 変性↔Java ワイルドカードの橋／Part7 §7-4 の前編 §1-3 誤引用是正。
+  所見＝`.reviews/_{java,ruby}-reader-review-seasoned.md`。残 FRICTION（Top/Bot 格子・μ 束縛子・`ground` 語）は
+  文脈回復可で据え置き。**残レイヤー：後編 L3 読・L4 整**。
 - **残る任意バックログ（nitpick・著者裁量）**：三題噺②ラベルの本文⇔表ゆれ（Ruby だと/Ruby・RBS）、
   part1 初出での型名前空間予告（技術判断含み・著者留保）、図キャプションのコードスパン体裁。
   デザイナーによる図の本清書は将来別途。
