@@ -1,148 +1,94 @@
-# 後編 L1 真・型理論エキスパート 査読（2026-06-09）
+# 型理論エキスパートレビュー（後編 v1）／2026-06-13 L1真
 
-対象：`book/v1/ja/seasoned/`（Part 1〜8）＋ `examples/*.rb`、裏取りに付録 a1/a4・glossary・lib。
-査読者：型システム理論（TAPL 講義水準／双方向・変性・System F・再帰型・HKT・単一化・健全性）。
-方針：**形式として正しいか**を厳しく見る。本書が*意図的*に簡略化・後送りと明記した所、`examples`
-で*意図的に*縮約したスケッチは咎めない（事故的不正確さと区別）。
+後編 The Seasoned chibirigor（Part 1〜8 ＋ README ＋ examples）を、形式的・技術的正確さの観点で査読した。
+横断参照として glossary.md・appendix a1/a3-2/a4、前編 little/、lib/chibirigor/、Rigor チェックアウト
+（ADR-5/20/35/41/47, acceptance.rb）も事実確認に用いた。`examples/*.rb` 全 5 本と `check_docs.rb` は緑。
 
-凡例：**ERROR**（型理論として誤り）／**MISLEADING**（条件付き）／**REF**（参照番号誤り）／nitpick。
-ラベル：［事故］＝事故的不正確さ／［簡略・許容］＝本書が明記した意図的簡略化。
+## 総括（先に結論）
 
-## 0. 自己チェックの再現
+**形式的 ERROR はゼロ。** 探した「条件付きでしか正しくない記述」も実害のあるものは無く、見つかったのは
+参照の精密化に値する nitpick・MISLEADING 寄りの軽微点が数件のみ。後編が掲げる「TAPL 並みの厳密さは目指さず、
+explicit に断った簡略化は咎めない」という設計方針に照らして、**この巻は形式的に信頼できる**。
 
-`ruby <file>` を 5 本すべて実行 → 全 PASS（緑）を確認。本文の `run:` ブロックと実出力は一致。
-スケッチのアルゴリズムは（後述の occurs-check を除き）形式的に健全。
+特に良かった点（簡略化の正しさが守られている所）：
 
----
+- 双方向（Part 1）：subsumption `(Sub)` と Var-Synth を正しく書き、「Var が x∉Γ で失敗する」TAPL 規則を
+  chibirigor が `|| Dynamic` で全域化している差分を「脚注つき」と明示。診断が `⇐` でしか出ない理由を
+  「合成の全域化＋照合の寛容」の 2 点に正しく分解（lib の `accepts.rb` が `Dynamic→:maybe` で裏付く）。
+- 変性（Part 2）：S-Arrow の引数反変・戻り共変、width/depth、アルゴリズム的部分型付け（反射・推移の吸収）が
+  正確。`examples/subtype.rb` の `subtype(tp, sp)` 入れ替えが反変の実証になっている。Rigor 実装の注（Nominal
+  一律共変・宣言サイト変性未実装・S-Arrow は override 互換 ADR-35）は acceptance.rb / ADR-35 と一致。
+- 代入（Part 3）：シャドーイング（params.include? で停止）と変数捕獲（fresh α 変換）の 2 落とし穴を正しく
+  分離。TAPL 23.7 erasure 定理と Java の型消去を別物と明示し、さらに Rigor の `erase_to_rbs`（境界の保守的
+  変換）を「もう一つの意味」と断った上で重ねている — 三者の混同を防いでいる。
+- 再帰型（Part 4）：iso/equi（TAPL 20.2）、余帰納＝最大不動点（TAPL 21）、HKT の一次根拠が再帰型章ではなく
+  TAPL 29（カインド）である、を正しく区別。スケッチの `seen` 判定が α 同値ベースの「健全な簡約版」で本式
+  （展開後ペアの最大不動点）より弱い、と自己申告している誠実さは特筆に値する。
+- 推論（Part 5）：道 A（capability）/道 B（制約＋単一化）、`(X)->X` がジェネリックに残る話、occurs-check を
+  省いたスケッチへの明示注記、HM ランク境界（後述）、TypeProf 対比が正確。
+- 健全性（Part 7）：progress＋preservation（TAPL 8.3）、正規化（TAPL 12）と Ω の型付け不能、「手放すのは
+  主に progress、preservation は untyped widen で自明に保つ」という非対称の整理が正しい。gradual の 2 規律
+  （consistency `~` 非推移／gradual guarantee）の区別も正確。
 
-## 総評（先に結論）
-
-**後編は型理論として極めて良くできている。** 双方向（subsumption の定義）・S-Arrow（戻り共変／
-引数反変）・width/depth・α 変換と変数捕獲・μ と余帰納・型再構築の骨子・progress/preservation の
-切り分けまで、講義で使える水準で正確。とりわけ評価できるのは **「意図的簡略化を形式的に正直に
-開示する」姿勢**で、Part 4 の「正確には」注（`naive_eq` 版は本来の最大不動点余帰納より弱い）は
-模範的。Liskov/robustness/S-Arrow の三点収束（2-3a）も導出として正しい。
-
-形式的 ERROR は**ゼロ**。修正に値するのは次の 3 系統：
-
-1. **MISLEADING（要修正・1 件）**：Part 7 §7-4 が `untyped` を「最大型」と呼ぶ ― 付録 a1-4 と
-   Part 2 §2-1 が「`untyped` はトップ型ではない」と明言した区別と内部矛盾。
-2. **MISLEADING/nitpick（1 件）**：Part 7 §7-3 の「『しくみ』のミニ言語は正規化する」が、a4-3 と
-   Part 4 自身の「『しくみ』8 章は（同値）再帰型を実装」と整合しない疑い。
-3. **［事故］doc-drift（1 件・低）**：5 本中 3 本のスケッチのヘッダコメントが Part 番号を誤記。
-4. nitpick：unification.rb の occurs-check 不在が無言（Part 4 の開示姿勢と比べると不揃い）。
-   Wells 1999 の帰属がやや緩い。「join」の語が事実集合では meet 方向。
-
----
-
-## Part 1 ― 双方向型付け
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 1-a | `(Sub) Γ⊢e⇒S  S<:T / Γ⊢e⇐T`、「照合とは『合成してから部分型で突き合わせる』こと」 | subsumption の定式化として正確。`⇐`＝合成後 `<:` という同定も正しい | （良）| — |
-| 1-b | §1-3「診断が生まれるのは照合 `⇐` の subsumption で `S<:T` が崩れたときだけ…『⇐ 位置が無いから』ではなく『合成が未知を untyped に倒し、照合が untyped を罰しないから』」 | 双方向の枠組みで gradual の全域化合成＋寛容照合を正しく分離。よくある誤り（「注釈が無い＝⇐位置が無い」）を明示的に否定しており、形式的に正確 | （良）| — |
-| 1-c | §1-7-a `check_against`：`Dynamic` が絡めば return、`Accepts==:no` のみ診断 | 戻り型照合を `⇐` に正しく載せている。gradual の約束（untyped で黙る）と整合 | （良）| — |
-
-Part 1 は形式的に問題なし。導入として模範的。
-
-## Part 2 ― 部分型と変性
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 2-a | S-Arrow `A'<:A  B<:B' / (A)->B <: (A')->B'`、subtype.rb の `subtype(tp, sp)` 入れ替え | 反変／共変ともに正しい。スケッチの引数入替えも正確。`arg contravariant reverse is false` が反変の証拠になっている | （良）| — |
-| 2-b | 2-2 width/depth：「キーが多い方が部分型（小さい箱）」「値型に対して共変」 | レコード部分型の標準形。`{l_i (i∈1..n+k)} <: {l_i (i∈1..n)}` も正確 | （良）| — |
-| 2-c | 2-3a「override は引数を広げてよい・戻りを狭めてよい」=LSP | 健全なメソッドオーバーライド規則（param 反変・return 共変）として正しい。S-Arrow/LSP/robustness の三点収束の導出も妥当 | （良）| — |
-| 2-d | 2-4「読み共変・書き反変・両方で不変」、実装注で「Rigor 現実装は Nominal 型引数を一律共変」 | 可変コンテナの変性として正しく、実装の保守的近似も正直に開示。良い | （良）| — |
-| 2-e | 2-5「`untyped` が絡むと `<:` は両方向に通る … gradual consistency `~`」、§2-1 注「`any`／`Dynamic[Top]` はトップ型ではなく『チェックを切る型』」 | consistency の対称・非推移を正確に提示。**`untyped`≠トップ型の区別を明言**している点が重要（Part 7 との矛盾の根拠になる、後述 7-1） | （良・伏線）| — |
-
-Part 2 は形式的に問題なし。
-
-## Part 3 ― ジェネリクスと型代入
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 3-a | 3-2 シャドーイング停止条件「`TypeAbs.params` が置換対象 `X` を含むなら中は置換せず返す」 | α 変換抜きの素朴 subst の正しい停止条件。段1【適用】／段2【代入】の分離も正確 | （良）| — |
-| 3-b | 3-3 「置換の前に内側束縛変数を新品名に付け替える（α 変換）」、subst.rb が常に fresh 化 | 捕獲回避として健全。なお本スケッチは*常時* α 改名する eager 版（最小限の捕獲回避より強い）だが、本文が「freshens U」と明記しており事故ではない | （良）| ［簡略・許容］|
-| 3-c | 3-5「erasure 定理（TAPL 23.7）…Java の型消去とは別物（あちらは実装手法、こちらは意味論の定理）」 | erasure の意味論定理と Java erasure の区別は正確。参照番号 23.7（System F の Erasure）も正しい | （良）REF-OK | — |
-
-Part 3 は形式的に問題なし。
-
-## Part 4 ― 再帰型：μ と余帰納
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 4-a | 4-3 同型再帰／同値再帰の区別（TAPL 20.2）、4-4 余帰納＝仮定集合 `seen` | iso/equi の区別・余帰納の説明とも正確。参照 20/21 章正しい | （良）| — |
-| 4-b | §4-4 「正確には」注：「このスケッチの `seen` 判定は `naive_eq`（展開しない比較）…TAPL 21 章の本来の余帰納（展開後ペアの最大不動点）より弱い（捕まえる『等しい』が少なめ）」 | **模範的な開示**。簡約版が健全（過剰に等しいと言わない）かつ不完全（少なめ）であることを正しく区別。これが形式査読のあるべき姿 | （良・模範）| ［簡略・許容］|
-| 4-c | 4-5 HKT/`App`+fuel、「HKT の根拠は再帰型 20/21 章ではなく TAPL 29 章（型演算子とカインド）」 | HKT を 20/21 でなく 29（kinding）に正しく帰属。`App[F,A]` を defunctionalize 版と呼ぶのも妥当 | （良）REF-OK | — |
-
-Part 4 は形式的に問題なし。開示の質が高い。
-
-## Part 5 ― 本物の型推論
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 5-a | 5-3「TAPL 22 章の型再構築、いわゆる Hindley–Milner の骨子」、unification.rb の `unify`/`solve` | 制約生成＋単一化の骨子として妥当。`id` が制約ゼロ→ジェネリック、矛盾→`UnifyError` も正しい | （良）| — |
-| 5-b | unification.rb に **occurs-check が無い**（`unify(X, X->X)` が無限／不健全に通る） | 形式的には HM 単一化の健全性・停止性に必須の検査。スケッチが TCon/TVar のみで関数型を作らないため自己チェックは緑のままだが、「HM の骨子」と銘打つ以上、Part 4 が `naive_eq` の弱さを開示したのと同程度の一言（「occurs-check は割愛」）が欲しい。**無言の割愛は開示姿勢が不揃い** | nitpick | ［事故・軽］|
-| 5-c | 5-4 型理論コラム①「ランク 3 以上の多相型推論は決定不能です（Wells 1999）」 | 内容は正しい（rank≥3 の型推論は決定不能。rank-2 は決定可能＝Kfoury–Wells 1994）。ただし**rank ベースの境界の一次出典は Kfoury–Wells**。Wells 1999（"Typability and type checking in System F … undecidable", APAL）は*無制限* System F の決定不能性。帰属がやや緩い | REF/nitpick | ［事故・軽］|
-| 5-d | 5-3 参考書メモ「ML の `let` 多相は 22 章の主題ではなく…23 章の領分」 | let 多相を System F/23 章寄りに置くのは TAPL の章立てとして妥当（22 は単相の再構築） | （良）| — |
-| 5-e | 5-4a TypeProf 対比（whole-program 抽象解釈 vs local+catalog） | 設計対比として正確で公平。形式的問題なし | （良）| — |
-
-## Part 6 ― 完全な FactStore
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 6-a | 6-5「合流後: x は Integer | String（両枝の事実の『共通部分』＝join）」「型は union、事実は積」 | 型は union（型格子の join）、事実は intersection＝命題格子では meet。本文も「共通部分＝積」と正しく述べているが、その積を **「join」と命名**しているのは型格子用語との衝突。データフロー解析では合流点の演算を慣例的に join と呼ぶ（格子の向きに依らず）ので弁護可能だが、型理論読者には引っかかる。「合流（merge）」等にするか一言断りが安全 | nitpick | ［事故・軽］|
-| 6-b | 6-2 6 バケツ、§6-3 stability、不変ストア＋バケツ指定無効化（fact_invalidation.rb） | フロー解析の設計として一貫。型理論の射程外（a4-3 が「独自地形」と明記）で、形式的誤りなし | （良）| — |
-
-## Part 7 ― 健全性と正規化、わざと unsound（最重要章）
-
-| # | 原文引用 | 評価 | 重大度 | ラベル |
-|---|---|---|---|---|
-| 7-1 | §7-4 「preservation の側は…怪しくなれば untyped に widen するので、『型は（**最大型 `untyped`** まで含めて）保たれる』が自明に成り立つ」 | **付録 a1-4・Part 2 §2-1 と内部矛盾**。両所は「`untyped`（`any`／`Dynamic[Top]`）は**トップ型ではない** ― `Top` にチェック切りマーカーを重ねた別物」と明言。ここで untyped を「最大型」と呼ぶと、巻全体で築いた軸 A（格子位置）／軸 B（チェック有無）の分離が崩れる。preservation が自明に成り立つ論拠も、正しくは「untyped へ widen すると `~`（consistency）で型が保たれる（と見なせる）」であって「最大型だから保たれる」ではない | **MISLEADING** | ［事故］ |
-|   | 修正案 | 「最大型 `untyped`」→「`untyped`（widen の落とし所）」。論拠は「widen 後は consistency `~` のもとで型が保たれる」に。a1-4 の `untyped`≠`Top` と一貫させる | — | — |
-| 7-2 | §7-3 「『しくみ』のミニ言語も `any` を持たないので正規化が成り立ちます（型が付けば必ず止まる）」 | **疑わしい**。a4-3 と Part 4 §4-3 は「『しくみ』8 章が（同値）再帰型を実装」と明記。同値再帰型を持つ体系では well-typed な発散項を書けるため、一般には**正規化しない**（μ型は STLC の正規化定理の前提＝再帰なしを壊す）。「`any` が無い」ことは正規化の十分条件ではない（再帰型／一般再帰の有無こそ要点）。少なくとも「（型注釈付きで再帰型を入れない範囲なら）」等の限定が要る。Part 4 で自分が紹介した同書の再帰型と衝突 | **MISLEADING**（ERROR 寄り） | ［事故］ |
-|   | 修正案 | 「『しくみ』のミニ言語も `any` を持たないので正規化が成り立ちます」→「単純型付きの中核（再帰型・一般再帰を入れない範囲）では正規化が成り立ちます」。あるいは「『しくみ』8 章の再帰型を足すと正規化は破れる ― 後編 Part 4 で見た通り」と接続して、§7-3 末尾の「（再帰型を足すと話が変わる ― 後編 Part 4）」を『しくみ』にも適用する | — | — |
-| 7-3 | §7-4 表「① untyped 受理 → progress を放棄（~ が非推移＝subsumption が漏れる） … ④ 保守的ナローイング → progress の*検出*を放棄」 | progress/preservation の切り分けは形式的に妥当。gradual 健全性は「reduce か value か **cast error**」に弱まる（Siek/Taha）が、chibirigor は cast を持たないため NoMethodError が真の stuck＝progress 失敗、という整理は正しい。④を「progress の*検出*を放棄」と言い換えた精度も良い | （良）| — |
-| 7-4 | §7-3 Ω「`x:A->B` かつ `x:A`、つまり `A=A->B` という再帰的な型が要る…単純型には無いので Ω は型付け不能」 | STLC で `λx.x x` が型付け不能な理由として正確。再帰型を足すと型付く、という後送りも正しい | （良）| — |
-| 7-5 | §7-5 consistency `~`（対称・非推移）と gradual guarantee（注釈量への連続性、Siek ら）の 2 規律 | 2 規律の区別・帰属とも正確。`~` 非推移の例（Integer~untyped~String だが Integer≁String）も正しい | （良）| — |
-
-Part 7 は枠組み自体は正確だが、上の 7-1（untyped=最大型）と 7-2（『しくみ』正規化）の 2 点で、
-**本書が他所で築いた区別と矛盾する**。いずれも他章・付録と突き合わせれば直る［事故］。
-
-## Part 8 ― 本物の Rigor へ
-
-形式的主張なし（実用ツールへの橋）。問題なし。8-6 まとめ表の理論帰属（HKT=TAPL 29 等）も正確。
+erasure の前編再アンカー（glossary「P1 予告→P3 本式」・a3-2「内部精密型↔RBS 境界保守型」）と後編 Part 3 §3-5・
+Part 8 §8-3 の記述は**整合しており、矛盾・二重定義は無い**。
 
 ---
 
-## 横断：スケッチのヘッダ Part 番号 doc-drift（事故）
+## 指摘表
 
-`examples/*.rb` のヘッダコメントの Part 番号が 3 本で誤記。本文のリンク・節は正しいので無害だが、
-「本文⇔実装の不整合」として記録：
-
-| ファイル | ヘッダの記載 | 正しい Part | 判定 |
-|---|---|---|---|
-| `subst.rb` | 「Part 6 ― 型代入 subst」 | Part 3 | **誤** |
-| `unification.rb` | 「Part 3 ― 制約ベース推論」 | Part 5 | **誤** |
-| `fact_invalidation.rb` | 「Part 5 ― 再代入で事実が消える」 | Part 6 | **誤** |
-| `subtype.rb` | 「Part 2」 | Part 2 | 正 |
-| `mu_typeeq.rb` | 「Part 4」 | Part 4 | 正 |
-
-重大度 nitpick／［事故］。コメント 1 行の修正。`check_docs.rb` が Part 番号までは照合していない
-可能性（ドリフト検出の盲点）。
+| 該当箇所 | 本書の記述 | 型理論的な問題 | 修正案 | 重大度 |
+|---|---|---|---|---|
+| Part 5 §5-4 ①（行 160-161） | 「ランク 2 までで境界が引かれ、**ランク 3 以上の多相型推論は決定不能**です（Wells 1994/1999 は無制限 System F の型付け可能性の決定不能性）」 | ランク境界（≤2 決定可能／≥3 決定不能）は正しいが、その根拠は Kfoury & Wells (1999) のランク 3 結果。括弧内の Wells 引用は*無制限* System F に正しくスコープされているため誤りではないが、ランク 3 境界と無制限結果が同一文に同居し、読者がランク 3 境界＝Wells と読み違える余地がある | 「ランク ≥3 は決定不能（Kfoury & Wells 1999）。無制限 System F の型付け可能性そのものの決定不能性は Wells 1994」と分けると正確。最小修正なら現状維持可（事実誤りではない） | nitpick |
+| Part 1 §1-2（行 67-77）／§1-5（行 142） | 「`Γ`（ガンマ）は前編の `Scope`」「`Scope`/`FactStore` ＝ 環境 Γ」 | Γ は通常「変数→型」の静的環境で、Part 1 の `Scope` 対応は妥当。一方 Part 6 の `FactStore` はフロー感応な*事実*集合で、純粋な Γ より広い（フロー解析の状態）。「Γ＝FactStore」は近似であって厳密な同一ではない | §1-5 で「FactStore は Γ のフロー感応な拡張（厳密には Γ より広い）」と一言。実際 Part 6 §6-1 では正しく「Γ を一般化」と書いており、Part 1 の同一視と整合させると親切 | nitpick |
+| Part 4 §4-5 コラム末（行 190） | リスト/引用のインデント崩れ：「**fuel（既定 64）＋進捗追跡**で安全側に打ち切ります。」の行が引用ブロック `>` の外に出ている | 型理論の問題ではなく整形。直前まで blockquote、当該行だけ `>` 落ち | 行頭に `> ` を補う（内容は正しい。fuel 既定 64 は ADR-20 WD3 と一致） | nitpick |
+| Part 2 §2-1（行 40-41） | 「格子の両端 … 前編の `untyped`（後で見る）を除けば、最小の `Bot`…」 | `untyped`/`Dynamic[Top]` を「格子の両端の話から除外」する扱いは a1-4 の「untyped はトップ型ではない（軸 A/B）」と整合的で正しい。ただし本文だけ読むと「untyped も端の候補か」と一瞬誤読し得る | a1 への参照は既にある（行 62・227）ので実害なし。強いて言えば「untyped は格子の*端ではなく*判定を切るマーカー（→a1）」と能動的に否定すると締まる | nitpick |
+| Part 7 §7-4 表 ①行（行 86） | 「① `untyped` は何でも受理 ／ progress を放棄（`~` が非推移＝subsumption が漏れる）」 | `~` の非推移性は「`untyped` が無制限の抜け穴になりきらない＝健全側に働く性質」として §7-5・Part 2 で正しく使われている。ここで非推移性を progress 放棄の*理由*側に置くと、同じ性質が「漏れる根拠」と「漏れを抑える根拠」の両方に見え、読者が混乱し得る（事実としては「untyped が `:maybe` を通すこと」が progress 放棄の核） | 「`~` で `untyped` を素通しさせる（`:maybe` を罰しない）」と理由を consistency の*通す*側に寄せる。非推移性は §7-5 の「無秩序でない」側に純化 | MISLEADING |
+| Part 6 §6-2 脚注 [^buckets]（行 81・87-89） | 「バケツ名は本物の Rigor の内部仕様（`inference-engine.md`）の正式名と一致します」 | 検証範囲外の主張（spec ファイルの正式名と本文 6 名の一致を本査読では突合していない）。型理論的問題ではないが「一致する」と断言している | spec と語が一致することを著者側で再確認（または「概ね対応」に緩める）。型理論的には無害 | nitpick |
 
 ---
 
-## 参照番号（REF）チェック総括
+## 重点項目ごとの所見（ERROR なしの確認記録）
 
-確認した TAPL 参照はすべて正しい：8.3（safety＝progress+preservation）／12（normalization）／
-9（STLC）／15・16（subtyping・metatheory）／20・21（recursive・metatheory）／22（type
-reconstruction）／23・23.7（System F・erasure）／26（bounded quantification）／29（type
-operators & kinding）／15.2（subtype relation）。『しくみ』の章対応（3/7/9/8 章等）も a4-3 と整合。
-唯一の緩みは 5-c の「Wells 1999」（rank 境界の一次出典は Kfoury–Wells）。
+1. **双方向（Part 1）**：`(Var-Synth)`・`(Sub)` 規則の書式・前提・結論すべて正しい。「照合＝合成してから `<:`」
+   の同定が前編「引数を type_of→accepts」と形式的に一致。`check(rbs:)` モードと `check_against`（`:no` のみ診断・
+   Dynamic で黙る）は lib/chibirigor/checker.rb の実装と一致。`param:` ディレクティブの「本体ナローイング＋呼び
+   出し地点照合」の二役整理も妥当。
+2. **部分型と変性（Part 2）**：誤りなし。LSP／robustness／S-Arrow の収束（§2-3a）は「同じ規則に別ルートで至る」
+   という主張として正しく、過剰主張になっていない。可変コンテナの読み共変・書き反変・両方不変も標準どおり。
+3. **代入・System F（Part 3）**：誤りなし。α 同値の map 技法が Part 4 再帰型と「根が一つ」という橋渡しも妥当。
+   有界量化＝TAPL 26 章の参照も正しい。
+4. **再帰型（Part 4）**：誤りなし。簡約版 `seen` の弱さの自己申告、HKT 根拠＝TAPL 29 章、fuel＝余帰納の工学的
+   代替、`symbolize_names: true` のリテラル型による HKT 引数切替（Const 連動）まで一貫。
+5. **HM・型再構築・単一化（Part 5）**：occurs-check 省略の明示、let 多相が 22 章でなく 23/System F の領分という
+   切り分け、ランク境界（上表 nitpick 以外は正確）、TypeProf（whole-program 抽象解釈）との対比すべて妥当。
+6. **健全性（Part 7）**：progress/preservation/正規化/Ω/gradual 2 規律、いずれも正しい。「再帰型を足すと正規化が
+   破れる」も（μ 型で Ω が型付け可能になるため）正しい。`assert:` ディレクティブを「unsound キャストではなく
+   確かめた上で事実を足すゲート」と位置づけ、TS のユーザー定義型ガードに寄せた整理も妥当。
+7. **HKT/カインド（Part 4・8）**：`App[F,A]` の正しさ根拠を TAPL 29 章（kinding）に置く判断は正確。defunctionalize
+   した軽量実装という説明も Rigor ADR-20 と整合。
+8. **データフローの join/meet（Part 6 §6-5）**：合流点で「両枝で成り立つ事実だけ残す」＝事実格子の meet を、
+   慣用語では「join」と呼ぶ、という格子の向きの取り違えを*正しく*回避している（型格子 join≠事実格子 meet を明記）。
 
-## 修正の優先度
+## 参照番号・定理名の確認（REF：誤りなし）
 
-1. **要修正（MISLEADING・内部矛盾）**：7-1「最大型 untyped」、7-2「『しくみ』は正規化」。
-2. **軽（事故）**：スケッチ 3 本のヘッダ Part 番号、5-c の Wells 帰属、5-b occurs-check の無言割愛、
-   6-a「join」の語。
+- TAPL：8.3（安全性＝進行＋保存）、9（STLC 型付け規則・T-Var）、12（正規化）、15・16（部分型・メタ理論）、
+  20.2（iso/equi）、21（再帰型メタ理論・余帰納）、22（型再構築）、23・23.7（System F・erasure 定理）、
+  26（有界量化）、29（型演算子とカインド）— **すべて正しい**。
+- 人名・文献：Milner「Well-typed programs cannot go wrong」、Pierce & Turner "Local Type Inference"(2000)、
+  Dunfield & Krishnaswami "Bidirectional Typing"(2021)、Siek & Taha (2006) gradual typing、Siek ら gradual
+  guarantee、Liskov (LSP)、Wells（System F 型付け決定不能）— **帰属に致命的誤りなし**（Wells と Kfoury&Wells の
+  ランク 3 結果の区別だけ上表 nitpick）。
+- 『しくみ』章対応（3/7/8/9 章・おわりに）と a4 早見表 — 本文各章の参照と整合。
+
+## Rigor 実装との整合（fidelity 観点の事実確認）
+
+- ADR-5（robustness）/ADR-20（軽量 HKT・fuel 既定 64）/ADR-35（override 互換＝param 反変・戻り共変）/
+  ADR-41（Status: Proposed＝未実装）/ADR-47（narrowing-driven-clause-reachability＝a1 の `flow.unreachable-clause`）
+  すべて実在・記述と一致。
+- acceptance.rb：Nominal 型引数は要素ごと共変（zip→covariant）。Part 2「一律共変・宣言サイト変性未実装」と一致。
+- lib/chibirigor：`check_against`・`register_method`・`element_read`・`type_of_block`・`accepts(Dynamic→:maybe)`
+  すべて本文記述どおり実在。
+
+以上。形式的に堅牢で、簡略化はいずれも正しく断られている。表中の MISLEADING 1 件（Part 7 §7-4 ① の理由づけ）と
+nitpick 群のみ、必要に応じて反映されたい。

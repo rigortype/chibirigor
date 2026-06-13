@@ -83,7 +83,7 @@ preservation）で言い直します。**（前編側はここへの前振りを
 
 | 前編 §9-2 の標語 | progress／preservation の言葉 | 許す「行き詰まり」 |
 |---|---|---|
-| ① `untyped` は何でも受理 | progress を放棄（`~` が非推移＝subsumption が漏れる） | `untyped` 値が応えないメソッドを呼ぶ → `NoMethodError` |
+| ① `untyped` は何でも受理 | progress を放棄（`untyped` をどの期待型にも受理＝subsumption を素通し） | `untyped` 値が応えないメソッドを呼ぶ → `NoMethodError` |
 | ② open な hash・未知キー→`nil` | progress を放棄（幅部分型を引数で緩める） | 実は無いキーが `nil` → `nil` への呼び出しで停止 |
 | ③ `:maybe` を罰しない | progress を放棄（証明不能を `:no` に昇格させない） | `:maybe` が実は不一致 → 実行時の型エラー |
 | ④ 保守的ナローイング | progress の*検出*を放棄（disjoint・`Dynamic` を絞らない） | 絞れず見逃した枝の実エラーを報告しない |
@@ -119,6 +119,9 @@ preservation（評価で型が保たれる）の側は、chibirigor はそもそ
 - でも `~` は**推移的でない**：`Integer ~ untyped` かつ `untyped ~ String` でも
   `Integer ~ String` ではない。だから `untyped` を「何にでも化ける抜け穴」にしつつ、
   `Integer` と `String` の取り違えは依然 `:no` にできる。
+
+> `~` は gradual typing の学術慣例（Siek）の記号です。実 Rigor はドキュメントで記号衝突を避け、
+> この関係を `consistent(A, B)` と綴ります（`~T` は否定／補型に予約）。意味（対称・非推移）は同じです。
 
 前編の三値 `accepts` は、まさにこの `<:`（証明できる／できない）と `~`（untyped が絡む）を
 **一つの判定に畳む**ためのものでした：
