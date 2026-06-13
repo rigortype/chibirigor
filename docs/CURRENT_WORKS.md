@@ -29,8 +29,11 @@
   38/41 の外し 3 項目は両名一致の定数畳み込みで、本文は「丸める」と明記＝Part2§2-7 発展ノート＝
   ハーネス側の過剰採点（本の欠陥でない）。唯一の共通 FRICTION（Part4 `node.subsequent` の ElseNode 非明示）に
   散文ノートを適用。所見＝`book/v1/ja/.reviews/_reproducibility-review.md`。
-- **残る著者裁量**：Part 6・7・4 の図版（Claude Design へ依頼用の仕様書を `book/v1/ja/figures/_drafts/README.md` に用意済み。
-  図が入ったら本文への配線＝私が実施）。これ以外の `.reviews/_*.md` 残件は軸を保って選択適用の任意バックログ。
+- **図版バックログ完了（2026-06-13）**：Claude Design 作成の図 4-1（then/else→union）・6-1（open shape）・
+  7-1（accepts 三値＋Union 畳み込み）を `figures/svg/little-{4,6,7}-1.svg` に追加、各章（§4-1・§6-3・§7-3a 後）へ配線。
+  仕様書＝`book/v1/ja/figures/_drafts/README.md`。XML 整形式・CSS 変数既知・ラベル本文一致・色の意味づけ 3 図一貫を確認。
+  → 前編の図は 0/2/4/5/6/7 をカバー（概念ヤマの偏在解消）。デザイナーによる本清書は将来別途。
+- **残る任意バックログ**：`.reviews/_*.md` の未適用指摘（軸を保って選択適用）。刊行前なら L4 整フルパスの再走。
 
 ### ★本線：v1 清書版 `book/v1/ja/`（draft の外・リポジトリ直下）
 原稿 `draft/` を**二巻維持・大胆再構成**で再編した清書ツリー。**ここが今後の編集対象**。
