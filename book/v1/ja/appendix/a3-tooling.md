@@ -205,14 +205,126 @@ demo.rb:2:7: 7
 
 ---
 
+## a3-3b. `rigor trace` ― 推論の手順をコマ送りで見る
+
+ここまでの道具（`--explain`・`type-of`・カスケード）は、推論の**答え**や**地図**を見せるもの
+でした。実 Rigor にはもう一つ、推論の**手順そのもの**を見せる道具があります ― `rigor trace`
+です。`check` が走らせるのと同じ推論を file に対して再走させ、記録した推論イベントを**端末の
+コマ送りアニメーション**として再生します。1 コマ＝推論の 1 場面で、ローカルが scope に入る瞬間
+（`bind`）、分岐の型が 1 つの union に溶ける瞬間（`union`）、メソッド送信が解決する（または
+`Dynamic[top]` に fail-soft する）瞬間（`dispatch`）を、評価される範囲をハイライトしながら見せます。
+
+```sh
+rigor trace lib/example.rb              # キー押しでコマ送り
+rigor trace --delay=0.5 lib/example.rb  # 自動再生
+rigor trace --format=json lib/example.rb # 生のイベント列
+```
+
+`--verbose` は式ごとの enter/result まで全部出し、既定では上の 3 種の「教えどころ」だけに絞ります。
+JSON のイベント列は安定しているので、教材の図や講義資料の素材にできます。
+
+### a3-3bx. 発展：chibirigor にも極小 `trace` がある
+
+これは付録の中でも珍しく、**本書側にも実物とほぼ同じ道具がある**節です（実装は
+`lib/chibirigor/tracer.rb`）。本書で各 Part を写経して作った部品 ― scope への束縛・`Type.union`
+の畳み込み・dispatch の表引き ― が、**動く順番**で目の前を流れていきます。読者が「評価順は
+こうだろう」「ここで union になるはず」と頭の中で組み立てた推論を、**目で確かめる**ための学習用の
+道具です。
+
+3 行の例で動かしてみます ― 代入・三項演算子・メソッド呼び出しを 1 つずつ含みます：
+
+```console
+$ printf 'x = 5\ny = x > 0 ? 1 : -1\nz = y + 2\n' > demo.rb
+$ ruby exe/chibirigor trace demo.rb
+```
+
+端末では 1 コマずつ Enter で送ります（`q` で終了）。全 17 コマのうち、要点のコマだけ抜き出すと：
+
+```text
+chibirigor trace ─ step 2/17
+────────────────────────────────────────────────────────────────
+  1  x = 5
+  2  y = x > 0 ? 1 : -1
+  3  z = y + 2
+────────────────────────────────────────────────────────────────
+型環境  : x: 5
+評価中  : （トップレベル）
+► 束縛: x ← 5（型環境に追加）
+…
+chibirigor trace ─ step 5/17
+…
+型環境  : x: 5
+評価中  : if（三項含む） › > の呼び出し
+► dispatch: 5.>(0) → untyped （表に無い → fail-soft で untyped）
+…
+chibirigor trace ─ step 7/17
+…
+評価中  : if（三項含む）
+► union: 1 , -1 → 1 | -1
+…
+chibirigor trace ─ step 9/17
+…
+型環境  : x: 5   y: 1 | -1
+評価中  : （トップレベル）
+► 束縛: y ← 1 | -1（型環境に追加）
+…
+chibirigor trace ─ step 12/17
+…
+評価中  : + の呼び出し
+► dispatch: 1.+(2) → 3 （定数畳み込み）
+chibirigor trace ─ step 13/17
+…
+► dispatch: -1.+(2) → 1 （定数畳み込み）
+chibirigor trace ─ step 14/17
+…
+► union: 3 , 1 → 3 | 1
+chibirigor trace ─ step 15/17
+…
+► dispatch: 1 | -1.+(2) → 3 | 1 （Union をメンバへ分配）
+…
+chibirigor trace ─ step 17/17
+…
+型環境  : x: 5   y: 1 | -1   z: 3 | 1
+評価中  : （トップレベル）
+► 束縛: z ← 3 | 1（型環境に追加）
+
+── 再生おわり（全 17 コマ）──
+```
+
+この 17 コマで、本編の部品が動く順に並びます。`x` の束縛（step 2）→ 三項の条件 `x > 0` が
+**表に無い `>`** なので fail-soft で `untyped` に倒れ（step 5）→ 2 本のアーム `1` と `-1` が
+**union** に溶けて `y` に束縛され（step 7・9）→ `y + 2` は `y` が `1 | -1` なので
+**メンバへ分配**して各メンバを**定数畳み込み**し（step 12・13）、結果をまた union でまとめて
+（step 14・15）`z` を `3 | 1` に束縛する（step 17）。各 Part で別々に作った仕組みが、1 つの式で
+**どう連動するか**が一望できます。`--verbose` を付ければ、間引いた式ごとの enter/result も全部
+出ます。JSON で出したいときは `--json`、自動再生は `--delay 0.5` です。
+
+仕組みは実物と同じ発想で、**コアには一切手を入れていません**。`type_of` / `eval_statement` /
+`Type.union` / `Dispatch.dispatch` に `Module#prepend` でフックを差し込むだけで、レコーダが
+`nil`（＝トレース中でない）ときフックは即 `super` します。だから `check` や `annotate` の挙動は
+変わらず、**本編で写経したコードを 1 行も汚しません**（`tracer.rb` 冒頭コメント参照）。
+
+| | 本書（chibirigor） | 実物（Rigor） |
+|---|---|---|
+| 見せるもの | 推論イベントのコマ送り（`bind`・`union`・`dispatch`） | 同じ（推論の derivation を再生） |
+| コアへの干渉 | `Module#prepend` のフック・レコーダ nil なら即 super | `check` と同じ推論に乗る記録→再生の探針 |
+| 出力形式 | 端末アニメーション／`--json`／`--verbose`／`--delay` | 端末アニメーション／`--format=json`／`--verbose`／`--delay`／`--line` |
+
+実物が `--line=N` で 1 行だけに絞れるのに対し、chibirigor は行フィルタを持たない、といった枝葉の差は
+ありますが、**推論の手順を再生して見せる**という発想と 3 種のイベントは同じです。本書の他の道具が
+「Rigor の実物 → 極小版」だったのに対し、`trace` は珍しく**本書側がほぼ実物と同型**で並びます。
+
+---
+
 ## a3-4. まとめ ― 「素朴／実物」対応の早見
 
-本付録で橋渡しした 3 つの道具を一枚に：
+本付録で橋渡しした 4 つの道具を一枚に：
 
 | 道具 | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
 | `rigor check --explain` | 極小版あり（未知ディスパッチを `:info` 地図化・§a3-1x） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
 | `rigor type-of file:line:col` | `annotate` ＋ 極小 `type-of`（内部型 1 つ・§a3-2x） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
+| `rigor trace file` | ほぼ実物と同型の極小版あり（`bind`・`union`・`dispatch` をコマ送り・§a3-3bx） | 推論の手順を端末アニメーションで再生（`--verbose`・`--line`・`--format=json`） | ― |
 | dispatch 5 段カスケード | 1 段の表引き（`METHODS`・極小版は設けず） | ① 定数畳み込み → ② shape → ③ RBS → ④ in-source → ⑤ fallback | 前編 Part 2 |
 
 いずれも、本書で手作りした骨格（`Dynamic` マーカー・`annotate`・`METHODS` 表）が、実 Rigor では
