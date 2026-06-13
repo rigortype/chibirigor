@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 3 ― ローカル変数と不変 Scope
+title: Part 3 ― ローカル変数と不変 Scope
 description: "`x = 1` で型を覚え `x` を読めるようにする。不変 Scope で「上書きしない」設計を体得する。"
 sidebar:
   order: 4

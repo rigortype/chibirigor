@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor（後編）
+title: The Seasoned chibirigor (後編)
 description: 前編で作ったものの裏側を、形式の言葉で読み解く熟練編。Part 1〜8。
 sidebar:
   order: 2

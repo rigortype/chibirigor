@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 7 ― 受理判定と「たぶん」
+title: Part 7 ― 受理判定と「たぶん」
 description: "「この型を渡して合う？」を三値（`:yes`／`:no`／`:maybe`）で判定する `accepts` を作る。"
 sidebar:
   order: 8

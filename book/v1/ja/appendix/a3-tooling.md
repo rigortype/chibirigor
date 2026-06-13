@@ -1,5 +1,5 @@
 ---
-title: 付録 a3 ― 道具（実 Rigor の CLI と dispatch カスケード）
+title: 付録 a3 ― 道具 (実 Rigor の CLI と dispatch カスケード)
 description: 本編が 1 行ポインタで送った実 Rigor のツール挙動（`check --explain`・型表示の二段構え／erasure・`trace`・dispatch 5 段カスケード）を 1 箇所にまとめる参照付録。
 sidebar:
   order: 23

@@ -1,5 +1,5 @@
 ---
-title: "The Little chibirigor Part 6 ― ハッシュと配列の型"
+title: "Part 6 ― ハッシュと配列の型"
 description: "ハッシュ・配列のリテラルに構造的な型（`HashShape`／`Tuple`）をつけ、部分一致を許す設計にする。"
 sidebar:
   order: 7

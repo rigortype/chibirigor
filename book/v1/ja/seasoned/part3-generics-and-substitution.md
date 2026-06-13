@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor Part 3 ― ジェネリクスと型代入
+title: Part 3 ― ジェネリクスと型代入
 description: 前編でなぞった型変数の置換を本式に組み直し、α 同値・変数捕獲・erasure を形式で扱う。
 sidebar:
   order: 13

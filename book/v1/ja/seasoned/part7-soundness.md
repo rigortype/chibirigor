@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor Part 7 ― 健全性と正規化、そして「わざと unsound」
+title: Part 7 ― 健全性と正規化、そして「わざと unsound」
 description: "型理論の中心定理（progress + preservation）を据え、なぜ chibirigor はわざと健全でないのかを形式で言い直す。gradual の 2 つの規律と、停止性を守る工学（余帰納・fuel・予算）をここに集約する。"
 sidebar:
   order: 17

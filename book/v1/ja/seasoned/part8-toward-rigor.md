@@ -1,5 +1,5 @@
 ---
-title: "Part 8（最終章）― 本物の Rigor へ"
+title: "Part 8 (最終章) ― 本物の Rigor へ"
 description: "二巻を締める章。chibirigor と本物の Rigor の対応を整理し、次に読むべき ADR への道を示す。"
 sidebar:
   order: 18

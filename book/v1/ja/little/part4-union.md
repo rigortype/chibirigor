@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 4 ― Union：型が一本に決まらない
+title: Part 4 ― Union：型が一本に決まらない
 description: "型が一本に決まらないときの型 `Union` を導入し、`if`／三項の枝の型を 1 つにまとめる。"
 sidebar:
   order: 5

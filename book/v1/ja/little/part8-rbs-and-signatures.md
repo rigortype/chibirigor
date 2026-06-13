@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 8 ― RBS と型シグネチャ
+title: Part 8 ― RBS と型シグネチャ
 description: "手書きの `METHODS` 表を RBS 由来に差し替え、その上で `def` を読み本体から戻り型を合成して RBS 風シグネチャを出力する。"
 sidebar:
   order: 9

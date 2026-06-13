@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 0 ― はじめに：推論を土台にした型チェッカー
+title: Part 0 ― はじめに：推論を土台にした型チェッカー
 description: 本編の入口。chibirigor が何で・何でないかを掴む章。実装の前提と全編を貫く約束ごとを共有する。
 sidebar:
   order: 1

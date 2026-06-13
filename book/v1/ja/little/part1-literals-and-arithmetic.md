@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 1 ― リテラルと算術
+title: Part 1 ― リテラルと算術
 description: 値に型をつける最小の仕組みを作り、`check` と `annotate` を動かす。`Const` と `type_of` の導入。
 sidebar:
   order: 2

@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 5 ― ナローイング：場合分けで絞る
+title: Part 5 ― ナローイング：場合分けで絞る
 description: "Union で増えた型を、`if`/`case` の枝ごとに絞り込む（ナローイング）。`narrow` の実装と、絞り込みの 2 つの掟を作る。"
 sidebar:
   order: 6

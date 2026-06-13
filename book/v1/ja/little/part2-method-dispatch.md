@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor Part 2 ― メソッド送信とディスパッチ
+title: Part 2 ― メソッド送信とディスパッチ
 description: メソッド呼び出しの型付けを手書きの「ディスパッチ表」で実装し、引数の型不整合を診断する。
 sidebar:
   order: 3

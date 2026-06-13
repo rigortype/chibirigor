@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor Part 4 ― 再帰型：μ と余帰納
+title: Part 4 ― 再帰型：μ と余帰納
 description: "型が自分自身を参照する再帰型を μ 記法で扱い、Rigor の HKT／fuel 実装との対応を読み解く。"
 sidebar:
   order: 14

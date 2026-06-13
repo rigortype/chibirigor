@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor Part 1 ― 双方向型付けの正体
+title: Part 1 ― 双方向型付けの正体
 description: 前編で作った `type_of`／`accepts` が「合成（⇒）」と「照合（⇐）」という双方向型付けの骨格だったことを明かす。
 sidebar:
   order: 11

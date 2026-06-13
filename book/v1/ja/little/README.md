@@ -1,5 +1,5 @@
 ---
-title: The Little chibirigor（前編）
+title: The Little chibirigor (前編)
 description: 動く最小版（check + annotate）を Part 0〜9 で作り切る、やさしい導入の巻。
 sidebar:
   order: 1

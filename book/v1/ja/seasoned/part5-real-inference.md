@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor Part 5 ― 本物の型推論：引数を埋める
+title: Part 5 ― 本物の型推論：引数を埋める
 description: "前編が `untyped` に倒していた引数の型を、本体での使われ方から導出する制約ベース推論を扱う。"
 sidebar:
   order: 15

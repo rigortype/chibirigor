@@ -1,5 +1,5 @@
 ---
-title: The Seasoned chibirigor Part 6 ― 完全な FactStore
+title: Part 6 ― 完全な FactStore
 description: 前編の素朴な Scope と narrow を、Rigor の本物の FactStore（6 バケツ設計）へ拡張して読み解く。
 sidebar:
   order: 16
