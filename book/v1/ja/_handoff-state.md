@@ -1,6 +1,19 @@
 # 査読ハンドオフ状態
 
-最終更新：2026-06-11（フルサイクル査読 真→伝→読→整）
+最終更新：2026-06-13（lib 先行 2 機能の本文反映＋整/読バックログ一部適用）
+
+## 2026-06-13 適用分
+- **Union ディスパッチの発展ノート**：前編 part4 に「4-1x. 発展：Union レシーバへのメソッド送信
+  （分配して畳む）」を追加（lib 51f299b の本文反映。出力は実 `annotate` で検証済み、Rigor 言及は
+  `inference-engine.md` で裏取り）。
+- **trace コマンドの付録節**：a3 に「a3-3b. `rigor trace`」＋「a3-3bx. 発展：chibirigor にも極小
+  trace」を追加（lib 19c182d の本文反映。`rigor trace` は `docs/manual/02-cli-reference.md`・
+  `05-inspecting-types.md` に実在確認済み。a3-4 早見表に 1 行追加）。
+- **三題噺フル定義の一本化**（下記 L4 バックログ消化）：Part 0 を定義の家に、共通 README・little
+  README は 1 行参照へ。
+- **chibivue 比喩の回収**（下記 L3 M2 消化）：Part 0 で `book/impls` ↔ `impls/dist/partN` の対応を
+  一文で回収。
+- **後編 part5 unify 抜粋を region と同期**（occurs-check 注記の include 反映漏れ。チェッカー --fix）。
 
 ## 進行中のフルサイクル
 - [x] **L1 真**（型理論・フィデリティ・mametter）― 査読・適用済み
@@ -49,7 +62,7 @@
 
 ## L4 整 ― 著者裁量バックログ
 - **図の偏在**：図は little Part 0・2・5 のみ。概念ヤマの Part 4（Union）・6（open shape）・7（accepts 三値）に図なし。最低 Part 7・6 に新規図。
-- **三題噺の定義が共通 README／little README／Part 0 で三重逐語反復** → フル定義は Part 0 に一本化、他は 1 行参照へ。
+- ~~**三題噺の定義が共通 README／little README／Part 0 で三重逐語反復** → フル定義は Part 0 に一本化、他は 1 行参照へ。~~ **適用済み（2026-06-13）**
 - **後編の章冒頭様式のばらつき**：README が謳う「前編の◯◯は実は△△」フォーマットが Part 2 以降薄い。「起点（前編 P◯）→ 与える名前」を定型化。
 - **用語集に後編/Rigor 固有 headword が混在**（`Difference`/refinement carrier）→ 「前編で出会う／後編・Rigor 固有」で区切る。
 - **演習 18 章に解答・確認導線がない** → 巻末解答か examples リンク。
@@ -57,6 +70,6 @@
 
 ## L3 読 ― 著者裁量バックログ（背景強化・要・著者一次知識）
 - **【書評 M1・最大の穴】Rigor 自身の来歴が空白**：誰が・なぜ・何に困って作ったか／Sorbet・Steep・RBS 公式との関係。README か Part 0 に 2〜3 文。**著者（Rigor 作者）の一次知識が要るので捏造せず著者記述**。
-- **【書評 M2】chibivue 引用が枕止まり**：Part 0 の chibivue 比喩が回収されない。各章末の実装リンク（impls/dist/partN＝「動く最小版が残る」）に繋げる一文で回収できる。
+- ~~**【書評 M2】chibivue 引用が枕止まり**：Part 0 の chibivue 比喩が回収されない。各章末の実装リンク（impls/dist/partN＝「動く最小版が残る」）に繋げる一文で回収できる。~~ **適用済み（2026-06-13）**
 - **【書評 R1】章末「続編に送ったもの」の粒度不揃い**：Part 6 filter_map は「なぜ難しいか」まで書けているが、Part 2 method_missing 等は名詞列挙のみ。各項に一行「なぜ後回しか」。
 - **【辛口 #2・要判断】Part 0「作るものは 2 つの機能だけ」 vs 付録 `-x`（check --unreachable/--explain/type-of）**：本編中心機能＝2つ・付録は発展、という擁護は可能。気になるなら Part 0 に「本編で作る中心は」等の限定句、または付録の位置づけを明示。教育的簡略化を壊さない範囲で著者判断。
