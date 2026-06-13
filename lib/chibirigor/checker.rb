@@ -45,7 +45,9 @@ module Chibirigor
     seen = baseline.map { |d| d.slice(:line, :message) }
     result = errors.reject { |d| seen.include?(d.slice(:line, :message)) }
 
-    # 各フラグが立っているときだけ、その種類を併載する（完全に同一のイベントのみ重複排除）。
+    # dump_type(式) は基本機能：フラグ不要で常に併載する（:info・型印字）。
+    result += special.select { |d| d[:kind] == :dump_type }.uniq
+    # 残りはフラグが立っているときだけ併載する（完全に同一のイベントのみ重複排除）。
     result += special.select { |d| d[:kind] == :fail_soft }.uniq if explain
     result += special.select { |d| d[:kind] == :unreachable }.uniq if unreachable
     result

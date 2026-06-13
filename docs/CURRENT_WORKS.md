@@ -47,6 +47,11 @@
   - 中核**関数** `type_of`（アンダースコア）は本書の心臓につき維持。フィデリティ：`dump_type` は実在
     （`rigor/lib/rigor/testing.rb`・`analysis/check_rules.rb` で裏取り済み）。type-of も内部 API として残存
     （消える話ではない）。Rigor 側 manual がユーザー露出を絞れば本書と完全一致。
+  - **chibirigor 本体にも `dump_type` を基本機能として実装（2026-06-13）**：`type_of_call` が `dump_type(式)`
+    を認識→引数型を `:info`（`kind: :dump_type`）で印字、値は素通し（型は引数型のまま）。`check` は
+    フラグ不要で常に併載（`--explain`/`--unreachable` の opt-in とは別扱い）。コマンドではなく式なので
+    Part0「2 つのコマンド」は不変。`lib/chibirigor/{type_of,checker}.rb`＋`test/test_dump_type.rb`（緑）。
+    本文反映＝付録 a3-2 に実出力つきで追記。impls/dist には入れない（Part1–9 の核narrative外の常時機能）。
 - **残る任意バックログ（nitpick・著者裁量）**：三題噺②ラベルの本文⇔表ゆれ（Ruby だと/Ruby・RBS）、
   part1 初出での型名前空間予告（技術判断含み・著者留保）、図キャプションのコードスパン体裁。
   デザイナーによる図の本清書は将来別途。

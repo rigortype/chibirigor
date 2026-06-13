@@ -83,6 +83,12 @@ module Chibirigor
     diagnostic(node, "この枝には到達しません（#{reason}）").merge(kind: :unreachable, severity: :info)
   end
 
+  # dump_type(式) の型印字（:info・kind :dump_type）。値素通しなので型エラーではない。
+  # check がフラグなしで常に併載する基本機能（実 Rigor の Rigor::Testing.dump_type に相当）。
+  def dump_type_diagnostic(node, type)
+    diagnostic(node, "dump_type: #{type}").merge(kind: :dump_type, severity: :info)
+  end
+
   # 枝（文の並び）を評価し、最後の文の型を返す。枝の中でもスコープを縫う。
   def type_of_body(statements_node, scope, diagnostics)
     return Type::Const[nil] if statements_node.nil?
@@ -95,6 +101,14 @@ module Chibirigor
   # メソッド送信。レシーバと各引数の型を求め、ディスパッチ表に委ねる。
   # （Part 1 の `+` 場当たり特別扱いを、Part 2 で手書きの表に一般化した。）
   def type_of_call(node, scope, diagnostics)
+    # dump_type(式) ― その位置の推論型を :info で印字する基本機能（実 Rigor の
+    # Rigor::Testing.dump_type 相当）。実行時は値をそのまま返すので、型も引数の型を返す。
+    if node.receiver.nil? && node.name == :dump_type && (node.arguments&.arguments || []).size == 1
+      t = type_of(node.arguments.arguments.first, scope, diagnostics)
+      diagnostics << dump_type_diagnostic(node, t)
+      return t
+    end
+
     receiver = node.receiver ? type_of(node.receiver, scope, diagnostics) : Type::Dynamic.new
     arg_nodes = node.arguments&.arguments || []
 
