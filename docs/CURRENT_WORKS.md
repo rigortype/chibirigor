@@ -52,6 +52,10 @@
     フラグ不要で常に併載（`--explain`/`--unreachable` の opt-in とは別扱い）。コマンドではなく式なので
     Part0「2 つのコマンド」は不変。`lib/chibirigor/{type_of,checker}.rb`＋`test/test_dump_type.rb`（緑）。
     本文反映＝付録 a3-2 に実出力つきで追記。impls/dist には入れない（Part1–9 の核narrative外の常時機能）。
+  - **L1 真レイヤー監査済み（2026-06-13）**：フィデリティ/型理論/mametter の 3 レンズで dump_type/type-of/
+    erasure を監査＝**ERROR ゼロ**。実フィックス 2 件反映：a3-2 の include 要件（裸 `dump_type(x)` のみ必須・
+    `Rigor.dump_type(x)` 完全修飾なら不要）／glossary erasure の予告先 a1→a3-2（REF）。type-of 非露出は
+    「先行（著者方針）」と確認（事故的乖離ではない）。所見＝`.reviews/_{fidelity,expert,mametter}-review.md`。
 - **残る任意バックログ（nitpick・著者裁量）**：三題噺②ラベルの本文⇔表ゆれ（Ruby だと/Ruby・RBS）、
   part1 初出での型名前空間予告（技術判断含み・著者留保）、図キャプションのコードスパン体裁。
   デザイナーによる図の本清書は将来別途。
