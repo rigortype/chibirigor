@@ -13,7 +13,8 @@ sidebar:
 
 > はじめての方は二巻共通の入口 [README](../README.md)（動機・対象読者・環境構築）から。
 > 用語は [用語集](../glossary.md)、巻をまたぐ参照情報は [付録](../appendix/) で引けます。
-> 各章は「① 型理論 ↔ ② Ruby/RBS ↔ ③ Rigor 実装」の三題噺で、章末に演習があります。
+> 各章は「① 型理論 ↔ ② Ruby/RBS ↔ ③ Rigor 実装」の三題噺で、章末に演習があります
+> （三題噺のくわしい読み方は [Part 0](part0-introduction.md) で）。
 
 ## 章立て
 

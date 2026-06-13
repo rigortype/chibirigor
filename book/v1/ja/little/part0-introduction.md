@@ -13,7 +13,9 @@ sidebar:
 `chibirigor` は、**型を自分で推論する、最小限の Ruby 型チェッカー**です。本物の
 [Rigor](https://github.com/rigortype/rigor)（Ruby 向けの漸進的型チェッカー）のアーキテクチャの「最小版」を、
 ステップバイステップで自分の手で作っていきます。[chibivue](https://github.com/chibivue-land/chibivue)
-が Vue を小さく作り直して学ぶように、私たちは Rigor を小さく作り直して学びます。
+が Vue を小さく作り直して学ぶように、私たちは Rigor を小さく作り直して学びます。本書も chibivue が
+`book/impls` に各回の到達点を残すのと同じ作りで、章末から `impls/dist/partN` の段階スナップショット
+（その章まで作った、動く最小版）に飛べます。
 
 作るものは 2 つの機能だけ：
 
