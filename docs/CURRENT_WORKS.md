@@ -56,6 +56,13 @@
     erasure を監査＝**ERROR ゼロ**。実フィックス 2 件反映：a3-2 の include 要件（裸 `dump_type(x)` のみ必須・
     `Rigor.dump_type(x)` 完全修飾なら不要）／glossary erasure の予告先 a1→a3-2（REF）。type-of 非露出は
     「先行（著者方針）」と確認（事故的乖離ではない）。所見＝`.reviews/_{fidelity,expert,mametter}-review.md`。
+- **後編 seasoned の L1 真レイヤー監査済み（2026-06-13）**：型理論/フィデリティ/mametter の 3 レンズで
+  後編 8 章を監査＝**形式 ERROR・Rigor 乖離ゼロ**（FactStore 6 バケツ・sig-gen ADR-5・健全性/正規化・
+  型代入/erasure・ExpressionTyper 等コンポーネント名すべて一次情報と一致、設計スケッチ 5 本も全 PASS）。
+  精度フィックス 4 件反映：§5-3 let 多相の「System F 由来」逆因果除去／§5-4 ランク境界の出典精密化
+  （Kfoury–Wells と Wells を分離）／§5-4a TypeProf＝抽象実行と明示（道 B との等値を解消）／§7-4 progress
+  放棄の根拠から `~` 非推移を外す＋§7-5 に `~`/`consistent` 記法注記。type-of 除去の後編波及はゼロ
+  （`type_of` 関数参照のみ）。所見＝`.reviews/_{expert,fidelity,mametter}-review-seasoned.md`。
 - **残る任意バックログ（nitpick・著者裁量）**：三題噺②ラベルの本文⇔表ゆれ（Ruby だと/Ruby・RBS）、
   part1 初出での型名前空間予告（技術判断含み・著者留保）、図キャプションのコードスパン体裁。
   デザイナーによる図の本清書は将来別途。
