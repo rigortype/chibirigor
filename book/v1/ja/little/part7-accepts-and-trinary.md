@@ -150,6 +150,9 @@ end
   `Integer` を期待する式に渡すと `:no`。
 - **③ Rigor だと**：Union への照合でも「分からなければ `:maybe`」。全員 `:yes` のときだけ怒れる。
 
+![図 7-1　accepts の三値判定 ― untyped は :maybe、Union は一番弱い答え](../figures/svg/little-7-1.svg)
+> ▼ 図 7-1　`accepts` の三値判定 ― untyped は `:maybe`、Union は一番弱い答え
+
 ---
 
 ## 7-4. 「たぶん」は罰しない ― この章の山場

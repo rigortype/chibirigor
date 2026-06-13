@@ -80,6 +80,9 @@ when Prism::IfNode
 type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => 1 | "a"（両枝とも Const のまま union）
 ```
 
+![図 4-1　if／三項の型 ― then と else をまとめて Union](../figures/svg/little-4-1.svg)
+> ▼ 図 4-1　`if`／三項の型 ― then と else をまとめて Union（図 5-1 の逆向き）
+
 - **① 型理論**：値が複数の型になり得るとき＝合併型（『しくみ』はあえて避けた領域）。
 - **② Ruby だと**：分岐で別々の型を返すのは日常。`x = cond ? 1 : "a"` は普通に書く。
 - **③ Rigor だと**：一本に決めず Union で持つ。決めつけない＝後で困らない。

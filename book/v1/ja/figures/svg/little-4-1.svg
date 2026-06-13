@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 316" role="img" aria-label="図 4-1 if／三項の型 ― then と else をまとめて Union（図 5-1 の逆向き）">
+<defs>
+ <marker id="flittle41_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="flittle41_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="flittle41_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="flittle41_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="flittle41_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="flittle41_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>図 4-1 if／三項の型 ― then と else をまとめて Union（図 5-1 の逆向き）</title>
+
+  
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="150" y="14" width="240" height="40"></rect>
+  <text x="270" y="39" text-anchor="middle">x = rand &lt; 0.5 ? 1 : &#34;a&#34;</text>
+
+  
+  <path style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M270,54 V80 H140 V108" marker-end="url(#flittle41_a)"></path>
+  <path style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M270,54 V80 H400 V108" marker-end="url(#flittle41_a)"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="232" y="74" text-anchor="middle">then 節</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="308" y="74" text-anchor="middle">else 節</text>
+
+  
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="92" y="110" width="96" height="44"></rect>
+  <text x="140" y="137" text-anchor="middle">1</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="352" y="110" width="96" height="44"></rect>
+  <text x="400" y="137" text-anchor="middle">&#34;a&#34;</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="84" y="137" text-anchor="end">Const</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="456" y="137" text-anchor="start">Const</text>
+
+  
+  <path style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M140,154 V190 H218" marker-end="url(#flittle41_aA)"></path>
+  <path style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M400,154 V190 H322" marker-end="url(#flittle41_aA)"></path>
+  <rect style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="222" y="173" width="96" height="34"></rect>
+  <text x="270" y="195" text-anchor="middle">union</text>
+
+  
+  <line style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="270" y1="207" x2="270" y2="240" marker-end="url(#flittle41_aA)"></line>
+  <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="190" y="242" width="160" height="42"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-accent,#7A2A2A)" x="270" y="268" text-anchor="middle">1 | &#34;a&#34;</text>
+
+  
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="270" y="304" text-anchor="middle">else が無ければ偽のとき nil ― だから c ? 1 : nil も 1 | nil</text>
+</svg>
