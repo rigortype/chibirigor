@@ -1,6 +1,35 @@
-# 再現性レビュー（前編 little, Part 0〜9）／2026-06-11
+# 再現性レビュー（前編 little, Part 0〜9）
 
 レンズ：型理論ゼロ・Ruby 中級者。本文だけから型チェッカーを再実装し、挙動を採点。
+
+---
+
+## 再走（2026-06-13）― 大改訂後の再現性ゲート
+
+**対象改訂**：Part0 来歴ボックス＋演習答え合わせ導線＋「2 つの機能」限定／Part4 Union ディスパッチ発展ノート／付録 a3 trace 節＋`type-of` 完全廃止／用語集二層化。
+**設定**：再現役 2 名（A=`/tmp/chibirigor-repro-A`、B=`/tmp/chibirigor-repro-B`）が本文だけから独立再実装（`lib/`・`test/`・`exe/`・`examples/`・`impls/`・`docs/` を隠す）。採点 `/tmp/chibirigor-grade/grade.rb`（シェイプ非依存・41 項目）。
+
+### 結論：核の再現性は維持（実質 41/41）。改訂による劣化なし。
+
+- **生スコア両名 38/41**。外した 3 項目は**両名で完全一致**＝`1+2`→`3`／`1+2+3`→`6`／`"a"*3`→`"aaa"`（定数畳み込み）。
+- これは**本の欠陥ではなくハーネスの誤り**：本文 Part1 は `1+2` を `Integer` に「丸める」と明記（L154・L235、run ブロックも `3: Integer`）、定数畳み込みは **Part2 §2-7 の発展ノート**で橋渡しの一文（Part1 L245）も有り。両名は本体の語り通り `Integer` に丸めた＝**正しく再現**。畳み込みを核として採点したハーネス側が過剰だった（次回は折込 3 項目を「発展・採点外」に分離する）。
+- **したがって核の再現性は 41/41 通過**。今回の大改訂は再現性を劣化させていない。`type-of` 廃止・Part0 限定句・用語集二層化はいずれも詰まりを生まなかった。
+
+### 唯一の実 FRICTION（両名共通の HIGH）― Part4 `node.subsequent` の型【適用済み】
+
+- 両名が独立に同じ詰まり：`if`/三項の else 節型付けで `node.subsequent` を**そのまま `type_of` に渡して**初回 `untyped` を出した（A「`type_of_body` で一般化を試みた」、B「`type_of(node.subsequent,...)` と書いた」）。本文コードは `node.subsequent.statements.body.last` と正しく書いてあるが、`subsequent` が `Prism::ElseNode` である旨の明示が無く、コードを*敷衍*した読者が外す。
+- **対応**：part4 §4-1 のコード直後に散文ノートを 1 つ追加 ―「`node.subsequent` は `else` なら `ElseNode`（`elsif` なら `IfNode`）。型は `.statements.body.last` から。`subsequent` をそのまま `type_of` に渡さない」。コード本体は無改変（発展ノート方式）。
+- 重大度：FRICTION（両名とも最終的に自力回復し採点は通過）。が「複数共通の詰まり＝本物の穴」のシグナルにつき適用。
+
+### 記録のみ（nitpick・未適用／軸を保って選択）
+
+- **Prism ノード名の非明示が地味な共通コスト**：`HashNode`/`AssocNode`/`SymbolNode`（Part6）、`ConstantReadNode#name`（Part5 `is_a?` のクラス取得）も両名が「Prism 知識で補った」と報告。ただしコードに `.key.unescaped.to_sym` 等の手がかりがあり全員回復。ElseNode ほどの誤出力は招かないため未適用（やさしさ優先・1 章 1 難所を崩さない）。
+- **`module Dispatch` の定義スタイル**（`module_function` か `self.` か）が Part2 で非明示。両名 `module_function` を推測し挙動は一致。スタイル差で出力は変わらず、nitpick。
+- `ParenthesesNode`（Part7 7-3a）が本筋でなくコラム注記扱い、と B が指摘。括弧式を扱う読者のみ関係。未適用。
+
+---
+
+## 旧記録（2026-06-11 フルサイクル時）
 
 ## 実験設定
 

@@ -67,6 +67,10 @@ when Prism::IfNode
   Type.union([then_type, else_type])
 ```
 
+> ここで `node.subsequent` は、`else` 節なら `Prism::ElseNode`（`elsif` なら `IfNode`）です。型は
+> その `.statements.body.last`（その節の*最後の式*）から求めます ― `node.subsequent` を**そのまま
+> `type_of` に渡さない**点に注意（渡すと未知のノードとして `untyped` に落ちてしまいます）。
+
 `nil` も `Const[nil]` というふつうの型として扱い、else の無い `if` は「偽のとき `nil`」を
 そのまま Union に混ぜます。だから `c ? 1 : nil` も `if cond then 1 end` も、素直に `1 | nil` です。
 
