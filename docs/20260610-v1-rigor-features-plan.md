@@ -26,7 +26,7 @@
 
 | # | 機能 | Rigor 対応 | 労力 | 本文の格上げ先 | FP |
 |---|---|---|---|---|---|
-| 1 | `type-of` 位置クエリ | `rigor type-of FILE:LINE:COL` | S | 付録 a3-2・前編 Part 1 コラム | 0（表示のみ） |
+| 1 | ~~`type-of` 位置クエリ~~ **（2026-06-13 廃止）** | `rigor type-of FILE:LINE:COL` | S | 付録 a3-2・前編 Part 1 コラム | 0（表示のみ） |
 | 2 | `check --explain`（fail-soft 地図） | `rigor check --explain` | S〜M | 付録 a3-1・前編 Part 9 | 0（:info のみ） |
 | 3 | 到達不能アーム診断 | ADR-47（`flow.unreachable-clause`） | S〜M | 付録 a1-3・a5-5・後編 Part 7 | 0（封筒を厳格に） |
 | 4 | ジェネリクス 5a（要素型の読み） | 軽量 HKT（ADR-20）／`unification.rb` | M | 後編 Part 3/5/6・ROADMAP L1 | 0（degrade 死守） |
@@ -37,14 +37,12 @@
 
 ## 各スライスの成果物
 
-### 1. `type-of` 位置クエリ ― S・FP 0
-- **lib**：`Chibirigor.type_at(source, line, col)`。トップレベル文を縫って scope を育てつつ、
-  `line:col` を**含む最小の式ノード**を選び、その型を返す。`annotate` の推論を位置引きに転用。
-- **CLI**：`exe/chibirigor type-of FILE:LINE:COL`。
-- **test**：`test/test_type_at.rb`（`1 + 2` 位置→ `3`、未知呼び出し→ `untyped` 等）。
-- **本文**：付録 a3-2 の対応表「本書：annotate（行単位）のみ」に**発展ノート**を足し
-  「chibirigor にも位置引き極小版がある（ただし内部型 1 つ。実物は内部精密型＋境界保守型の 2 段）」
-  と橋渡し。前編 Part 1 の `type-of` コラムから戻りポインタ。
+### 1. `type-of` 位置クエリ ― **廃止（2026-06-13）**
+- 「2 つの機能だけ（`check`／`annotate`）」の看板と衝突し読者を混乱させるため、実装
+  （`type_at.rb`・`exe type-of`・`test_type_at.rb`）と本文の極小版（旧 a3-2x）を**完全廃止**。
+- 付録 a3-2 は**実 Rigor の `type-of`** の紹介として残す（位置指定＋内部精密型/RBS 境界型の 2 段）。
+  chibirigor 側は「極小版は設けない・推論型は `annotate` で見る」と明記。前編 Part 1 のコラムも
+  実 Rigor の道具紹介として整合（変更不要）。
 
 ### 2. `check --explain` ― S〜M・FP 0
 - **lib**：未知ディスパッチで `Dynamic` に倒れた地点を `{line, column, reason}` で**provenance 収集**。

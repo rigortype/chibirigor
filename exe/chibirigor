@@ -18,21 +18,11 @@ if (i = args.index("--delay"))
 end
 arg = args[0]
 
-unless %w[check annotate type-of trace].include?(command) && arg
-  abort "usage: chibirigor <check [--explain] [--unreachable]|annotate|trace [--delay SEC] [--verbose] [--json]> FILE | chibirigor type-of FILE:LINE:COL"
+unless %w[check annotate trace].include?(command) && arg
+  abort "usage: chibirigor <check [--explain] [--unreachable]|annotate|trace [--delay SEC] [--verbose] [--json]> FILE"
 end
 
-# type-of は FILE:LINE:COL。末尾 2 つを LINE/COL に、残りを FILE に（パス中のコロンに頑健）。
-if command == "type-of"
-  parts = arg.split(":")
-  col = parts.pop
-  line = parts.pop
-  file = parts.join(":")
-  abort "usage: chibirigor type-of FILE:LINE:COL" if file.empty? || line.nil? || col.nil?
-else
-  file = arg
-end
-
+file = arg
 source = File.read(file)
 
 # 診断 1 件を「file:line:col: [info: ]message」＋ 該当行＋キャレットで描く。
@@ -68,8 +58,4 @@ when "trace"
   else
     Chibirigor::Tracer.play(source, events, delay: delay, verbose: verbose)
   end
-when "type-of"
-  type = Chibirigor.type_at(source, line.to_i, col.to_i)
-  abort "#{file}:#{line}:#{col}: その位置に式がありません" unless type
-  puts "#{file}:#{line}:#{col}: #{type}"
 end

@@ -120,28 +120,11 @@ $ rigor type-of app/models/user.rb:10:5
 | 見せる型 | 内部型 1 つ | 内部の精密な型 ＋ 境界で丸めた保守的な型の 2 つ |
 | 用途 | 推論結果の確認 | 内部型と RBS 境界型の**食い違いの調査** |
 
-### a3-2x. 発展：chibirigor にも極小 `type-of` がある
-
-上の表は本書を「`annotate`（行単位）だけ」として実物と対比していますが、chibirigor にも
-**位置指定の極小版**を足してあります（`lib/chibirigor/type_at.rb`）。`annotate` の推論をそのまま
-位置引きに転用しただけの小さな道具です：
-
-```console
-$ printf 'x = 5\ny = x + 2\n' > demo.rb
-$ ruby exe/chibirigor type-of demo.rb:2:5   # 2 行目の `x`（参照）
-demo.rb:2:5: 5
-$ ruby exe/chibirigor type-of demo.rb:2:7   # 2 行目の `+`（式 `x + 2` 全体）
-demo.rb:2:7: 7
-```
-
-`file:line:col` で**その位置を含む最小の式**を 1 つ選び、推論型を表示します（`5` は `Const`、
-`7` は定数畳み込みの結果）。実装は、トップレベルの文を縫って scope を育てながら、位置を含む
-最深のノードを `type_of` に渡すだけです。
-
-ただし**実物との差は表のまま**です ― chibirigor が見せるのは**内部型 1 つ**だけ。実 Rigor の
-`type-of` は「内部の精密型 ＋ 境界で丸めた保守型」の **2 段**を並べ、その食い違い（erasure）を
-調べる道具でした。chibirigor には境界（RBS への erasure）が無いので 1 段で済んでいます。
-位置で式を指す**動詞**は同じ、見せる**段数**が実物では 2 になる、という対応で読めます。
+> chibirigor 側には、この位置指定 `type-of` の極小版は**設けていません**。本書で作る道具は
+> `check` と `annotate` の 2 つに絞り、推論型を見たいときは `annotate`（行単位）で足ります。
+> 位置をピンポイントで指す `type-of` と、その背後の二段構え（内部精密型／RBS 境界型）は、
+> あくまで**実 Rigor の道具**として読んでください ― そこを覗きたくなったら、それは前編を
+> 読み終えて本物の Rigor に進む合図です。
 
 ---
 
@@ -323,7 +306,7 @@ chibirigor trace ─ step 17/17
 | 道具 | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
 | `rigor check --explain` | 極小版あり（未知ディスパッチを `:info` 地図化・§a3-1x） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
-| `rigor type-of file:line:col` | `annotate` ＋ 極小 `type-of`（内部型 1 つ・§a3-2x） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
+| `rigor type-of file:line:col` | 極小版は設けず（推論型は `annotate` で行単位に見る・§a3-2） | 位置指定で内部の精密型 ＋ 境界の保守型を 2 つ並べる | 前編 Part 1 |
 | `rigor trace file` | ほぼ実物と同型の極小版あり（`bind`・`union`・`dispatch` をコマ送り・§a3-3bx） | 推論の手順を端末アニメーションで再生（`--verbose`・`--line`・`--format=json`） | ― |
 | dispatch 5 段カスケード | 1 段の表引き（`METHODS`・極小版は設けず） | ① 定数畳み込み → ② shape → ③ RBS → ④ in-source → ⑤ fallback | 前編 Part 2 |
 
