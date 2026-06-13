@@ -93,6 +93,64 @@ type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => 1 | "a"（両枝とも Const の
 
 ---
 
+## 4-1x. 発展：Union レシーバへのメソッド送信（分配して畳む）
+
+> これは本筋から外した**発展ノート**です。この章は Union を*作る*話に集中し、できた Union に
+> メソッドを送る話には踏み込みませんでした。ここでは Part 2 のディスパッチ表に*ひとさじ*足すと、
+> Union レシーバがどう振る舞うかを重ねます。4-1 の `union` も `IfNode` の型付けもそのままです。
+
+`x = cond ? 1 : 2` で `x` は `1 | 2`。では `x + 1` の型は？ この章の最小版（と Part 2 の素朴な
+ディスパッチ表）は、レシーバの型を `class_of` で 1 つのクラス名に丸めて表を引きます。`Union` は
+クラス名に丸まらない（`class_of` が `nil`）ので、**表が引けず黙って `untyped` に倒れる** ―
+fail-soft の出口です。脅かしはしませんが、せっかくの `1 | 2` の精度は捨ててしまいます。
+
+実物の `exe/chibirigor` は、ここで一歩踏み込みます。**Union レシーバはメンバごとに表を引き、
+出てきた戻り型を `Type.union` で畳む**（`lib/chibirigor/dispatch.rb` の `dispatch_union`）：
+
+```ruby
+# Union レシーバの分配ディスパッチ。実行時はどのメンバにもなり得るので、
+# メンバごとに dispatch して結果を union で畳む。
+def dispatch_union(receiver_type, name, arg_types, node, diagnostics)
+  buffers = []
+  results = receiver_type.members.map do |member|
+    buffers << (buffer = [])
+    dispatch(member, name, arg_types, node, buffer)   # メンバ 1 つずつ表を引く
+  end
+  diagnostics.concat(merge_member_diagnostics(buffers))
+  budgeted_union(results)                              # 結果を畳む（重なれば 1 つに）
+end
+```
+
+引数側に Union が来ても同じ発想です。2-7 の定数畳み込み段は、引数を**メンバの直積**に展開して
+組ごとに畳みます（`const_combinations`）― `1 + (1 | 2)` なら `1+1` と `1+2` を両方計算して `2 | 3`。
+実際に動かすと、レシーバ分配も引数分配もこう出ます（`exe/chibirigor annotate`）：
+
+```text
+x = cond ? 1 : 2 ; x + 1        # 2: 2 | 3      （レシーバ (1|2) を分配して畳む）
+a = 1 ; a + (cond ? 1 : 2)      # 2: 2 | 3      （引数 (1|2) を直積に展開して畳む）
+x = cond ? 1 : "a" ; x + 1      # 2: 2 | String （Integer 側は畳み、String 側は表の戻り型へ）
+```
+
+この挙動は誤検知ゼロの原則と地続きです。**分配の結果が割れたら**どうするか ―
+`x = cond ? 1 : "a"` の `x + 1` は、`1 + 1` は通り `"a" + 1` は型エラー。でも実行時には `x` が
+`Integer` 側に転んでいれば動きます。だから**全メンバで失敗したときだけ怒り、一部だけの失敗は
+黙る**（`:maybe`）。`x + "a"` のように `(1 | 2)` のどちらでも失敗する式だけが、診断 1 件になります。
+**未知メンバがいたら**さらに保守的で、`x = cond ? 1 : nil` の `x + 1` は `nil.+` が表に無い時点で、
+Union 全体を `untyped` に倒します（一部でも型を見失えば、全体の精度を主張しない）。
+
+実物の挙動は **`test/test_union_dispatch.rb`** が仕様兼サンプルです（レシーバ分配・引数の直積・
+全メンバ失敗時だけ怒る・未知メンバで untyped・メンバ数予算でクラスに丸める、を網羅）。
+4-1 の `annotate` 出力（`rand < 0.5 ? 1 : "a"` が `1 | "a"`）の*続き*として、その `x` に
+メソッドを送ると分配が起きる、と読んでください。手元の `exe/chibirigor` で `(1 | 2) + 1` が
+`2 | 3` と出る（章の最小版なら `untyped`）のは、この分配が Dispatch 側に入っているからです。
+
+> **実 Rigor では**、`Union` レシーバは「各メンバを個別にディスパッチし、全メンバが解決したら
+> 戻り型を union、どれか 1 つでも解決しなければ全体を `nil`（解決失敗）にする」と定めています
+> （`rigor/docs/internal-spec/inference-engine.md`「`Union` receivers MUST dispatch each member
+> individually」）。chibirigor の「未知メンバがいたら全体を untyped」は、この縮図です。
+
+---
+
 ## 4-2. この章のまとめ
 
 足したもの：型キャリア `Union` ひとつ、まとめ道具 `union`、そして `IfNode` の型付け
