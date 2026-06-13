@@ -191,4 +191,4 @@ c ? 1 : nil   ->  1 | nil
 
 ---
 
-> **この章の実装** → [`impls/dist/part4/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part4/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part4/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part4/lib)

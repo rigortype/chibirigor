@@ -262,4 +262,4 @@ Integer が必要ですが 1 | "a" が渡されました
 
 ---
 
-> **この章の実装** → [`impls/dist/part7/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part7/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part7/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part7/lib)

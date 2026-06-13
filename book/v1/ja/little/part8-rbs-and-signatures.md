@@ -312,4 +312,4 @@ gradual typing へと接続して、本編を閉じます。
 
 ---
 
-> **この章の実装** → [`impls/dist/part8/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part8/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part8/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part8/lib)

@@ -187,4 +187,4 @@ String が必要ですが 1 が渡されました
 
 ---
 
-> **この章の実装** → [`impls/dist/part3/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part3/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part3/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part3/lib)

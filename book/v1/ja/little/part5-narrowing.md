@@ -252,4 +252,4 @@ Rigor はもう一歩進めて、その枝を**「絶対に通らない余分な
 
 ---
 
-> **この章の実装** → [`impls/dist/part5/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part5/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part5/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part5/lib)

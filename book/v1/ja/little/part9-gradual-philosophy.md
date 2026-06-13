@@ -208,4 +208,4 @@ chibirigor は、最初から一貫してこの立場で作ってきました：
 
 ---
 
-> **この章の実装** → [`impls/dist/part9/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part9/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part9/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part9/lib)

@@ -303,4 +303,4 @@ SARIF や GitHub の注釈に変換されます（ADR-51）。
 
 ---
 
-> **この章の実装** → [`impls/dist/part1/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part1/lib)
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part1/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part1/lib)
