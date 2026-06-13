@@ -37,13 +37,16 @@
   反映＝校閲ERROR「differ 置換」(part8×3)を平易日本語へ／part0 §0.4 係り受け・来歴の敬体統一／
   README 目次の a3 を trace 反映＋type-of を実Rigor専用と明示／Part9 末から a3 trace へ戻りポインタ。
   所見全文＝`.reviews/_editorial-review.md`・`_copyedit-review.md`。
-- **実 Rigor の type-of 引退に先行（2026-06-13・著者方針）**：Rigor 側が `rigor type-of` を引退予定のため、
-  本書（刊行版）を先行させて CLI コマンド `type-of` を**公開テキストから完全除去**。価値ある概念
-  （内部精密型／RBS 境界の保守型＝二段構え・erasure）は Rigor が残す `annotate`/hover に再アンカー
-  （a3-2 を「Rigor の型表示」に改題、Part1 コラム・README・a3-4 早見表も差替）。中核**関数** `type_of`
-  （アンダースコア）は本書の心臓につき維持。**フィデリティ注意**：現時点で Rigor docs/code には
-  `type-of` がまだ残存 ― 本書が一時的に先行している。**Rigor が実際に引退させたらこの先行は解消**
-  （逆に Rigor 側で残す判断に転じた場合は本書の除去を巻き戻す要否を再検討）。
+- **type-of をユーザー向けに見せない＋dump_type を導入（2026-06-13・著者方針）**：正確には「引退」ではなく、
+  `rigor type-of` は **hover/エディタ/MCP 等ツールが使う低レベル API**であり、**ユーザー/学習者には
+  コマンドとして見せない**のが正しい位置づけ。よって本書の公開テキストから CLI コマンド `type-of`
+  （ハイフン）を除去（a3-2 を「Rigor の型表示」に改題、Part1 コラム・README・a3-4 早見表を差替）。
+  - **ユーザー向けの型確認手段**＝① `annotate`（ファイル全体）② **`dump_type(式)` を書いて `check`**
+    （`include Rigor::Testing`／実行時は値をそのまま返す／`check` が `:info` で `dump_type: <型>` を印字。
+    PHPStan の `dumpType()` 相当。本書 §a3-1 `--explain` と同じ `:info` 機構）。a3-2 に追記済み。
+  - 中核**関数** `type_of`（アンダースコア）は本書の心臓につき維持。フィデリティ：`dump_type` は実在
+    （`rigor/lib/rigor/testing.rb`・`analysis/check_rules.rb` で裏取り済み）。type-of も内部 API として残存
+    （消える話ではない）。Rigor 側 manual がユーザー露出を絞れば本書と完全一致。
 - **残る任意バックログ（nitpick・著者裁量）**：三題噺②ラベルの本文⇔表ゆれ（Ruby だと/Ruby・RBS）、
   part1 初出での型名前空間予告（技術判断含み・著者留保）、図キャプションのコードスパン体裁。
   デザイナーによる図の本清書は将来別途。
