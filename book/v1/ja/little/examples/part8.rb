@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Part 8 到達段階の挙動確認。
-# impls/dist/part8/lib を使う（RBS 由来 dispatch + def シグネチャ合成）。
+# RBS 由来 dispatch + def シグネチャ合成
 
 $LOAD_PATH.unshift File.expand_path('dist/part8/lib', __dir__)
 require 'chibirigor'
