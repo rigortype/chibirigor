@@ -164,6 +164,24 @@ Union 全体を `untyped` に倒します（一部でも型を見失えば、全
 （then 節と else 節の型を `union` する）。`union` の小道具は「入れ子をならす・重複を消す」の
 2 つだけ。これで「型が一本に決まらない」Ruby を、型のレベルで素直に表せるようになりました。
 
+動かすとこうなります：
+
+```ruby
+x_int_str = Chibirigor.annotate("x = c ? 1 : \"a\"\nx\n").last[:type]
+x_int_nil = Chibirigor.annotate("x = c ? 1 : nil\nx\n").last[:type]
+puts "c ? 1 : \"a\"  ->  #{x_int_str}"
+puts "c ? 1 : nil   ->  #{x_int_nil}"
+```
+
+<!-- run: examples/part4.rb -->
+```text
+c ? 1 : "a"  ->  1 | "a"
+c ? 1 : nil   ->  1 | nil
+```
+
+`c ? 1 : "a"` は then 節が `1`・else 節が `"a"`。どちらか一方に決めつけず `1 | "a"` という
+Union にまとめます。else 側が `nil` でも同じく `1 | nil`。
+
 この章の三題噺：
 
 | | 内容 |
@@ -171,12 +189,6 @@ Union 全体を `untyped` に倒します（一部でも型を見失えば、全
 | ① 型理論 | 値が複数の型になり得る＝合併（『しくみ』が*あえて避けた*領域。TAPL も直接の章なし） |
 | ② Ruby/RBS | 分岐で別々の型を返すのは日常。`x = cond ? 1 : "a"` も `User | nil` も普通に書く |
 | ③ Rigor 実装の問題 | 一本に決めつけず Union で持つ。決めつけない＝後で困らない |
-
-<!-- run: examples/part4.rb -->
-```text
-c ? 1 : "a"  ->  1 | "a"
-c ? 1 : nil   ->  1 | nil
-```
 
 ## 演習
 
