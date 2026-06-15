@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Part 7 到達段階の挙動確認。
-# impls/dist/part7/lib を使う（段の挙動）。
+# impls/dist/part7/lib を使う。
 
 $LOAD_PATH.unshift File.expand_path('dist/part7/lib', __dir__)
 require 'chibirigor'
