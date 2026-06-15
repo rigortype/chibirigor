@@ -30,7 +30,7 @@ def select(cond, a, b) = cond ? a : b
 ```
 
 `<T>` を付けるのが**型抽象（type abstraction）**、`select<Integer>` のように具体型を入れるのが
-**型適用（type application）**。TAPL 23 章の System F の用語そのものです。型適用の中身は ―
+**型適用（type application）** です。TAPL 23 章の System F の用語そのものです。型適用の中身は ―
 `<T>` を外し、本体の `T` を*すべて*具体型で置き換える、つまり**型代入**です。
 
 ---
@@ -162,14 +162,14 @@ typeEq(TypeVar[n1], TypeVar[n2], map):
 
 ## 3-5. erasure ― 型を消して RBS に戻す
 
-型適用は**実行時には何もしません**。`select<Integer>` は実行時にはただの `select`。TAPL 23.7 の
+型適用は**実行時には何もしません**。`select<Integer>` は実行時にはただの `select` です。TAPL 23.7 の
 *erasure（消去）定理*は「型注釈・型適用を消しても実行結果は変わらない」を保証します（Java の
 ジェネリクスの「型消去」とは別物 ― あちらは生成コードから型を落とす実装手法、こちらは
 *意味論* の定理です）。
 
 Rigor にとって erasure はもう一つ意味があります ― **内部の豊かな型を、保守的に RBS へ戻す**
 操作です。`HashShape` は RBS の record か `Hash[K,V]` へ、リテラル union は基底クラスへ、
-`Dynamic[T]` は `untyped` へ。**より広くはなっても、決して狭くならない**（健全な近似）。これが
+`Dynamic[T]` は `untyped` へ戻します。**より広くはなっても、決して狭くならない**（健全な近似）。これが
 「Rigor は RBS のスーパーセットで、いつでも RBS に書き戻せる」の中身です。
 
 ---

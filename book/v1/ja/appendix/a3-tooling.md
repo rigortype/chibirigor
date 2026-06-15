@@ -143,7 +143,7 @@ demo.rb:2:1: info: dump_type: 1 | "a"
 仕組みは前編 Part 9 で作った `:info` 診断そのまま ― `type_of` が `dump_type(式)` を見つけたら、引数の
 推論型を `:info` 診断に記録し（`check` がそれを表に出します）、値はそのまま返します
 （だから `dump_type(x)` の型は `x` の型のまま）。
-実装は `lib/chibirigor/type_of.rb`、挙動の網羅は `test/test_dump_type.rb`。
+実装は `lib/chibirigor/type_of.rb`、挙動の網羅は `test/test_dump_type.rb` です。
 
 ---
 

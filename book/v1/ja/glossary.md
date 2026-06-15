@@ -19,7 +19,7 @@
 - **`Nominal`（名前的型）**〔前編 P1〕… 名前付きクラスを表す型。例：`Nominal[:Integer]`。
 - **`Dynamic`／untyped**〔前編 P1〕… 「型を見失った」印。gradual の要。他言語対応表・軸 A/軸 B は
   付録 a1（特別な型カタログ）参照。
-- **`Union`（合併型）**〔前編 P4〕… 「`A` か `B` のどちらか」。例：`Integer | String`。
+- **`Union`（ユニオン型）**〔前編 P4〕… 「`A` か `B` のどちらか」。例：`Integer | String`。
 - **`HashShape`（レコード型）**〔前編 P6〕… キーごとの型を覚えるハッシュの型。Hack の `shape(...)` を起点とし PHPStan/Psalm を経て Rigor に至る設計（前編 P6 コラム参照）。
 - **丸め／正規化（normalization）**〔前編 P1〕… 細かい型（`Const[3]`）を大ざっぱな型
   （`Integer`）に戻すこと。

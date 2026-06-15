@@ -97,7 +97,7 @@ module Chibirigor
 end
 ```
 
-『しくみ』の `typecheck` が `switch (t.tag)` だったのと、ほとんど同じ形ですね。違いは最後の行。
+『しくみ』の `typecheck` が `switch (t.tag)` だったのと、ほとんど同じ形ですね。違いは最後の行です。
 **『しくみ』は知らない構文に出会いません**（対象がきっちりしたミニ言語だから）。でも私たちが相手に
 するのは*本物の Ruby* です。知らないものは必ず出てきます。そのとき **エラーにせず
 `Dynamic`（untyped）を返す** ── これが Rigor の入口の姿勢です。
@@ -173,7 +173,7 @@ module Chibirigor
 end
 ```
 
-`check` の戻り値は **`{line:, message:}` の配列**（どの行で何が問題か）。動かしてみます：
+`check` の戻り値は **`{line:, message:}` の配列**です（どの行で何が問題か）。動かしてみます：
 
 ```ruby
 Chibirigor.check("1 + 2")       # => []                                          （文句なし）
@@ -232,8 +232,8 @@ RUBY
 4: untyped
 ```
 
-`42` は `Const[42]` なので `42` と細かく出る。`1 + 2` は丸めて `Integer`。`foo.bar` は
-わからないので `untyped`。**「`untyped` がどこに出るか」＝「Rigor が型を見失った場所」** で、
+`42` は `Const[42]` なので `42` と細かく出る。`1 + 2` は丸めて `Integer` になります。`foo.bar` は
+わからないので `untyped` です。**「`untyped` がどこに出るか」＝「Rigor が型を見失った場所」** で、
 これが見えること自体が `annotate` の値打ちです（実 Rigor の `sig-gen` の発想の芽）。
 
 > chibirigor の `annotate` は、推論した内部の型をそのまま見せる最小版です。実 Rigor の `annotate` は、
@@ -274,8 +274,8 @@ SARIF や GitHub の注釈に変換されます（ADR-51）。
 
 ## 1-5. この章のまとめ
 
-作ったもの：型 `Const`／`Dynamic`／`Nominal`、関数 `type_of`／`check`／`annotate`。
-全部で 50 行ほど。『しくみ』 2 章の `typecheck`（約 40 行）に、「丸め」「止まらない」「untyped に
+作ったものは、型 `Const`／`Dynamic`／`Nominal`、関数 `type_of`／`check`／`annotate` です。
+全部で 50 行ほどです。『しくみ』 2 章の `typecheck`（約 40 行）に、「丸め」「止まらない」「untyped に
 逃がす」が少し足された規模感です。
 
 この章の三題噺：

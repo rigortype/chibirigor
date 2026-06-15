@@ -46,7 +46,7 @@ sidebar:
 `payload` が運ぶ「述語を満たす値の集合」を表す精密な型 ― `non-empty-array`・`positive-int`
 などの **refinement carrier** ― は、前編 [Part 1](../little/part1-literals-and-arithmetic.md)の
 `Const[42]`（特定の 1 つの値）とは別概念です。詳しくは付録
-[a2 ― ナローイング・パターン集](../appendix/a2-narrowing-patterns.md)の a2-6（refinement carrier）。
+[a2 ― ナローイング・パターン集](../appendix/a2-narrowing-patterns.md)の a2-6（refinement carrier）へ。
 
 ---
 
@@ -82,11 +82,11 @@ sidebar:
 
 なお `object_content` バケツに入る ivar（インスタンス変数）の型は「すべての可視な代入の
 union」になります（`@x` をどこかで `nil` にし得るなら、どこで読んでも `nil` を含む保守的近似）。
-この個別パターンは付録 [a2 ― ナローイング・パターン集](../appendix/a2-narrowing-patterns.md)の a2-4（ivar union）を参照。
+この個別パターンは付録 [a2 ― ナローイング・パターン集](../appendix/a2-narrowing-patterns.md)の a2-4（ivar union）へ。
 
 [^buckets]: 6 バケツのうち `local_binding`/`captured_local`/`object_content`/`global_storage`/
 `relational` は「事実が付く対象」で分かれるのに対し、`dynamic_origin` だけは「`untyped` の
-*由来*を追う」別系統です。位置づけが違うことに注意（実 spec でも 6 つ目として並ぶが役割は別）。
+*由来*を追う」別系統です。位置づけが違うことに注意したい（実 spec でも 6 つ目として並ぶが役割は別）。
 
 ---
 
@@ -179,7 +179,7 @@ x = nil
 
 ## 6-5. 合流（join）― 分岐が合わさるとき
 
-`if` の二枝が合流したあと、どの事実が生き残るか。答えは「**両方の枝で成り立つ事実だけ**」：
+`if` の二枝が合流したあと、どの事実が生き残るか。答えは「**両方の枝で成り立つ事実だけ**」です：
 
 ```ruby
 if cond

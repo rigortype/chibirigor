@@ -141,8 +141,8 @@ def greet
 end
 ```
 
-`"hi".upcase` の型は（前節までの RBS 表から）`String`。メソッドの戻り型は本体の最後の式の型
-そのもの。だから合成できます。`type_of` に `def` を足します：
+`"hi".upcase` の型は（前節までの RBS 表から）`String` です。メソッドの戻り型は本体の最後の式の型
+そのものです。だから合成できます。`type_of` に `def` を足します：
 
 ```ruby
 when Prism::DefNode then type_of_def(node, scope, diagnostics)
@@ -266,10 +266,10 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 
 ## 8-7. この章のまとめ
 
-足したもの（前半）：`Rbs.load`（ごく小さな RBS リーダー）と `Rbs::CORE`。`Dispatch::METHODS` の
+足したもの（前半）は、`Rbs.load`（ごく小さな RBS リーダー）と `Rbs::CORE` です。`Dispatch::METHODS` の
 *出どころ*だけが変わり、ふるまいは変わりませんでした。
-足したもの（後半）：`type_of` の `DefNode` 対応（本体チェック＋戻り型合成）、`annotate` の
-`method_signature`。型を「外」から読む土台の上に、型を「中」から立ち上げる仕掛けが乗りました。
+足したもの（後半）は、`type_of` の `DefNode` 対応（本体チェック＋戻り型合成）、`annotate` の
+`method_signature` です。型を「外」から読む土台の上に、型を「中」から立ち上げる仕掛けが乗りました。
 
 この章の三題噺：
 

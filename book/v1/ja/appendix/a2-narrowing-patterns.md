@@ -194,7 +194,7 @@ Rigor は **refinement carrier（細粒度キャリア）** と呼びます。`u
 この種の carrier の「なぜその名か」の答えはここにあります。
 
 > **ただし refinement carrier すべてが集合差ではありません。** 実 Rigor は二層構成（ADR-3）で、
-> `non-empty-string` のような**点除去**だけが `Difference`。`lowercase-string`/`numeric-string` の
+> `non-empty-string` のような**点除去**だけが `Difference` です。`lowercase-string`/`numeric-string` の
 > ような**述語部分集合**は別キャリア `Refined`、`Integer[1..10]` のような**範囲整数**は
 > `IntegerRange` で表します（値の表記は `Integer[1..10]`。`int<min,max>` はディレクティブ語彙や内部表示で使う）。
 > 下表の carrier はこの 3 種が混ざっています。
