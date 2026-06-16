@@ -7,13 +7,13 @@ sidebar:
 
 # The Seasoned chibirigor（後編）
 
-前編[The Little chibirigor](../little/README.md)で動く最小版（`check`＋`annotate`）を
-作り切ったあと、その裏側を形式の言葉で読み解く巻です。
-前編でわざと避けたもの（双方向型付けの形式化、変性、ジェネリクス、再帰型、本物の型推論、FactStore、健全性）を、ここで回収します。
+前編[The Little chibirigor](../little/README.md)で動く最小版（`check`＋`annotate`）を作り切ったあと、その裏側を形式の言葉で読み解く巻です。前編でわざと避けたもの（双方向型付けの形式化、変性、ジェネリクス、再帰型、本物の型推論、FactStore、健全性）を、ここで回収します。
+
 コードより概念が主役で、各章は前編の実装を起点にした解説と設計スケッチの集まりです（動くスケッチは[`examples/`](examples/README.md)にあり、`ruby <file>`で自己チェックが緑になります）。
 
 > [!IMPORTANT]
 > **後編は「作る」より「読み解く」巻です。**前編は「とても易しく、専門用語は後出し」でしたが、後編は用語と形式を扱います。
+>
 > 参考書（『しくみ』/TAPL）の対応は[付録a4](../appendix/a4-bibliography.md)に一元化しています（どちらも必読ではありません）。
 
 ## 章立て（構造から推論、フローを経て理論の頂点へ、そして橋へと続く一本の坂）
@@ -31,11 +31,8 @@ sidebar:
 
 ## 動く設計スケッチ
 
-中核アルゴリズムは単体で走る最小のRubyとして[`examples/`](examples/README.md)に置いてあります。
-`subtype.rb`（Part 2）、`subst.rb`（Part 3）、`mu_typeeq.rb`（Part 4）、`unification.rb`（Part 5）、`fact_invalidation.rb`（Part 6）の5本です。
-本文とコードのドリフトは`check_docs.rb`が検出します。
+中核アルゴリズムは単体で走る最小のRubyとして[`examples/`](examples/README.md)に置いてあります。`subtype.rb`（Part 2）、`subst.rb`（Part 3）、`mu_typeeq.rb`（Part 4）、`unification.rb`（Part 5）、`fact_invalidation.rb`（Part 6）の5本です。本文とコードのドリフトは`check_docs.rb`が検出します。
 
 ## 読む順番
 
-前編（The Little chibirigor）を読み終えてから来てください。
-後編の各章は「前編のあの実装は、実は◯◯という理論だった」「前編が避けた◯◯を、ここで読み解く」という形で進みます。
+前編（The Little chibirigor）を読み終えてから来てください。後編の各章は「前編のあの実装は、実は◯◯という理論だった」「前編が避けた◯◯を、ここで読み解く」という形で進みます。
