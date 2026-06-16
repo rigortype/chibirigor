@@ -6,8 +6,10 @@
 # make impls        : 段スナップショット（impls/dist/partN）を steps から生成
 # make impls-verify : 生成 ＋ 各段の test_stage.rb を実行
 # make impls-check  : 生成し直して dist が steps と同期しているか（手編集されていないか）を検証
+# make fmt          : 和欧境界スペースを詰める（book/v2/ja を書き換え）
+# make fmt-check    : 和欧境界スペースの未整形を検出（書き換えず、あれば失敗）
 
-.PHONY: all test drift fix impls impls-verify impls-check
+.PHONY: all test drift fix impls impls-verify impls-check fmt fmt-check
 
 all: test drift impls-verify
 
@@ -41,3 +43,9 @@ impls-check: impls
 	@git diff --exit-code -- impls/dist \
 	  && echo "OK: impls/dist は steps から再生成された内容と一致" \
 	  || (echo "NG: impls/dist が手編集されています。steps を直して make impls してください"; exit 1)
+
+fmt:
+	ruby tools/ja_format.rb --write book/v2/ja
+
+fmt-check:
+	ruby tools/ja_format.rb --check book/v2/ja
