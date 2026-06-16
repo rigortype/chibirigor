@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 356" role="img" aria-label="Figure 7-1 accepts's three-valued verdict — untyped is :maybe, a Union takes the weakest answer">
+<defs>
+ <marker id="flittle71_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="flittle71_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="flittle71_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="flittle71_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="flittle71_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="flittle71_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>Figure 7-1 accepts's three-valued verdict — untyped is :maybe, a Union takes the weakest answer</title>
+
+
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="40" y="16" width="300" height="36"></rect>
+  <text x="190" y="39" text-anchor="middle">accepts(expected, actual)</text>
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="190" y1="52" x2="190" y2="76" marker-end="url(#flittle71_a)"></line>
+
+
+  <rect rx="8" style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="64" y="78" width="252" height="44"></rect>
+  <text x="190" y="105" text-anchor="middle">either untyped?</text>
+  <line style="fill:none;stroke:var(--rigor-type-untyped,#6E7480);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="316" y1="100" x2="402" y2="100" marker-end="url(#flittle71_aM)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="360" y="92" text-anchor="middle">yes</text>
+
+
+  <rect style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-type-untyped,#6E7480);stroke-width:2" x="404" y="80" width="120" height="42"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-type-untyped,#6E7480)" x="464" y="107" text-anchor="middle">:maybe</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:11px;fill:var(--rigor-type-untyped,#6E7480)" x="464" y="138" text-anchor="middle">the unknown</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:11px;fill:var(--rigor-type-untyped,#6E7480)" x="464" y="151" text-anchor="middle">stays unknown</text>
+
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="190" y1="122" x2="190" y2="150" marker-end="url(#flittle71_a)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="204" y="140" text-anchor="start">no</text>
+
+
+  <rect rx="8" style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="64" y="152" width="252" height="44"></rect>
+  <text x="190" y="179" text-anchor="middle">actual a Union?</text>
+  <line style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="316" y1="174" x2="344" y2="174" marker-end="url(#flittle71_aA)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="330" y="166" text-anchor="middle">yes</text>
+
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="190" y1="196" x2="190" y2="222" marker-end="url(#flittle71_a)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="204" y="214" text-anchor="start">no</text>
+
+
+  <rect rx="8" style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="64" y="224" width="252" height="44"></rect>
+  <text x="190" y="251" text-anchor="middle">widen, class match?</text>
+
+  <path style="fill:none;stroke:var(--rigor-success,#2E6F3F);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M150,268 V288 H110 V300" marker-end="url(#flittle71_aK)"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-success,#2E6F3F)" x="124" y="283" text-anchor="end">match</text>
+  <path style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M230,268 V288 H270 V300" marker-end="url(#flittle71_aE)"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-error,#B5302B)" x="258" y="283" text-anchor="start">mismatch</text>
+
+
+  <rect style="fill:none;stroke:var(--rigor-success,#2E6F3F);stroke-width:1.5" x="56" y="302" width="108" height="40"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-success,#2E6F3F)" x="110" y="327" text-anchor="middle">:yes</text>
+  <rect style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5" x="216" y="302" width="108" height="40"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-error,#B5302B)" x="270" y="327" text-anchor="middle">:no</text>
+
+
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="346" y="158" width="184" height="150"></rect>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="438" y="178" text-anchor="middle">Union fold</text>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1" x1="346" y1="186" x2="530" y2="186"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="358" y="206" text-anchor="start">all members → accepts</text>
+  <text x="358" y="226" text-anchor="start" style="font-size:12px">take the weakest answer</text>
+
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-ink,#0E1116)" x="358" y="252" text-anchor="start">[:yes,:yes,:no]</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-error,#B5302B)" x="528" y="252" text-anchor="end">→ :no</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-ink,#0E1116)" x="358" y="274" text-anchor="start">[:yes,:maybe]</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-type-untyped,#6E7480)" x="528" y="274" text-anchor="end">→ :maybe</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-ink,#0E1116)" x="358" y="296" text-anchor="start">[:yes,:yes]</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-success,#2E6F3F)" x="528" y="296" text-anchor="end">→ :yes</text>
+</svg>

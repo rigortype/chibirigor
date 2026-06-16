@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" role="img" aria-label="Figure 0-1 chibirigor's data flow">
+<defs>
+ <marker id="flittle01_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="flittle01_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="flittle01_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="flittle01_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="flittle01_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="flittle01_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>Figure 0-1 chibirigor's data flow</title>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="12" y="80" width="96" height="42"></rect>
+  <text x="60" y="106" text-anchor="middle">Source</text>
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="108" y1="101" x2="182" y2="101" marker-end="url(#flittle01_a)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="143" y="92" text-anchor="middle">Prism</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="184" y="80" width="82" height="42"></rect>
+  <text x="225" y="106" text-anchor="middle">AST</text>
+  <line style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="266" y1="101" x2="340" y2="101" marker-end="url(#flittle01_aA)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-accent,#7A2A2A)" x="303" y="92" text-anchor="middle">type_of</text>
+  <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="342" y="80" width="82" height="42"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-accent,#7A2A2A)" x="383" y="106" text-anchor="middle">type</text>
+
+  <path style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M424,101 H452 V52 H560" marker-end="url(#flittle01_a)"></path>
+  <path style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M452,101 V150 H560" marker-end="url(#flittle01_a)"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="506" y="44" text-anchor="middle">accepts: mismatch</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="506" y="142" text-anchor="middle">show as is</text>
+
+  <rect style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5" x="562" y="32" width="150" height="42"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px;fill:var(--rigor-error,#B5302B)" x="637" y="58" text-anchor="middle">check (diagnostics)</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="562" y="130" width="150" height="42"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:12.5px" x="637" y="156" text-anchor="middle">annotate (types)</text>
+
+</svg>
