@@ -4,14 +4,19 @@
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
+require 'ripper'
+
 # check_docs.rb - guards against drift between the prose code blocks (seasoned *.md) and the runnable examples.
 #
 # How it works (just 3 things):
 #   1. Every examples/*.rb self-check is green (`ruby file.rb` exits 0).
-#   2. Each ```code block tagged with <!-- include: file.rb#region --> *byte-matches* that file's
-#      "# region <id> … # endregion" span (verbatim code sync).
+#   2. Each ```code block tagged with <!-- include: file.rb#region --> matches that file's
+#      "# region <id> … # endregion" span *modulo comments* (the code must be identical; comments
+#      may differ because the shared code is English-canonical while each book localizes the
+#      comments it prints — `book/v1/ja` shows Japanese, `book/v1/en` English).
 #   3. Each line of a ```text block tagged with <!-- run: file.rb --> appears *as-is*
-#      in that file's actual output (verbatim output sync; subset allowed).
+#      in that file's actual output (verbatim output sync; subset allowed). Output is language-
+#      neutral, so this check is identical across editions.
 #
 # Usage:
 #   ruby check_docs.rb         # check (exit 1 on drift)
@@ -34,6 +39,17 @@ EXAMPLES.each do |path|
   out = `ruby #{path} 2>&1`
   outputs[File.basename(path)] = out
   problems << "example not green: #{File.basename(path)} (exit #{$?.exitstatus})" unless $?.success?
+end
+
+# Normalize a code block to "code only" — strip comments (per-edition language) and blank lines.
+# Uses Ripper so a `#` inside a string or `#{}` interpolation is never mistaken for a comment.
+def code_only(lines)
+  src = Array(lines).join("\n")
+  kept = Ripper.lex(src)
+                .reject { |(_pos, type, _tok)| %i[on_comment on_embdoc_beg on_embdoc on_embdoc_end].include?(type) }
+                .map { |(_pos, _type, tok)| tok }
+                .join
+  kept.lines.map(&:rstrip).reject(&:empty?).join("\n")
 end
 
 # Extract the "# region <id> … # endregion" span (excluding the marker lines).
@@ -76,7 +92,8 @@ CHAPTERS.each do |md|
       want = extract_region(src, region)
       if want.nil?
         problems << "#{label}: region '#{region}' not found in #{file}"
-      elsif body != want
+      elsif code_only(body) != code_only(want)
+        # The CODE drifted — not merely the per-edition comment language.
         if FIX
           lines[(open_idx + 1)...close_idx] = want
           File.write(md, "#{lines.join("\n")}\n")

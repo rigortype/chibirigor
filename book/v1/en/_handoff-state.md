@@ -204,21 +204,28 @@ the diagnostic/CLI strings shown are the shared English.
   zero CJK in lib/exe/examples/tools/test/impls/dist/steps.
 - **STYLE.md** updated: the "Open question" note → **"Resolved (2026-06-16)."**
 
-### Follow-ups from the migration (non-blocking)
+### Follow-ups from the migration — DONE
 
-1. **`check_docs.rb` `<!-- include: -->` byte-match vs JA prose.** The Seasoned JA prose's
-   `<!-- include: -->` excerpts keep **Japanese comments** (correct per the per-edition model) but
-   now byte-mismatch the **English** fixtures, so `book/v1/ja/seasoned/examples/check_docs.rb`
-   reports include-drift (the Little one is fine — it checks language-neutral `<!-- run: -->`
-   output). Fix options: have `check_docs.rb` compare code *modulo comments* for includes, scope
-   include-checks to the EN edition, or drop `<!-- include: -->` from JA prose. (Content is correct;
-   only the drift-detector needs the bilingual-aware update.)
-2. **Still Japanese, out of scope:** `impls/rust/` (an experimental Rust port; not a click-through
-   target) and `impls/README.md` (contributor doc). Translate if/when desired.
+1. **`check_docs.rb` made bilingual-aware (DONE).** The Seasoned `<!-- include: -->` check now
+   compares the prose block against the fixture region **modulo comments** (via `Ripper.lex`, so a
+   `#` inside a string / `#{}` is never mistaken for a comment): the *code* must match, but the
+   *comments* may differ per edition (JA shows Japanese, EN English). Real code drift is still
+   caught (sanity-verified). Applied to both `book/v1/ja/seasoned/examples/check_docs.rb` and the
+   EN copy; `book/v1/ja/seasoned/examples/check_docs.rb` now reports **OK** again. (The EN seasoned
+   prose still has no `<!-- include/run -->` markers — its excerpts are verified by reading + the
+   sketches' self-checks; restoring markers to EN prose is optional.)
+2. **Rust port + `impls/README.md` → English (DONE).** All `impls/rust/src/*.rs` (comments +
+   diagnostic strings) and `impls/README.md` translated; `cargo build` + `cargo test` (19) green.
+3. **Junk removed:** the emacs autosave `book/v1/ja/little/examples/#part3.rb#` was deleted.
+
+**Net state:** zero Japanese remains in any code tree (lib/exe/test/tools/examples/impls incl.
+the Rust port and README, and all book example `.rb`). The whole shared tree is English-canonical;
+both editions' prose localize only their printed comments.
 
 ## Next (in order)
 
-1. (Optional) Address follow-up #1 (`check_docs.rb` bilingual include-check) and/or #2 (Rust port).
+1. (Optional) Restore `<!-- include/run -->` markers to the EN Seasoned prose so its excerpts are
+   drift-checked too (now that `check_docs.rb` is bilingual-aware). Otherwise nothing outstanding.
 2. **Resolve the open shared-tree decision** (author call) — see below. If "migrate to English,"
    the `seasoned/examples/*.rb` links resolve and the snapshot/CLI click-throughs match the prose.
 3. **Optional: curly-quote pass** — prose currently uses curly quotes/apostrophes inline; a
