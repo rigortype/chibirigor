@@ -7,6 +7,7 @@ sidebar:
 
 # The Seasoned chibirigor Part 6　完全なFactStore
 
+> [!TIP]
 > 参考書（任意）：フロー解析の一般論（データフロー解析）。型理論の教科書（TAPL、『しくみ』）には
 > 直接の対応章はありません。ここはgradualな実用チェッカーの独自地形です。
 > 前編の素朴な`Scope`、`narrow`を、Rigorの本物の**FactStore**へ拡張する章です。
@@ -20,6 +21,7 @@ sidebar:
 後編[Part 5（本物の型推論）](part5-real-inference.md)で引数を埋めたのと同じ精神で、
 ここではフロー感応な型環境を実用に耐える設計へ一般化します。
 
+> [!NOTE]
 > **個別の絞り込みパターンは付録a2へ。**本章は6バケツ、stability、joinの骨格に絞ります。
 > `&&`、`||`の積み下ろし、正規表現キャプチャ、refinement carrier（`non-empty-string`等）、
 > ivarのunion、エスケープブロックといった**個別のナローイングのパターン**は付録

@@ -7,6 +7,7 @@ sidebar:
 
 # The Seasoned chibirigor Part 3　ジェネリクスと型代入
 
+> [!TIP]
 > 参考書（任意）：TAPL 22章「型再構築」、23章「全称型（System F）」、『しくみ』9章。
 > 前編Part 8のRBSでなぞった型変数の置換を、本式に組み直す章です。
 
@@ -51,6 +52,7 @@ subst(TypeAbs[params, body], X, repl) = TypeAbs[params, subst(body, X, repl)]   
 **(1)シャドーイング**：内側の`<T>`が外側の`T`を隠すとき、内側の`T`は別物なので置換してはいけません。
 まず型適用は2段階であることを分けて見ます（混線しやすい所です）：
 
+> [!NOTE]
 > 記法の断り：この先の例では、関数（ラムダ）を`=> 本体`で書きます（TypeScriptのアロー関数と同じ）。
 > §3-1の`->`が関数の型、`=>`が関数そのものの矢印で、どちらもRubyのHashの`=>`（ロケット）とは無関係です。
 > `(arg1: T, …) => true`は「引数を取り`true`を返すラムダ」と読みます。
@@ -137,6 +139,7 @@ PASS: capture is avoided (inner U becomes U@1, distinct from the substituted U)
 最後のケースが捕獲回避そのものです。
 `bar`由来の`U`と、`arg2`の内側`<U>`を`U@1`に付け替えた別物が、混線せずに保たれています。
 
+> [!TIP]
 > **参考書メモ**：『しくみ』9章は、まず間違った`subst`（`poly_bug.ts`）を見せ、シャドーイングと捕獲を具体例で炙り出し、`freshTypeAbs`で直します。
 > この章の構成をそっくり追っています。
 > TAPL 23章がSystem Fの代入と α 変換の理論を与えます。
@@ -186,6 +189,7 @@ Rigorにとってerasureはもう一つ意味があります。
 
 ## 3-6x. 発展：要素型の読みはlibに入った（generics 5a）
 
+> [!IMPORTANT]
 > genericsのlib化は3段に分けて進めます。**5a＝要素型の読み、5b＝ブロック仮引数への押し下げ、5c＝戻り多相**。本節は**5a**、続く5bと5cは後編Part 5「5-6x」で扱います。
 
 ここまでは「`Array[Elem]`の`Elem`をどう置換するか」を概念とスケッチ（`subst.rb`）で見てきました。

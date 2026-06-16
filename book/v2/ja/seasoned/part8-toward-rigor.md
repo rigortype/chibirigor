@@ -7,6 +7,7 @@ sidebar:
 
 # The Seasoned chibirigor Part 8（最終章）　本物のRigorへ
 
+> [!TIP]
 > 参考書（任意）：RigorのADR群、spec（型理論の教科書には対応章なし。ここは「学習用最小版」
 > から「実用ツール」への橋）。後編、そしてチュートリアル全体を締める章です。
 
