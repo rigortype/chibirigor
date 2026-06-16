@@ -115,7 +115,7 @@ end
 puts "synced #{fixed} include block(s) from regions." if FIX && fixed.positive?
 
 if problems.empty?
-  puts "OK: v1/ja/little/ code/output is in sync with milestone snapshots (chapters: #{CHAPTERS.size}, examples: #{EXAMPLES.size})."
+  puts "OK: v2/ja/little/ code/output is in sync with milestone snapshots (chapters: #{CHAPTERS.size}, examples: #{EXAMPLES.size})."
   exit 0
 else
   warn 'DRIFT detected:'
