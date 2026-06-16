@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 222" role="img" aria-label="Figure 4-1 fold and unfold of a μ-type">
+<defs>
+ <marker id="fseasoned41_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="fseasoned41_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="fseasoned41_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="fseasoned41_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="fseasoned41_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="fseasoned41_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>Figure 4-1 fold and unfold of a μ-type</title>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="34" y="58" width="232" height="74"></rect>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="150" y="84" text-anchor="middle">folded form</text>
+  <text x="150" y="110" text-anchor="middle">μList.{ … List }</text>
+
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="374" y="58" width="252" height="74"></rect>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="500" y="84" text-anchor="middle">unfolded one step</text>
+  <text x="500" y="110" text-anchor="middle">{ … μList.{ … List } }</text>
+
+  <line style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="266" y1="80" x2="372" y2="80" marker-end="url(#fseasoned41_aA)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-accent,#7A2A2A)" x="319" y="72" text-anchor="middle">unfold</text>
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="372" y1="112" x2="268" y2="112" marker-end="url(#fseasoned41_a)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="319" y="128" text-anchor="middle">fold</text>
+
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="320" y="176" text-anchor="middle">the same type — unfolding goes on forever (stopped by coinduction)</text>
+
+</svg>
