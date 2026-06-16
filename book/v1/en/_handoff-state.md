@@ -134,13 +134,34 @@ Verification run (each chapter): em-dash typography clean (spaced ` — ` only; 
 for numeric ranges like `20–21`); all unresolved relative links are intended forward-references
 to not-yet-translated chapters/appendices; figures rendered and eyeballed.
 
+## Review iteration 1 — DONE (4 layers, fixes applied & committed)
+
+Ran the multi-lens battery (independent-context subagents, layered 真→読→整):
+- **L1 真 (truth):** `_fidelity-review` (en↔ja claim preservation) and `_en-fp-researcher-review`
+  (type-theory soundness) — **both passed clean: zero ERROR / zero MISLEADING.** All ADR numbers,
+  defaults (fuel 64, fold budget 1,000,000), TAPL/『しくみ』 citations, hedges ("Status: Proposed",
+  the reduced-coinduction caveat, etc.) preserved; formal content sound.
+- **L3 読 (read-feel):** `_en-veteran-editor-review` + `_en-modern-editor-review` — strong
+  transcreation; convergent translation-smell fixes **applied**: 怒る→flag/complain/blame
+  (~11×), 口→point/place/raise (4×), 倒す→fall back to/collapse to/default to/drop to (~17×),
+  手元で→"when you run it yourself" (4×), 流儀/作法→way/discipline/practice, running start→head
+  start. Both editors judged the Little/Seasoned + three-voices framing lands cleanly in 2020s
+  English.
+- **L4 整 (polish):** `_en-copyedit-review` — "near-publication" clean; fixes **applied**:
+  judgements→judgments (US), "option hash"→"options hash" (3×).
+- **L2 伝 (reproducibility): intentionally skipped** — the teaching structure is unchanged from
+  the JA, which already passed reproducibility 34/34; the translation risk was read-feel +
+  fidelity, both covered. Re-run if a future edit changes the *teaching* prose, not just wording.
+
+Notes committed to `book/v1/en/.reviews/` (tracked, like the JA side). Verification after fixes:
+em-dash clean, no residual flagged calques, links unchanged (only the 5 shared `examples/*.rb`).
+
 ## Next (in order)
 
-1. **English review pass** — run the read-feel battery model from STYLE "Review" (veteran +
-   modern English editors + FP researcher), plus language-neutral reproducibility/fidelity on
-   the English prose. Notes to `book/v1/en/.reviews/_<lens>-review.md`. Suggested order: a
-   reproducibility/fidelity pass on the Little volume first (it's the load-bearing teaching
-   volume), then read-feel across both volumes, then a native-English copyedit last.
+1. **Optional review iteration 2** — iteration 1 drove the book to "near-publication"; a second
+   full round would be low-yield. Worth doing only after the open shared-tree decision lands or a
+   substantive prose edit. A Ruby/Rails-junior + Java-mid reader pass (the JA battery's L2 伝
+   personas) could be added for teaching-clarity if desired.
 2. **Resolve the open shared-tree decision** (author call) — see below. If "migrate to English,"
    the `seasoned/examples/*.rb` links resolve and the snapshot/CLI click-throughs match the prose.
 3. **Optional: curly-quote pass** — prose currently uses curly quotes/apostrophes inline; a
