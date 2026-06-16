@@ -2,10 +2,9 @@
 
 本文で「実はこれ◯◯と呼ばれます」と後出しした用語を、引けるようにまとめます。
 
-**二部構成です。前編The Littleだけを読む方は、前半「前編で出会う語」だけで足ります。**
-後半「後編、Rigor固有の語」は、形式の言葉や実Rigor内部の概念なので、後編に進むとき引いてください。
-（前後編の両方で出会う語は、はじめて出会う前編側に置いています。初出の章はv1の章立てで併記。
-巻をまたぐ参照情報は[付録](appendix/)にも整理があります。）
+**二部構成です。前編The Littleだけを読む方は、前半「前編で出会う語」だけで足ります。**後半「後編、Rigor固有の語」は、形式の言葉や実Rigor内部の概念なので、後編に進むとき引いてください。
+
+（前後編の両方で出会う語は、はじめて出会う前編側に置いています。初出の章はv1の章立てで併記。巻をまたぐ参照情報は[付録](appendix/)にも整理があります。）
 
 ---
 
@@ -16,7 +15,7 @@
 - **型キャリア（type carrier）**〔前編P1〕：型を表すRubyオブジェクト。`Const`、`Nominal`、`Dynamic`、`Union`、`HashShape`、`Tuple`など。
 - **`Const`（リテラル型）**〔前編P1〕：「その値そのもの」を表す型。例：`Const[1]`。
 - **`Nominal`（名前的型）**〔前編P1〕：名前付きクラスを表す型。例：`Nominal[:Integer]`。
-- **`Dynamic`／untyped**〔前編P1〕：「型を見失った」印。gradualの要。他言語対応表、軸A、軸Bは付録a1（特別な型カタログ）参照。
+- **`Dynamic`／untyped**〔前編P1〕：「型を見失った」印。gradualの要。他言語対応表、軸A、軸Bは付録[a1](appendix/a1-special-types.md)（特別な型カタログ）参照。
 - **`Union`（ユニオン型）**〔前編P4〕：「`A`か`B`のどちらか」。例：`Integer | String`。
 - **`HashShape`（レコード型）**〔前編P6〕：キーごとの型を覚えるハッシュの型。Hackの`shape(...)`を起点としPHPStan/Psalmを経てRigorに至る設計（前編P6コラム参照）。
 - **丸め／正規化（normalization）**〔前編P1〕：細かい型（`Const[3]`）を大ざっぱな型（`Integer`）に戻すこと。
@@ -45,8 +44,8 @@
 
 ## 型と値（細粒度キャリア、Rigor内部）
 
-- **refinement carrier（細粒度キャリア）**〔後編P6 / Rigor固有〕：「空でない、正の値、リテラル由来」といった述語で絞り込まれた型。`Nominal`のサブクラスではなく、フロー事実から自動的に生まれる。`unless s.empty?`を通った後の`s`は`non-empty-string`になる。「値そのもの」の`Const[42]`とは別概念で、`Const`は特定の値、refinement carrierは述語を満たす値の集合。`non-empty-string`、`positive-int`などがあり、多くはPHPStanと同名（学習コストを下げる意図的な命名対応）。組み込みcarrierの一覧（PHPStan対応表）と「なぜ集合差か」の解説は付録a2-6が正本。個別の絞り込みパターンも付録a2。後編P6 §6-1。
-- **`Difference`型**〔Rigor内部〕：「`A`から`B`を除いた値の集合」（集合差`A - B`）を表す型キャリア。`non-empty-string`は内部的に`String - ""`として実装される。refinement carrierの一部（点除去型）の「なぜその名か」の答えがここにある（述語部分集合は別キャリア`Refined`、範囲整数は`IntegerRange`）。chibirigorでは扱わない。詳細、二層構成は付録a2-6が正本。
+- **refinement carrier（細粒度キャリア）**〔後編P6 / Rigor固有〕：「空でない、正の値、リテラル由来」といった述語で絞り込まれた型。`Nominal`のサブクラスではなく、フロー事実から自動的に生まれる。`unless s.empty?`を通った後の`s`は`non-empty-string`になる。「値そのもの」の`Const[42]`とは別概念で、`Const`は特定の値、refinement carrierは述語を満たす値の集合。`non-empty-string`、`positive-int`などがあり、多くはPHPStanと同名（学習コストを下げる意図的な命名対応）。組み込みcarrierの一覧（PHPStan対応表）と「なぜ集合差か」の解説は付録[a2-6](appendix/a2-narrowing-patterns.md)が正本。個別の絞り込みパターンも付録[a2](appendix/a2-narrowing-patterns.md)。後編P6 §6-1。
+- **`Difference`型**〔Rigor内部〕：「`A`から`B`を除いた値の集合」（集合差`A - B`）を表す型キャリア。`non-empty-string`は内部的に`String - ""`として実装される。refinement carrierの一部（点除去型）の「なぜその名か」の答えがここにある（述語部分集合は別キャリア`Refined`、範囲整数は`IntegerRange`）。chibirigorでは扱わない。詳細、二層構成は付録[a2-6](appendix/a2-narrowing-patterns.md)が正本。
 
 ## 推論と型チェック
 
