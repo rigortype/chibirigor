@@ -70,7 +70,8 @@ when Prism::IfNode
 > [!NOTE]
 > ここで`node.subsequent`は、`else`節なら`Prism::ElseNode`（`elsif`なら`IfNode`）です。
 > 型はその`.statements.body.last`（その節の最後の式）から求めます。
-> `node.subsequent`をそのまま`type_of`に渡さない点に注意してください（渡すと未知のノードとして`untyped`に落ちてしまいます）。
+> `node.subsequent`をそのまま`type_of`に渡さない点に注意してください。
+> 渡すと未知のノードとして`untyped`に落ちてしまいます。
 
 `nil`も`Const[nil]`というふつうの型として扱い、elseの無い`if`は「偽のとき`nil`」をそのままUnionに混ぜます。
 だから`c ? 1 : nil`も`if cond then 1 end`も、素直に`1 | nil`です。
@@ -151,7 +152,7 @@ x = cond ? 1 : "a" ; x + 1      # 2: 2 | String （Integer 側は畳み、String
 でも実行時には`x`が`Integer`側に転んでいれば動きます。
 だから**全メンバで失敗したときだけ怒り、一部だけの失敗は黙ります**（`:maybe`）。
 `x + "a"`のように`(1 | 2)`のどちらでも失敗する式だけが、診断1件になります。
-未知メンバがいたらさらに保守的で、`x = cond ? 1 : nil`の`x + 1`は`nil.+`が表に無い時点で、Union全体を`untyped`に倒します（一部でも型を見失えば、全体の精度を主張しません）。
+未知メンバがいたらさらに保守的で、`x = cond ? 1 : nil`の`x + 1`は`nil.+`が表に無い時点で、Union全体を`untyped`に倒します。一部でも型を見失えば、全体の精度を主張しません。
 
 実物の挙動は**`test/test_union_dispatch.rb`**が仕様兼サンプルです（レシーバ分配、引数の直積、全メンバ失敗時だけ怒る、未知メンバでuntyped、メンバ数予算でクラスに丸めるを網羅）。
 4-1の`annotate`出力（`rand < 0.5 ? 1 : "a"`が`1 | "a"`）の続きとして、その`x`にメソッドを送ると分配が起きると読んでください。

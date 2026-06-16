@@ -72,8 +72,8 @@ Part 4、5で`if`の枝ごとに「この枝の中でだけ`x`は`Integer`」と
 when Prism::LocalVariableReadNode then scope.local(node.name) || Type::Dynamic.new
 ```
 
-`type_of`にはscopeを渡すようにします（受け手や引数の型を求める再帰にも一緒に渡す）。
-未束縛なら`Dynamic`です（脅かさない）。
+`type_of`にはscopeを渡すようにします。受け手や引数の型を求める再帰にも一緒に渡します。
+未束縛なら`Dynamic`です。型エラーを出して脅かしません。
 
 > [!NOTE]
 > ちょっとしたRubyの機微：**代入していない裸の名前（`y`）は、変数ではなくメソッド呼び出し（`self.y`）**です。
@@ -102,7 +102,7 @@ def eval_statement(node, scope, diagnostics)
 end
 ```
 
-`check`と`annotate`は、文の列を上から評価しながら**スコープを縫って**いきます（前の文で更新したスコープを次の文へ手渡していきます。コードを上から読んで「ここまでで何が定義済みか」を覚えながら進むのと同じ動きです）。
+`check`と`annotate`は、文の列を上から評価しながら**スコープを縫って**いきます。前の文で更新したスコープを次の文へ手渡していきます。コードを上から読んで「ここまでで何が定義済みか」を覚えながら進むのと同じ動きです。
 
 ```ruby
 scope = Scope.new
