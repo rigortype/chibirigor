@@ -12,6 +12,7 @@ Rubyでは`if`や三項演算子で枝ごとに別々の型を返すのが日常
 そのとき型を1本に決めつけず、「どちらか」としてまとめて持ちます。
 それがUnionです。
 
+> [!NOTE]
 > 私たちが作るUnion（`Integer | String`のような**無タグのユニオン型**）は、実は参考書があえて避けた出発点です。
 > 『しくみ』もTAPLも、持っているのは値に札を付けて区別するタグ付きのvariantであって、無タグのUnionとは別物です。
 > でもRubyを相手にする私たちには、無タグのUnionが必須です。（この違いは付録[a5-4](../appendix/a5-other-languages.md)へ。）
@@ -66,6 +67,7 @@ when Prism::IfNode
   Type.union([then_type, else_type])
 ```
 
+> [!NOTE]
 > ここで`node.subsequent`は、`else`節なら`Prism::ElseNode`（`elsif`なら`IfNode`）です。
 > 型はその`.statements.body.last`（その節の最後の式）から求めます。
 > `node.subsequent`をそのまま`type_of`に渡さない点に注意してください（渡すと未知のノードとして`untyped`に落ちてしまいます）。
@@ -86,14 +88,17 @@ type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => 1 | "a"（両枝とも Const の
 - **② Rubyだと**：分岐で別々の型を返すのは日常です。`x = cond ? 1 : "a"`は普通に書きます。
 - **③ Rigorだと**：一本に決めずUnionで持ちます。決めつけないことが、後で困らないことにつながります。
 
+> [!NOTE]
 > Unionのメンバには`nil`（`NilClass`）も普通に並びます。
 > 「`User`か`nil`」のような`User | nil`は、「見つかれば値、なければnil」というRubyで頻出の形であり、ただのUnionです。
 > この`nil`を含むUnionをどう剥がすかが、次章Part 5の主役になります。
 
+> [!NOTE]
 > Unionから何かを読むとき（例：`(Integer | String).to_s`）は、メンバを1つずつ考えてまとめるのが基本です。
 > この「全メンバを回して一番弱い結論を採る」考え方は、Part 7の`accepts`（`:yes`/`:no`/`:maybe`）でそのまま再登場します。
 > 頭の片隅に置いておいてください。
 
+> [!NOTE]
 > 「絞り尽くして候補がゼロになった枝」には**ボトム型**（`never`）という型理論上の名前があります。
 > 本書本体ではボトム型を型としては作らず、その話は付録a1にまとめました。
 
@@ -101,6 +106,7 @@ type_of(parse("rand < 0.5 ? 1 : \"a\""))   # => 1 | "a"（両枝とも Const の
 
 ## 4-1x. 発展：Unionレシーバへのメソッド送信（分配して畳む）
 
+> [!NOTE]
 > これは本筋から外した発展ノートです。
 > この章はUnionを作る話に集中し、できたUnionにメソッドを送る話には踏み込みませんでした。
 > Part 2のディスパッチ表にひとさじ足すと、Unionレシーバがどう振る舞うかを扱います。
@@ -151,6 +157,7 @@ x = cond ? 1 : "a" ; x + 1      # 2: 2 | String （Integer 側は畳み、String
 4-1の`annotate`出力（`rand < 0.5 ? 1 : "a"`が`1 | "a"`）の続きとして、その`x`にメソッドを送ると分配が起きると読んでください。
 手元の`exe/chibirigor`で`(1 | 2) + 1`が`2 | 3`と出る（章の最小版なら`untyped`）のは、この分配がDispatch側に入っているからです。
 
+> [!NOTE]
 > **実Rigorでは**、`Union`レシーバは「各メンバを個別にディスパッチし、全メンバが解決したら戻り型をunion、どれか1つでも解決しなければ全体を`nil`（解決失敗）にする」と定めています
 > （`rigor/docs/internal-spec/inference-engine.md`「`Union` receivers MUST dispatch each member
 > individually」）。

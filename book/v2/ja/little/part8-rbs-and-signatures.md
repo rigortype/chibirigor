@@ -14,6 +14,7 @@ sidebar:
 ここで`chibirigor`が推論を土台にしていることが一番はっきりします。
 注釈ゼロのメソッドでも、本体の最後の式から戻り型が決まるのです。
 
+> [!NOTE]
 > 『しくみ』9章「ジェネリクス」（TAPL 23章「全称型／System F」）の*型代入*が遠い親戚ですが、ここで本当に出会うのはRuby/RBS固有の世界観です。「**型はコードではなく、別ファイル（.rbs）に書く**」という考え方です。
 > 後半は逆向きに、TAPL 22章「型再構築」の側へ進みます。注釈の無いコードから型を立ち上げる方向です。
 
@@ -184,6 +185,7 @@ end
 これで`def`の本体も型チェックされるようになりました（`check`が`def bad; 1 + "x"; end`の中のエラーを拾います）。
 引数は`untyped`なので、`def ok(x); x + 1; end`は誤検知しません（`untyped + Integer`は`:maybe`で黙ります）。
 
+> [!NOTE]
 > `type_of_body`は空の本体を`nil`型にしましたが、RBSにはもう一段ゆるい戻り型**`void`**（「値は返るが当てにするな」）もあります。
 > これが効くのは**契約**の面です。
 > 戻り型を`-> nil`と宣言すると「nilを返す」と約束したことになり、後で別の値を返すよう実装を変えると契約違反になります。
@@ -251,6 +253,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 これはRigorの`sig-gen`（RBSを生成する機能）の発想の芽です。
 生成されたRBSの`untyped`は「人間が型を足すべき場所」を指しています。
 
+> [!NOTE]
 > ここで`def double(n)`の引数`n`を`untyped`のままにしているのは、**設計判断**です。
 > Ruby同梱のTypeProfなら、`double`が`double(3)`のように**呼ばれている場所**を見つけて`n`を`Integer`まで逆算し、`(Integer) -> Integer`を埋めてくれます。
 > chibirigor（とRigor）はあえてそれをしません。

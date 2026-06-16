@@ -184,6 +184,7 @@ check('"a" + 1')        # ["expected String but got 1"]
 check('"ab".length(1)') # ["wrong number of arguments for length (0 expected, 1 given)"]
 ```
 
+> [!NOTE]
 > この`matches?`は手書きの仮判定です。
 > Part 7で、これを`:yes`/`:no`/`:maybe`の三値を返す本物の`accepts`に置き換えます（「Part 1/2の場当たりはacceptsの手書き版だった」の回収）。
 > いまは「クラス一致」で十分です。
@@ -245,6 +246,7 @@ expected Integer but got "x"
 
 ## 2-7. 発展：定数畳み込み（畳めれば畳む）
 
+> [!NOTE]
 > これは本筋から外した発展ノートです。
 > Part 1では`1 + 2`を`Integer`に「丸める」とだけしましたが、ここではその丸めの手前で一手間かけて、畳める所は畳む話を重ねます。
 > 教えるコード（2-2〜2-4の表引き）はそのままに、`+`の解決に*ひとさじ*足すとどうなるかを見ます。
