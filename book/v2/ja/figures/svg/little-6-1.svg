@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 248" role="img" aria-label="図 6-1 open な HashShape ― 余分は許し、不足だけ咎める">
+<defs>
+ <marker id="flittle61_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="flittle61_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="flittle61_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="flittle61_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="flittle61_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="flittle61_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>図 6-1 open な HashShape ― 余分は許し、不足だけ咎める</title>
+
+  
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="115" y="22" text-anchor="middle">期待（open）</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="335" y="22" text-anchor="middle">実引数を渡してみる</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="492" y="22" text-anchor="middle">判定</text>
+
+  
+  <rect style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5" x="30" y="40" width="170" height="150"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-accent,#7A2A2A)" x="115" y="80" text-anchor="middle">{ name: }</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="115" y="120" text-anchor="middle">少なくとも</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="115" y="138" text-anchor="middle">name があればよい</text>
+
+  
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="250" y="44" width="170" height="40"></rect>
+  <text x="335" y="69" text-anchor="middle">{ name:, admin: }</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="250" y="98" width="170" height="40"></rect>
+  <text x="335" y="123" text-anchor="middle">{ name: }</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="250" y="152" width="170" height="40"></rect>
+  <text x="335" y="177" text-anchor="middle">{ age: }</text>
+
+  
+  <line style="fill:none;stroke:var(--rigor-type-untyped,#6E7480);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="248" y1="64" x2="204" y2="64" marker-end="url(#flittle61_aM)"></line>
+  <line style="fill:none;stroke:var(--rigor-type-untyped,#6E7480);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="248" y1="118" x2="204" y2="118" marker-end="url(#flittle61_aM)"></line>
+  <line style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:4 4" x1="248" y1="172" x2="204" y2="172" marker-end="url(#flittle61_aE)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:14px;fill:var(--rigor-error,#B5302B)" x="226" y="166" text-anchor="middle">✗</text>
+
+  
+  <line style="fill:none;stroke:var(--rigor-success,#2E6F3F);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="420" y1="64" x2="452" y2="64" marker-end="url(#flittle61_aK)"></line>
+  <line style="fill:none;stroke:var(--rigor-success,#2E6F3F);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="420" y1="118" x2="452" y2="118" marker-end="url(#flittle61_aK)"></line>
+  <line style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="420" y1="172" x2="452" y2="172" marker-end="url(#flittle61_aE)"></line>
+
+  
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-success,#2E6F3F)" x="462" y="70" text-anchor="start">✓ OK</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:11px;fill:var(--rigor-ink-3,#585F6B)" x="462" y="84" text-anchor="start">余分は許す</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-success,#2E6F3F)" x="462" y="124" text-anchor="start">✓ OK</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:16px;fill:var(--rigor-error,#B5302B)" x="462" y="178" text-anchor="start">✗ :no</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:11px;fill:var(--rigor-ink-3,#585F6B)" x="462" y="192" text-anchor="start">name 不足</text>
+
+  
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="115" y="214" text-anchor="middle">▲ width subtyping</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="115" y="230" text-anchor="middle">キーが多い方が部分型</text>
+</svg>

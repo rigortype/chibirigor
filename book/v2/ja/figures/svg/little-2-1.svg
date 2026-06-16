@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 312" role="img" aria-label="図 2-1 メソッド送信のディスパッチ">
+<defs>
+ <marker id="flittle21_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="flittle21_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="flittle21_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="flittle21_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="flittle21_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="flittle21_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>図 2-1 メソッド送信のディスパッチ</title>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="246" y="14" width="168" height="40"></rect>
+  <text x="330" y="39" text-anchor="middle">1 + &#34;x&#34;</text>
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="330" y1="54" x2="330" y2="92" marker-end="url(#flittle21_a)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-ink-3,#585F6B)" x="316" y="78" text-anchor="end">レシーバ=Integer · :+ · 引数=[String]</text>
+
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="214" y="94" width="232" height="42"></rect>
+  <text x="330" y="120" text-anchor="middle">METHODS[[:Integer, :+]]</text>
+
+  <line style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="330" y1="136" x2="330" y2="174" marker-end="url(#flittle21_a)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-success,#2E6F3F)" x="346" y="160" text-anchor="start">見つかる</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="214" y="176" width="232" height="42"></rect>
+  <text x="330" y="202" text-anchor="middle">引数を accepts で確認</text>
+
+  <path style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M270,218 V244 H150 V262" marker-end="url(#flittle21_aE)"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-error,#B5302B)" x="150" y="238" text-anchor="middle">合わない</text>
+  <rect style="fill:none;stroke:var(--rigor-error,#B5302B);stroke-width:1.5" x="80" y="264" width="140" height="40"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-error,#B5302B)" x="150" y="289" text-anchor="middle">診断</text>
+
+  <path style="fill:none;stroke:var(--rigor-success,#2E6F3F);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" d="M390,218 V244 H510 V262" marker-end="url(#flittle21_aK)"></path>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-success,#2E6F3F)" x="510" y="238" text-anchor="middle">合う</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="430" y="264" width="160" height="40"></rect>
+  <text x="510" y="289" text-anchor="middle">戻り型 Integer</text>
+
+  <line style="fill:none;stroke:var(--rigor-type-untyped,#6E7480);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:4 4" x1="446" y1="115" x2="498" y2="115" marker-end="url(#flittle21_aM)"></line>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-type-untyped,#6E7480);font-style:italic" x="579" y="84" text-anchor="middle">見つからない（未知）</text>
+  <rect style="fill:none;stroke:var(--rigor-type-untyped,#6E7480);stroke-width:1.5" x="500" y="94" width="160" height="42"></rect>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-type-untyped,#6E7480);font-style:italic" x="580" y="120" text-anchor="middle">untyped</text>
+
+</svg>

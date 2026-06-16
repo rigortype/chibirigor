@@ -1,0 +1,255 @@
+---
+title: Part 5 ― ナローイング：場合分けで絞る
+description: "Union で増えた型を、`if`/`case` の枝ごとに絞り込む（ナローイング）。`narrow` の実装と、絞り込みの 2 つの掟を作る。"
+sidebar:
+  order: 6
+---
+
+# The Little chibirigor Part 5 ― ナローイング：場合分けで絞る
+
+この章のゴール：**前章で型が「一本に決まらない」Union を手に入れた。今度は `if`/`case` の
+枝ごとに、変数の型を*絞る*仕組み（ナローイング）を作る。** Ruby のコードが当たり前に
+やっている「nil チェックしたから、この先は nil じゃない」を、型でも追えるようにします。
+
+前章（Part 4）で Union を導入したことで、ひとつの変数が `User | nil` のように複数の型を
+持つようになりました。型が増えたなら、次は**減らす**番です（前章で書いた `IfNode` の型付けに、
+枝ごとの絞り込みを足していきます）。`if`/`case` の枝の中では、人間は無意識に
+「この枝なら型はこれ」と読んでいます。それを型でも追うのが、
+この章の主題です。
+
+---
+
+## 5-1. 場合分けで型を絞る ― ナローイング
+
+こういう Ruby を見てください：
+
+```ruby
+x = find_user   # 型は User | nil（見つからなければ nil）
+if x.nil?
+  puts "いません"
+else
+  puts x.name   # ここでは x は絶対 nil じゃない → User
+end
+```
+
+人間は当たり前に「`else` の中では `x` は `nil` じゃない」と読めます。これを型でも追うのが
+**ナローイング（絞り込み）** です。条件分岐の枝ごとに、変数の型を*狭める*のです。
+
+- `if x.nil?` の **then 節**では、`x` は `nil`。
+- **else 節**では、`x` は `nil` を除いた残り（`User | nil` → `User`）。
+
+```text
+              x : User | nil
+                    │
+            if x.nil?
+          ┌─────────┴─────────┐
+       then 節               else 節
+     x : nil          x : User （nil を除く）
+          └─────────┬─────────┘
+              両枝の型を union
+```
+
+![図 5-1　if x.nil? のナローイング](../figures/svg/little-5-1.svg)
+> ▼ 図 5-1　`if x.nil?` のナローイング
+
+枝ごとに `x` の型を差し替えた**別の Scope**で本体を型付けし、最後に両枝の結果を union します。
+
+> **コラム：これは「nil で落ちる」を型で捕まえる話です**
+>
+> `User | nil` は「`nil` を含む Union」です。ナローイングは、`if x.nil?` の else 節で「ここの
+> `x` はもう `nil` じゃない」と型から `nil` を**剥がす**仕組み ― 剥がし切れていない（`nil` がまだ
+> 型に残っている）場所で `.name` を呼べば、そこが「`nil` で落ちる場所」です。ここで見方がひとつ
+> 変わります ― `nil` で落ちるバグは「実行時にたまたま落ちるもの」ではなく、**型で表現でき、型で
+> 防げるバグ**だった。この見方の転換が「**null 安全（null safety）**」と呼ばれるものです。特別な
+> 構文を足さず、`nil` をただの Union のメンバとして持ってガードで剥がすだけで、その入口に立てます。
+> （Java の `NullPointerException`＝「ぬるぽ」、Kotlin の `User?`、TypeScript の `User | null` との
+> 対応は付録 [a5-1](../appendix/a5-other-languages.md) へ。）
+
+---
+
+## 5-2. Ruby の「偽」は 2 つだけ ― 絞り込みを実装する
+
+実装の前に、Ruby の大事な事実を一つ確認します。**Ruby で「偽」とみなされるのは `false` と `nil` の
+2 つだけです**。`0` も `""` も真です。だから `if x` は「`x` が `false` でも `nil` でもない」を
+意味します。
+
+絞り込みは「条件を見て、枝ごとに変数の型を差し替えた**新しいスコープ**を作る」だけです。
+スコープは Part 3 で作った不変 `Scope`（`scope.local(名前)` で型を引き、`scope.with_local(名前, 型)`
+で束縛を 1 つ足した新しい `Scope` を返す）をそのまま使います：
+
+```ruby
+def remove_nil(t)
+  return t unless t.is_a?(Type::Union)
+  # nil は nil リテラルなら Const[nil]、`x.nil?` の真の枝なら Nominal[:NilClass] で来る。両方剥がす。
+  Type.union(t.members.reject { |m| m == Type::Const[nil] || m == Type::Nominal[:NilClass] })
+end
+
+def narrow(scope, cond, truthy:)
+  # まずは `x.nil?` の形だけ扱う（他の条件は後で同じ要領で増やせる）
+  if cond.is_a?(Prism::CallNode) && cond.name == :nil? &&
+     cond.receiver.is_a?(Prism::LocalVariableReadNode)
+    name = cond.receiver.name
+    narrowed = truthy ? Type::Nominal[:NilClass] : remove_nil(scope.local(name))
+    return scope.with_local(name, narrowed)   # 不変 Scope に束縛を足して返す
+  end
+  scope   # ★ 絞れない条件は、スコープをそのまま返す（何も主張しない）
+end
+```
+
+`if` の型付けは、then 節を「真に絞ったスコープ」で、else 節を「偽に絞ったスコープ」で
+それぞれ求め、最後にまとめます：
+
+```ruby
+when Prism::IfNode
+  then_scope = narrow(scope, node.predicate, truthy: true)
+  else_scope = narrow(scope, node.predicate, truthy: false)
+  then_type = type_of(node.statements.body.last, then_scope, diagnostics)
+  else_type =
+    if node.subsequent   # else 節がある（三項演算子も同じ IfNode）
+      type_of(node.subsequent.statements.body.last, else_scope, diagnostics)
+    else
+      Type::Const[nil]   # else が無ければ、偽のとき nil
+    end
+  Type.union([then_type, else_type])
+```
+
+（`if cond; ...; end` のように **else が無い** とき `node.subsequent` は `nil` です。その場合は
+偽の枝の型を `nil` とします ― 実際の Ruby が、else 無しの `if` が偽のとき `nil` を返すのに
+合わせています。）
+
+動かすと、ちゃんと絞れます：
+
+```ruby
+# x : Integer | nil のとき
+# then 節 → x は NilClass
+# else 節 → x は Integer
+```
+
+<!-- run: examples/part5.rb -->
+```text
+nil? narrowing: OK (no errors)
+expected String but got 1
+```
+
+`is_a?` でも同じ要領です（`if x.is_a?(String)` の then 節は `x` を `String` に絞る）。
+形が増えても `narrow` に分岐を足すだけ。
+**偽の枝はスコープをそのまま返す**（`is_a?` の条件が成り立たなかった側は、型を変えずに元の Scope を引き継ぐ）。
+
+ただし `is_a?` には落とし穴が一つあります。`x` がもともと `Integer` のとき
+`if x.is_a?(String)` の中身を「`x` は `String`」と絞ると、その枝は*起き得ない*（Integer は
+String にならない）のに `x + 1` を String の足し算とみなして**誤検知**します。これは
+「動くコードを脅かさない」に反します。だから **「そのクラスがあり得るときだけ絞る」** ―
+`x` が `Integer | String` のように String を含むときは絞る、`Integer` 単体なら絞らない
+（その枝は dead branch なので触らない）。`Dynamic` も絞りません（型が分からないものは、分からないまま通す）。
+
+```ruby
+check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK（dead branch、誤検知しない）
+check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n x + 1\nend\n")  # String の足し算エラー（正しい）
+```
+
+> **実装メモ ― `possible?` ガード**　「そのクラスがあり得るか」を `narrow` に判定させるには
+> 小さなヘルパが要ります。`Dynamic` は「あり得ないとは言えない」ので false、Union は
+> メンバを探索、それ以外はクラスが一致するかで判定します：
+>
+> ```ruby
+> def possible?(current, klass)
+>   return false if current.is_a?(Type::Dynamic)
+>   members = current.is_a?(Type::Union) ? current.members : [current]
+>   members.any? { |m| Dispatch.class_of(m) == klass }
+> end
+> # narrow_type の is_a? 節：klass && truthy && possible?(current, klass) のときだけ絞る
+> ```
+>
+> このガードを入れないと、`Integer` 単体に `is_a?(String)` を当てたとき dead branch を
+> `String` に絞ってしまい、`x + 1` が「String の足し算」として誤検知されます。
+
+### 到達できない枝の報告（unreachable arm）
+
+`is_a?` の dead branch を「触らない（絞らない）」のは誤検知を避ける消極的な対応ですが、
+Rigor はもう一歩進めて、その枝を**「絶対に通らない余分な分岐です」と指摘できる**ようにしています。
+ただし**既定では黙ったまま**で、`check --unreachable` を明示したときだけ表に出る opt-in です
+（動くコードを脅かさないため）。「足りない腕（missing arm）を書くまで止める」Java・C# の
+網羅性検査とは逆に、**動くものには黙り、求められたときだけ通らない枝を指摘する** ― これも
+「脅かさない」価値観の現れで、上の `possible?` ガードで「あり得ないときは絞らない」とした
+判断と同じ軸の上にあります。
+
+> 到達できない枝の「型」（ボトム型 `Bot`／`never`）は付録
+> [a1](../appendix/a1-special-types.md)、Java/C# の網羅性検査との方向の違いは付録
+> [a5-5](../appendix/a5-other-languages.md) で扱います。
+
+---
+
+## 5-3. 絞り込みの 2 つの掟（ここが Rigor らしさ）
+
+ナローイングには、Rigor が守っている掟が 2 つあります。どちらも「脅かさない」ためです。
+
+**掟その 1：絞れない条件は、黙ってそのまま通す。** `narrow` の最後の行 ―
+`scope`（そのまま返す）― がそれです。`if complicated_check(x)` のような、私たちに読めない
+条件のときは、**何も主張しません**。「絞れないから怪しい」とは言わない。
+
+**掟その 2：絞り込みは「事実を足す」だけ。間違えたら緩める側に倒す。** 型を*狭める*操作なので、
+やりすぎると「本当はあり得る値」を消してしまい、誤検知の元になります。だから迷ったら絞らない。
+なお、変数への**再代入**はそれ以前の全 facts をリセットします ― 事実は「変数名」ではなく
+「そのスコープ位置で確定した事実」に結びついているからです。`x = something_else` を書いた
+瞬間、`x` に関する narrowing の記憶は全て消えます。
+
+> **Part 7 への地ならし：Union は「全メンバで考える」**
+> Union から何かを読むとき（例：`(Integer | String).to_s`）は、メンバを 1 つずつ考えて
+> まとめるのが基本です。`to_s` は Integer にも String にもあるので OK。もし片方にしか無い
+> メソッドなら、その分だけ怪しくなる。── この「**全メンバを回して一番弱い結論を採る**」考え方は、
+> Part 7 の `accepts`（`:yes`/`:no`/`:maybe`）でそのまま再登場します。ここで
+> 身につけておいてください。
+
+- **① 型理論**：場合分けで型情報が増える（『しくみ』は扱わない独自地形）。
+- **② Ruby だと**：`false`/`nil` だけが偽、`x.nil?`/`is_a?` でガードするのが定石。さらに ―
+  `x` が*局所変数*かどうかは「先に代入があるか」で決まる（無ければ `self.x` の呼び出し扱い）。[^bare]
+- **③ Rigor だと**：絞り込みは*事実を足すだけ*。読めない条件は黙る。間違えるなら緩める側に。
+
+[^bare]: この「裸の `x` が局所変数かメソッド呼び出しか」は Prism が文脈で決めます。ナローイングは
+局所変数にしか効きません。本編では深追いしません。
+
+---
+
+## 5-4. この章のまとめ
+
+足したものは、道具 `remove_nil`／`narrow`、そして `IfNode` の絞り込み付き型付けです。`narrow` は
+実質 7 行です。スコープは Part 3 の不変 `Scope` に `with_local` で束縛を足すだけです。
+
+この章の三題噺：
+
+| | 内容 |
+|---|---|
+| ① 型理論 | 場合分けで型情報が増える（『しくみ』が扱わない独自地形。dead branch ＝ボトム型は付録 a1） |
+| ② Ruby/RBS | 偽は `false`/`nil` だけ、`x.nil?`/`is_a?` でガードが定石 |
+| ③ Rigor 実装の問題 | 絞り込みは*事実を足すだけ・読めなければ黙る・迷えば緩める*＝誤検知を出さない |
+
+**続編に送ったもの**：
+
+- 本物の **FactStore**（6 種類の「事実の置き場」、いつ事実が無効になるか、再代入やブロックの
+  クロージャ捕獲で事実を捨てる機微）。本編は素朴な `Scope` 止まり。この章で触れた「再代入で
+  facts が消える」話は、後編 Part 6（完全な FactStore）で一般化します。
+- `case`/`when`・`case`/`in`（パターンマッチ）の絞り込みと、到達しない枝の検出（実 Rigor の
+  ADR-47）。本編は `if` の `nil?`/`is_a?` まで。
+- **Union のサイズ予算**：前章の `union` ヘルパは重複を消すだけですが、実 Rigor では Union の
+  メンバ数が設定上限を超えると、各メンバの名前的クラス（`Integer`・`String` など）の Union に
+  **強制的に拡大（widen）**します。これは定数畳み込みの「大きすぎたら丸める」と同じ発想 ―
+  「型も*予算を持つ*」という設計原則の別の現れです。
+
+## 演習
+
+1. `x : String | nil` のとき `if x` の then 節で `x` が `String` に絞れることを確かめよ
+   （Ruby の偽は `false`/`nil` の 2 つだけ、を使う）。else 節では `x` は何型か。
+2. `x : Integer | String` のとき `if x.is_a?(Integer)` の then 節で `x` が `Integer` に絞れる
+   ことを確かめよ。
+3. `unless` も絞り込めるようにするには、`if` の型付けをどう変えればよいか方針を述べよ
+   （ヒント：真の枝と偽の枝を入れ替える）。
+
+---
+
+**次章予告（Part 6）**：ハッシュや配列のリテラルに型をつけます（`HashShape`/`Tuple`）。
+「symbol キーのオプションハッシュ」だらけの Ruby で、型を*完全一致で要求すると誤検知の嵐に
+なる*話に踏み込みます。
+
+---
+
+> **この章の実装（演習の答え合わせにも）** → [`impls/dist/part5/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part5/lib)

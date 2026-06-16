@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 252" role="img" aria-label="図 2-2 S-Arrow 戻りは共変・引数は反変">
+<defs>
+ <marker id="fseasoned22_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="fseasoned22_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="fseasoned22_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="fseasoned22_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="fseasoned22_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="fseasoned22_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>図 2-2 S-Arrow 戻りは共変・引数は反変</title>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:19px;fill:var(--rigor-ink,#0E1116);font-weight:600" x="320" y="46" text-anchor="middle">(A) -&gt; B  &lt;:  (A&#39;) -&gt; B&#39;</text>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5;stroke-dasharray:4 4" x1="60" y1="68" x2="580" y2="68"></line>
+
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-success,#2E6F3F)" x="60" y="116" text-anchor="start">戻り（共変・向きそのまま）</text>
+  <text x="360" y="120" text-anchor="middle">B</text>
+  <line style="fill:none;stroke:var(--rigor-success,#2E6F3F);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="384" y1="114" x2="470" y2="114" marker-end="url(#fseasoned22_aK)"></line>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-success,#2E6F3F)" x="500" y="120" text-anchor="middle">B&#39;</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-success,#2E6F3F)" x="427" y="104" text-anchor="middle">B &lt;: B&#39;</text>
+
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-accent,#7A2A2A)" x="60" y="188" text-anchor="start">引数（反変・向きが逆転）</text>
+  <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-accent,#7A2A2A)" x="360" y="192" text-anchor="middle">A&#39;</text>
+  <line style="fill:none;stroke:var(--rigor-accent,#7A2A2A);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round" x1="384" y1="186" x2="470" y2="186" marker-end="url(#fseasoned22_aA)"></line>
+  <text x="500" y="192" text-anchor="middle">A</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-accent,#7A2A2A)" x="427" y="176" text-anchor="middle">A&#39; &lt;: A</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12px;fill:var(--rigor-accent,#7A2A2A)" x="500" y="214" text-anchor="middle">↑ 入れ替わる</text>
+
+</svg>
