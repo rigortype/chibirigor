@@ -175,7 +175,7 @@ def check_call(recv_type, name, arg_types, diagnostics)
   sig[:params].zip(arg_types).each do |want, got|
     case accepts(want, got)
     when :no
-      diagnostics << "#{want} が必要ですが #{got} が渡されました"
+      diagnostics << "expected #{want} but got #{got}"
     when :maybe, :yes
       # 何もしない ← ここが全て
     end
@@ -188,14 +188,14 @@ end
 
 ```ruby
 check("1 + 2")        # 文句なし（:yes）
-check('1 + "x"')      # ["Integer が必要ですが \"x\" が渡されました"]（:no）
+check('1 + "x"')      # ["expected Integer but got \"x\""]（:no）
 check("1 + foo.bar")  # 文句なし！ foo.bar は untyped → :maybe → 黙る
 ```
 
 <!-- run: examples/part7.rb -->
 ```text
-Integer | Integer: OK（エラーなし）
-Integer が必要ですが 1 | "a" が渡されました
+Integer | Integer: OK (no errors)
+expected Integer but got 1 | "a"
 ```
 
 ここで、この本で一番大事な一文を置きます。専門用語は要りません：

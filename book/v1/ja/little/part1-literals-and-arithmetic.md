@@ -123,7 +123,7 @@ module Chibirigor
     if node.name == :+ && integerish?(recv)
       arg = type_of(args.first, diagnostics)
       unless integerish?(arg)
-        diagnostics << diagnostic(node, "整数に #{arg} は足せません")
+        diagnostics << diagnostic(node, "can't add #{arg} to an integer")
         return Dynamic.new
       end
       # ★ ここがポイント：Const[3] とは計算せず、Integer に「丸める」
@@ -177,7 +177,7 @@ end
 
 ```ruby
 Chibirigor.check("1 + 2")       # => []                                          （文句なし）
-Chibirigor.check('1 + "x"')     # => [{ line: 1, message: "整数に \"x\" は足せません" }]
+Chibirigor.check('1 + "x"')     # => [{ line: 1, message: "can't add \"x\" to an integer" }]
 Chibirigor.check("foo.bar")     # => []   ← 知らないメソッドは黙って通す
 ```
 
@@ -262,7 +262,7 @@ end
 
 ```console
 $ ruby exe/chibirigor check bad.rb
-bad.rb:2:1: Integer が必要ですが "bad" が渡されました
+bad.rb:2:1: expected Integer but got "bad"
   1 + "bad"
   ^^^^^^^^^
 ```

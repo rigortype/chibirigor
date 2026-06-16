@@ -130,7 +130,7 @@ Run it and it narrows properly:
 ```
 
 ```text
-nil? narrowing: OK (no error)
+nil? narrowing: OK (no errors)
 expected String but got 1
 ```
 

@@ -30,24 +30,27 @@ language-neutral, which keeps the translation surface small:
   `Dynamic`, `Union`, `HashShape`, `Tuple`, `Scope`, …), the public command names (`check`,
   `annotate`), the function names (`type_of`, `accepts`), and the `untyped` surface token.
   These are names in the codebase, never translated.
-- **Transcreated in printed excerpts:** the **comments** inside code excerpts, and the
-  **diagnostic message strings** the prose shows (`"can't add … to an integer"`,
-  `expected Integer but got …`). In the live tool these are written in Japanese; the English
-  book renders them in English so the chapter reads as one language. (Message *wording* is not
-  load-bearing — the reproducibility grader scores behavior, not strings.)
+- **Transcreated in printed excerpts:** the **comments** inside code excerpts. The Japanese
+  edition prints Japanese comments; the English edition prints English. The underlying code is
+  shared and **English-canonical** (below), so each edition translates only the comments it shows.
+- **English already — shared as-is in both editions:** the **diagnostic / CLI message strings**
+  (`expected Integer but got …`, `wrong number of arguments for …`, `fell to untyped here …`,
+  `No type errors`) and the `trace` output. The tool emits these in English; both editions show
+  them verbatim (not per-edition-translated).
 
-> **Open question (shared-tree language).** Unlike php-ministan — which migrated its shared
-> `dev/`/`impls/` code, comments, and CLI strings to English so both editions click through to
-> English source — the chibirigor codebase under [`lib/`](../../../lib) and the snapshot trees
-> (`impls/dist/partN`, `book/v1/*/little/examples/`) currently carry **Japanese** comments and
-> emit **Japanese** diagnostics. The English **prose** therefore prints excerpts and example
-> output in English, but a click-through to the live snapshot — or running the tool — still
-> shows Japanese today. Resolving this — migrate the shared comments and message strings to
-> English (the ministan path), or generate an English-commented/-stringed
-> `book/v1/en/little/examples/` tree — is a deliberate, repo-wide decision left to the author;
-> it is **not** something a chapter-translation session should undertake on its own. Until
-> then, keep excerpts and example output English, leave snapshot links pointing at the shared
-> tree, and don't pretend the click-through is English.
+> **Resolved (2026-06-16): the shared code is English-canonical.** The shared Ruby — `lib/`,
+> `exe/` (CLI diagnostics), `examples/`, `tools/`, the per-chapter sources `impls/steps/`, and the
+> generated snapshots `impls/dist/` + `book/v1/ja/little/examples/dist/` — was migrated so that
+> **comments, user-facing diagnostic/CLI strings, and the `trace` output are English** (matching
+> php-ministan's model). The tool now emits English; a click-through to any `impls/dist/partN`
+> snapshot shows English for both editions. Each book then translates only the **comments** in the
+> excerpts it prints — `book/v1/ja/` shows Japanese comments, `book/v1/en/` English — while the
+> diagnostic/CLI strings shown are the shared English. The Seasoned design sketches live per
+> edition (`book/v1/<ed>/seasoned/examples/*.rb`), identical English code. (Still Japanese, out of
+> this migration's scope: the experimental `impls/rust/` port and `impls/README.md`, neither
+> click-through targets. Tooling follow-up: `check_docs.rb`'s byte-match `<!-- include: -->` no
+> longer matches the JA prose's Japanese-commented excerpts against the English fixtures — see the
+> handoff ledger.)
 
 ## Directory & path mapping
 

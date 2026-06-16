@@ -159,7 +159,7 @@ chibirigor は戻り型を**本体から合成する**側（注釈を*検証*す
 ```console
 $ printf 'x = 1\nif x.is_a?(String)\n  y = x + 1\nelse\n  z = x * 2\nend\n' > demo.rb
 $ ruby exe/chibirigor check --unreachable demo.rb
-demo.rb:3:3: info: この枝には到達しません（条件が必ず偽になります）
+demo.rb:3:3: info: this branch is unreachable (the condition is always false)
     y = x + 1
     ^^^^^^^^^
 ```

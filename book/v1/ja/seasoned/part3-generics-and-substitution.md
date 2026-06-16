@@ -209,7 +209,7 @@ $ printf '[1, 2, 3].first\n{ a: 1, b: 2 }.values\n[].first\n' | ruby exe/chibiri
 
 誤検知ゼロも守ります：**空配列 `[].first` や未知レシーバ `foo.first` は `untyped`**（埋まらねば
 untyped）。読んだ要素型はちゃんとチェックにも流れます ― `a = [1,2]; a.first + true` は
-「Integer に true は足せません」を 1 件出します。
+「can't add true to an Integer」を 1 件出します。
 
 ここで lib が獲得したのは generics の**読み（5a）**です。続く**押し下げ（5b）**＝要素型を
 ブロック仮引数へ流し込む（`map { |x| ... }` の `x` を `Elem` にする）も lib に入りました ―

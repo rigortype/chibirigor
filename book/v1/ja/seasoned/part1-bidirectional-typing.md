@@ -203,7 +203,7 @@ rbs = <<~RBS
 RBS
 
 Chibirigor.check('def greet; "hi"; end', rbs: rbs)
-# => [{line: 1, message: "戻り型 Integer が宣言されていますが \"hi\" を返します"}]
+# => [{line: 1, message: "return type Integer is declared but \"hi\" is returned"}]
 
 Chibirigor.check('def greet; 1; end', rbs: rbs)   # => []（一致）
 Chibirigor.check('def greet; "hi"; end')           # => []（宣言なし＝照合なし）
@@ -223,7 +223,7 @@ def check_against(node, expected, actual, diagnostics)
   return if expected.is_a?(Type::Dynamic) || actual.is_a?(Type::Dynamic)
   return unless Accepts.call(expected, actual) == :no
 
-  diagnostics << diagnostic(node, "戻り型 #{expected} が宣言されていますが #{actual} を返します")
+  diagnostics << diagnostic(node, "return type #{expected} is declared but #{actual} is returned")
 end
 ```
 

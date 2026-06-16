@@ -110,7 +110,7 @@ def unify(a, b, subst)
   return subst.merge(a.name => b) if a.is_a?(TVar) # 変数 a を b に束縛
   return subst.merge(b.name => a) if b.is_a?(TVar) # 変数 b を a に束縛
 
-  raise UnifyError, "#{a.name} と #{b.name} は一致しない"
+  raise UnifyError, "#{a.name} and #{b.name} don't match"
 end
 
 # 制約（= 等しくしたい型のペア）を順に単一化していく
@@ -270,7 +270,7 @@ $ printf '[1, 2].map { |x| x + 1 }\n[1, 2].map { |x| x.to_s }\n[1, 2].select { |
 `map` の戻りは `Array[String]` です（戻り値も要素型つきの配列になる＝**戻り多相**、これが 5c）。
 ブロック本体は
 `x : Elem` のもとで
-**型チェックされます** ― だから `[1,2].map { |x| x + true }` は「Integer に true は足せません」を
+**型チェックされます** ― だから `[1,2].map { |x| x + true }` は「can't add true to an Integer」を
 1 件出します（押し下げが効いている証拠）。`each` はレシーバ（self）を返し、`select`/`reject`
 は要素型を保ちます。
 

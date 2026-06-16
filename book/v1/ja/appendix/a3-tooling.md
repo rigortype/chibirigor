@@ -72,17 +72,17 @@ chibirigor の「知らなければ黙る」は誤検知を防ぎますが、`--
 ```console
 $ printf 'x = mystery_call\ny = x + 2\n' > demo.rb
 $ ruby exe/chibirigor check --explain demo.rb
-demo.rb:1:5: info: ここで untyped に倒しました（`mystery_call` の型が引けません）
+demo.rb:1:5: info: fell to untyped here (can't look up the type of `mystery_call`)
   x = mystery_call
       ^^^^^^^^^^^^
-demo.rb:2:5: info: ここで untyped に倒しました（`+` の型が引けません）
+demo.rb:2:5: info: fell to untyped here (can't look up the type of `+`)
   y = x + 2
       ^^^^^
 ```
 
 注目したいのは **2 行目**です。`mystery_call` の型がわからず `x` が `untyped` になり、その `x` に
 対する `+` も型を引けずに `untyped` へ倒れています ― **沈黙が伝播していく**様子が地図に出ます。
-`--explain` 無しなら（誤検知を出さないので）`型エラーはありません` と黙るだけ。`:info` は
+`--explain` 無しなら（誤検知を出さないので）`No type errors` と黙るだけ。`:info` は
 終了コードを汚さない（`exit 0`）ので、CI を止めずに「どこで型が消えたか」だけ覗けます。
 
 実物との差は、実 Rigor が `Dynamic[Top]` の `Dynamic` マーカーを構造に保持して*あらゆる* fail-soft
@@ -249,48 +249,48 @@ chibirigor trace ─ step 2/17
   2  y = x > 0 ? 1 : -1
   3  z = y + 2
 ────────────────────────────────────────────────────────────────
-型環境  : x: 5
-評価中  : （トップレベル）
-► 束縛: x ← 5（型環境に追加）
+type env   : x: 5
+evaluating : (top level)
+► bind: x ← 5 (added to type env)
 …
 chibirigor trace ─ step 5/17
 …
-型環境  : x: 5
-評価中  : if（三項含む） › > の呼び出し
-► dispatch: 5.>(0) → untyped （表に無い → fail-soft で untyped）
+type env   : x: 5
+evaluating : if (incl. ternary) › call to >
+► dispatch: 5.>(0) → untyped (not in table → fail-soft to untyped)
 …
 chibirigor trace ─ step 7/17
 …
-評価中  : if（三項含む）
+evaluating : if (incl. ternary)
 ► union: 1 , -1 → 1 | -1
 …
 chibirigor trace ─ step 9/17
 …
-型環境  : x: 5   y: 1 | -1
-評価中  : （トップレベル）
-► 束縛: y ← 1 | -1（型環境に追加）
+type env   : x: 5   y: 1 | -1
+evaluating : (top level)
+► bind: y ← 1 | -1 (added to type env)
 …
 chibirigor trace ─ step 12/17
 …
-評価中  : + の呼び出し
-► dispatch: 1.+(2) → 3 （定数畳み込み）
+evaluating : call to +
+► dispatch: 1.+(2) → 3 (constant folding)
 chibirigor trace ─ step 13/17
 …
-► dispatch: -1.+(2) → 1 （定数畳み込み）
+► dispatch: -1.+(2) → 1 (constant folding)
 chibirigor trace ─ step 14/17
 …
 ► union: 3 , 1 → 3 | 1
 chibirigor trace ─ step 15/17
 …
-► dispatch: 1 | -1.+(2) → 3 | 1 （Union をメンバへ分配）
+► dispatch: 1 | -1.+(2) → 3 | 1 (distribute Union to members)
 …
 chibirigor trace ─ step 17/17
 …
-型環境  : x: 5   y: 1 | -1   z: 3 | 1
-評価中  : （トップレベル）
-► 束縛: z ← 3 | 1（型環境に追加）
+type env   : x: 5   y: 1 | -1   z: 3 | 1
+evaluating : (top level)
+► bind: z ← 3 | 1 (added to type env)
 
-── 再生おわり（全 17 コマ）──
+── playback done (17 steps total) ──
 ```
 
 この 17 コマで、本編の部品が動く順に並びます。`x` の束縛（step 2）→ 三項の条件 `x > 0` が

@@ -127,8 +127,8 @@ when Prism::IfNode
 
 <!-- run: examples/part5.rb -->
 ```text
-nil? narrowing: OK（エラーなし）
-String が必要ですが 1 が渡されました
+nil? narrowing: OK (no errors)
+expected String but got 1
 ```
 
 `is_a?` でも同じ要領です（`if x.is_a?(String)` の then 節は `x` を `String` に絞る）。

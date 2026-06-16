@@ -203,7 +203,7 @@ check("1 + foo.bar")  # no complaint! foo.bar is untyped → :maybe → stay qui
 ```
 
 ```text
-Integer | Integer: OK (no error)
+Integer | Integer: OK (no errors)
 expected Integer but got 1 | "a"
 ```
 

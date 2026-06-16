@@ -182,9 +182,43 @@ notes.
 > EN now reads slightly ahead of the JA here. Consider re-converging by back-porting to
 > `book/v1/ja/` so both editions stay in sync (per STYLE "Sync with the Japanese source").
 
+## Shared-tree migration — DONE (author chose option (a): English-canonical code)
+
+The shared code was migrated to **English-canonical** (php-ministan's model): the tool now emits
+English, and a click-through to any `impls/dist/partN` snapshot shows English for both editions.
+Each book translates only the **comments** in its printed excerpts (JA = Japanese, EN = English);
+the diagnostic/CLI strings shown are the shared English.
+
+- **Migrated to English:** `lib/chibirigor/*.rb`, `exe/chibirigor` (CLI diagnostics), `examples/`,
+  `tools/gen_impls.rb`, `test/*.rb` (comments/labels), `impls/steps/*` (the snapshot source) →
+  regenerated `impls/dist/` + `book/v1/ja/little/examples/dist/`, plus the book example/sketch `.rb`
+  (`book/v1/ja/little/examples/*.rb`, `book/v1/ja/seasoned/examples/*.rb`).
+- **JA prose followed along:** the diagnostic/CLI strings shown in `book/v1/ja/` prose (10 content
+  files) are now the shared English (matching the EN chapters); JA comments/explanatory prose stay
+  Japanese.
+- **EN now self-contained:** created `book/v1/en/seasoned/examples/*.rb` (the 5 sketches + check_docs,
+  identical English) — all EN relative links resolve (0 unresolved). Fixed `OK (no error)` →
+  `OK (no errors)` in EN Part 5/7 to match the tool's actual output.
+- **Verified:** all 16 lib tests green; `ruby tools/gen_impls.rb --verify` = all stage tests pass;
+  `book/v1/ja/little/examples/check_docs.rb` = "in sync"; dogfood + `trace` output match the EN book;
+  zero CJK in lib/exe/examples/tools/test/impls/dist/steps.
+- **STYLE.md** updated: the "Open question" note → **"Resolved (2026-06-16)."**
+
+### Follow-ups from the migration (non-blocking)
+
+1. **`check_docs.rb` `<!-- include: -->` byte-match vs JA prose.** The Seasoned JA prose's
+   `<!-- include: -->` excerpts keep **Japanese comments** (correct per the per-edition model) but
+   now byte-mismatch the **English** fixtures, so `book/v1/ja/seasoned/examples/check_docs.rb`
+   reports include-drift (the Little one is fine — it checks language-neutral `<!-- run: -->`
+   output). Fix options: have `check_docs.rb` compare code *modulo comments* for includes, scope
+   include-checks to the EN edition, or drop `<!-- include: -->` from JA prose. (Content is correct;
+   only the drift-detector needs the bilingual-aware update.)
+2. **Still Japanese, out of scope:** `impls/rust/` (an experimental Rust port; not a click-through
+   target) and `impls/README.md` (contributor doc). Translate if/when desired.
+
 ## Next (in order)
 
-1. **Open shared-tree decision** (author call) — see below; the only substantive open item.
+1. (Optional) Address follow-up #1 (`check_docs.rb` bilingual include-check) and/or #2 (Rust port).
 2. **Resolve the open shared-tree decision** (author call) — see below. If "migrate to English,"
    the `seasoned/examples/*.rb` links resolve and the snapshot/CLI click-throughs match the prose.
 3. **Optional: curly-quote pass** — prose currently uses curly quotes/apostrophes inline; a
