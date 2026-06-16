@@ -52,9 +52,9 @@ app/models/user.rb:51:3: info: fell soft to Dynamic[Top] here (param `opts` is u
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
-| `untyped` の正体 | `Type::Dynamic`（印だけ） | `Dynamic[Top]`（`Top` に `Dynamic` マーカー） |
-| fail-soft 地点 | 黙って `Dynamic` を返すだけ | 地点を構造に保持し、`--explain` で一覧化 |
-| 沈黙の可視化 | 仕組みなし（最小版の対象外） | `check --explain` が `:info` 診断で地図を出す |
+| `untyped`の正体 | `Type::Dynamic`（印だけ） | `Dynamic[Top]`（`Top`に`Dynamic`マーカー） |
+| fail-soft地点 | 黙って`Dynamic`を返すだけ | 地点を構造に保持し、`--explain`で一覧化 |
+| 沈黙の可視化 | 仕組みなし（最小版の対象外） | `check --explain`が`:info`診断で地図を出す |
 
 chibirigorの「知らなければ黙る」は誤検知を防ぎますが、`--explain`は**その沈黙そのものを可視化する道具**です。
 
@@ -104,9 +104,9 @@ chibirigorの`annotate`は内部型だけを見せます。
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
-| 型の見せ方 | `annotate` が行単位で内部型を並べる | `annotate`／hover で見せ、境界では erasure で丸める |
-| 見せる型 | 内部型 1 つ | 内部の精密な型、境界で丸めた保守的な型の二段 |
-| ズレの正体 | （境界が無いので起きない） | 内部精密型と RBS 境界型の食い違い（erasure） |
+| 型の見せ方 | `annotate`が行単位で内部型を並べる | `annotate`／hoverで見せ、境界ではerasureで丸める |
+| 見せる型 | 内部型1つ | 内部の精密な型、境界で丸めた保守的な型の二段 |
+| ズレの正体 | （境界が無いので起きない） | 内部精密型とRBS境界型の食い違い（erasure） |
 
 > [!NOTE]
 > chibirigor側は道具を`check`と`annotate`の2つに絞っています。
@@ -147,11 +147,11 @@ demo.rb:2:1: info: dump_type: 1 | "a"
 
 | 段 | 名前 | 何を当てるか | 外れたら |
 |---|---|---|---|
-| ① | **定数畳み込み** | `1 + 2` のように両辺が既知の定数なら、その場で**実際に計算**して結果の型（`3`）を出す | ② へ |
-| ② | **shape dispatch** | `HashShape` のキー読み出しなど、**型の構造に直接触れる**操作を構造から直接解く | ③ へ |
-| ③ | **RBS** | コア、stdlib、プラグインが提供する **RBS の型**で引く（本書の手書き `METHODS` 表の実物） | ④ へ |
-| ④ | **in-source**（本体推論） | RBS に無いメソッドは、**本体を推論**して戻り型を合成する（前編 Part 8 の戻り型合成の実物） | ⑤ へ |
-| ⑤ | **fallback** | どの段でも当たらなければ **`Dynamic[Top]`** に degrade（脅かさない） | （ここで止まる） |
+| ① | **定数畳み込み** | `1 + 2`のように両辺が既知の定数なら、その場で**実際に計算**して結果の型（`3`）を出す | ② へ |
+| ② | **shape dispatch** | `HashShape`のキー読み出しなど、**型の構造に直接触れる**操作を構造から直接解く | ③ へ |
+| ③ | **RBS** | コア、stdlib、プラグインが提供する**RBSの型**で引く（本書の手書き`METHODS`表の実物） | ④ へ |
+| ④ | **in-source**（本体推論） | RBSに無いメソッドは、**本体を推論**して戻り型を合成する（前編Part 8の戻り型合成の実物） | ⑤ へ |
+| ⑤ | **fallback** | どの段でも当たらなければ**`Dynamic[Top]`**にdegrade（脅かさない） | （ここで止まる） |
 
 ### 流れの読み方
 
@@ -186,11 +186,11 @@ demo.rb:2:1: info: dump_type: 1 | "a"
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
-| dispatch の段数 | 1 段（`METHODS` 表を引くだけ） | 5 段（① 定数畳み込み、② shape、③ RBS、④ in-source、⑤ fallback） |
-| 表の中身 | 手書きの `METHODS` Hash | ③ が RBS（コア、stdlib、プラグイン由来） |
-| 本体推論 | `annotate` で別途（前編 Part 8） | ④ in-source として dispatch に組み込み |
-| 未知の扱い | `Dynamic` を返す | ⑤ fallback で `Dynamic[Top]` |
-| 宣言 vs 推論の優先 | （区別なし） | 段の順序（③ が ④ より先）で表現 |
+| dispatchの段数 | 1段（`METHODS`表を引くだけ） | 5段（① 定数畳み込み、② shape、③ RBS、④ in-source、⑤ fallback） |
+| 表の中身 | 手書きの`METHODS` Hash | ③ がRBS（コア、stdlib、プラグイン由来） |
+| 本体推論 | `annotate`で別途（前編Part 8） | ④ in-sourceとしてdispatchに組み込み |
+| 未知の扱い | `Dynamic`を返す | ⑤ fallbackで`Dynamic[Top]` |
+| 宣言vs推論の優先 | （区別なし） | 段の順序（③ が ④ より先）で表現 |
 
 > [!NOTE]
 > 本書のPart 2がdispatchを1段に留めたのは、③ RBS（前編Part 8まで未習）や ④ in-sourceを未習のまま列挙すると話が浮くからです。
@@ -294,8 +294,8 @@ JSONで出したいときは`--json`、自動再生は`--delay 0.5`です。
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
-| 見せるもの | 推論イベントのコマ送り（`bind`、`union`、`dispatch`） | 同じ（推論の derivation を再生） |
-| コアへの干渉 | `Module#prepend` のフック、レコーダ nil なら即 super | `check` と同じ推論に乗る記録から再生する探針 |
+| 見せるもの | 推論イベントのコマ送り（`bind`、`union`、`dispatch`） | 同じ（推論のderivationを再生） |
+| コアへの干渉 | `Module#prepend`のフック、レコーダnilなら即super | `check`と同じ推論に乗る記録から再生する探針 |
 | 出力形式 | 端末アニメーション、`--json`、`--verbose`、`--delay` | 端末アニメーション、`--format=json`、`--verbose`、`--delay`、`--line` |
 
 実物が`--line=N`で1行だけに絞れるのに対し、chibirigorは行フィルタを持たない、といった枝葉の差はありますが、**推論の手順を再生して見せる**という発想と3種のイベントは同じです。
@@ -309,9 +309,9 @@ JSONで出したいときは`--json`、自動再生は`--delay 0.5`です。
 
 | 仕組み | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
-| `rigor check --explain` | 極小版あり（未知ディスパッチを `:info` 地図化、§a3-1x） | `Dynamic[Top]` マーカーを手がかりに fail-soft 地点を `:info` で地図化 | 前編 Part 9 |
-| 型表示の二段構え（erasure） | `annotate` は内部型 1 つ（境界が無いのでズレない、§a3-2） | `annotate`／hover の裏で内部精密型と RBS 境界型を erasure で丸める | 前編 Part 1 |
-| `rigor trace file` | ほぼ実物と同型の極小版あり（`bind`、`union`、`dispatch` をコマ送り、§a3-3bx） | 推論の手順を端末アニメーションで再生（`--verbose`、`--line`、`--format=json`） | （なし） |
-| dispatch 5 段カスケード | 1 段の表引き（`METHODS`、極小版は設けず） | ① 定数畳み込み、② shape、③ RBS、④ in-source、⑤ fallback | 前編 Part 2 |
+| `rigor check --explain` | 極小版あり（未知ディスパッチを`:info`地図化、§a3-1x） | `Dynamic[Top]`マーカーを手がかりにfail-soft地点を`:info`で地図化 | 前編Part 9 |
+| 型表示の二段構え（erasure） | `annotate`は内部型1つ（境界が無いのでズレない、§a3-2） | `annotate`／hoverの裏で内部精密型とRBS境界型をerasureで丸める | 前編Part 1 |
+| `rigor trace file` | ほぼ実物と同型の極小版あり（`bind`、`union`、`dispatch`をコマ送り、§a3-3bx） | 推論の手順を端末アニメーションで再生（`--verbose`、`--line`、`--format=json`） | （なし） |
+| dispatch 5段カスケード | 1段の表引き（`METHODS`、極小版は設けず） | ① 定数畳み込み、② shape、③ RBS、④ in-source、⑤ fallback | 前編Part 2 |
 
 いずれも、本書で手作りした骨格（`Dynamic`マーカー、`annotate`、`METHODS`表）が、実Rigorでは**同じ骨格を拡大した形**で動いている、という対応で読めます。

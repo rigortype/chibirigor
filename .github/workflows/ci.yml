@@ -24,3 +24,6 @@ jobs:
 
       - name: drift check
         run: make drift
+
+      - name: ja format check (和欧詰め)
+        run: make fmt-check

@@ -22,13 +22,13 @@ sidebar:
 
 chibirigor（前編）は、Prism ＋ 数百行で、こう積み上げました：
 
-| 部品 | 前編での最小版 | Rigor の本物 |
+| 部品 | 前編での最小版 | Rigorの本物 |
 |---|---|---|
-| 式の型付け | `type_of`（合成 `⇒`） | `ExpressionTyper`（純粋、非破壊） |
+| 式の型付け | `type_of`（合成`⇒`） | `ExpressionTyper`（純粋、非破壊） |
 | 受理判定 | `accepts`（三値） | `accepts`＋`AcceptsResult`（三値＋理由） |
-| 型環境 | `Scope`（Hash） | `Scope`＋`FactStore`（6 バケツ、stability） |
-| メソッド解決 | 手書き表→ミニ RBS | `MethodDispatcher`（多段ティア、RBS、継承） |
-| 型キャリア | 7 種 | 多数（`Refined`、`Intersection`、`App`、…） |
+| 型環境 | `Scope`（Hash） | `Scope`＋`FactStore`（6バケツ、stability） |
+| メソッド解決 | 手書き表→ミニRBS | `MethodDispatcher`（多段ティア、RBS、継承） |
+| 型キャリア | 7種 | 多数（`Refined`、`Intersection`、`App`、…） |
 
 最小版は「**骨格を忠実に、肉は最小限**」でした。
 骨格（双方向、gradual、フロー、RBS境界）は本物と同じです。
@@ -42,14 +42,14 @@ chibirigor（前編）は、Prism ＋ 数百行で、こう積み上げました
 chibirigorは意図的にこれらを切り捨てました。
 ここからは「読むなら、どのADRから」を具体的な次の一歩として示します（ADRはRigorの設計判断記録で、リポジトリの`docs/adr/`にあります）：
 
-| 足すもの | 何を解く工学か | 入口の ADR |
+| 足すもの | 何を解く工学か | 入口のADR |
 |---|---|---|
-| **プラグイン機構** | Rails、RSpec、dry-rb の DSL、マクロ、open class を、コアを汚さず外から型付け | ADR-2（拡張 API）→ ADR-37（インターフェース分離）→ ADR-9（プラグイン間連携） |
-| **マクロ／DSL 展開** | `attr_accessor` や `Data.define` 等の生成メソッドを型付け | ADR-16（マクロ展開）／ADR-48（`Data`、`Struct` 折りたたみ） |
-| **キャッシュ／インクリメンタル** | 大規模コードを毎回全解析しない | ADR-6（永続キャッシュ）→ ADR-45（unchanged 高速パス）→ ADR-46（増分解析） |
-| **LSP（エディタ統合）** | 型エラーのリアルタイム表示、補完、ホバー | ADR-19（Language Server 同梱） |
-| **CI 連携** | SARIF、GitHub、GitLab 等、各 CI が読める出力 | ADR-51（CI 出力形式）／ADR-27（配布） |
-| **baseline／オンボーディング** | 既存コードへの後付け導入（前編 Part 9 の baseline の本式） | ADR-22（baseline ＋ オンボーディング） |
+| **プラグイン機構** | Rails、RSpec、dry-rbのDSL、マクロ、open classを、コアを汚さず外から型付け | ADR-2（拡張API）→ ADR-37（インターフェース分離）→ ADR-9（プラグイン間連携） |
+| **マクロ／DSL展開** | `attr_accessor`や`Data.define`等の生成メソッドを型付け | ADR-16（マクロ展開）／ADR-48（`Data`、`Struct`折りたたみ） |
+| **キャッシュ／インクリメンタル** | 大規模コードを毎回全解析しない | ADR-6（永続キャッシュ）→ ADR-45（unchanged高速パス）→ ADR-46（増分解析） |
+| **LSP（エディタ統合）** | 型エラーのリアルタイム表示、補完、ホバー | ADR-19（Language Server同梱） |
+| **CI連携** | SARIF、GitHub、GitLab等、各CIが読める出力 | ADR-51（CI出力形式）／ADR-27（配布） |
+| **baseline／オンボーディング** | 既存コードへの後付け導入（前編Part 9のbaselineの本式） | ADR-22（baseline ＋ オンボーディング） |
 | **性能** | アロケーション削減、並行解析で実用的な速さ | ADR-44（アロケーション）／ADR-15（Ractor/fork）／ADR-50（性能ゲート） |
 
 これらは「**型システムそのもの**」ではなく「型システムを*応用*した機能」です。
@@ -175,10 +175,10 @@ chibirigorを作り終えたいま、RigorのADRを読むと、その多くが**
 | 1 | 双方向型付け（`type_of`＝`⇒`／`accepts`＝`⇐`、診断は照合位置のみ） |
 | 2 | 部分型と変性（width/depth、戻り共変、引数反変、gradual consistency） |
 | 3 | ジェネリクスと型代入（α 同値、変数捕獲、fresh、erasure） |
-| 4 | 再帰型（μ、余帰納 ↔ HKT/fuel。HKT の根拠は TAPL 29 章） |
+| 4 | 再帰型（μ、余帰納 ↔ HKT/fuel。HKTの根拠はTAPL 29章） |
 | 5 | 本物の型推論（capability/duck、制約ベース、自明な範囲だけ） |
-| 6 | 完全な FactStore（6 バケツ、stability、クロージャ捕獲、join） |
-| 7 | 健全性、正規化、そして「わざと unsound」＋gradual guarantee |
+| 6 | 完全なFactStore（6バケツ、stability、クロージャ捕獲、join） |
+| 7 | 健全性、正規化、そして「わざとunsound」＋gradual guarantee |
 | 8 | 実用ツールへの橋（プラグイン、キャッシュ、LSP、性能、ADR） |
 
 ## 演習

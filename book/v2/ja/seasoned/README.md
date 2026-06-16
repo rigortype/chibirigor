@@ -20,14 +20,14 @@ sidebar:
 
 | Part | テーマ | 起点（前編） |
 |---|---|---|
-| [1](part1-bidirectional-typing.md) | 双方向型付けの正体（`type_of`＝合成 `⇒`／`accepts`＝照合 `⇐`） | 前編 P7、P9 |
-| [2](part2-subtyping-and-variance.md) | 部分型と変性（width/depth、戻り共変、引数反変） | 前編 P6、P7 |
-| [3](part3-generics-and-substitution.md) | ジェネリクスと型代入（`subst`、α 同値、変数捕獲、erasure） | 前編 P8 |
-| [4](part4-recursive-types.md) | μ と余帰納でみる再帰型（発展：HKT/`App`+fuel） | 前編 P6 |
-| [5](part5-real-inference.md) | 引数を埋める本物の型推論（能力収集、制約、単一化） | 前編 P8 |
-| [6](part6-fact-store.md) | 完全な FactStore（6 バケツ、stability、クロージャ捕獲、join） | 前編 P3、P5 |
-| [7](part7-soundness.md) | 健全性と正規化、そして「わざと unsound」（gradual の 2 規律） | 前編 P9 |
-| [8](part8-toward-rigor.md) | 本物の Rigor へ（プラグイン、キャッシュ、LSP、ADR、性能） | 前編全体 |
+| [1](part1-bidirectional-typing.md) | 双方向型付けの正体（`type_of`＝合成`⇒`／`accepts`＝照合`⇐`） | 前編P7、P9 |
+| [2](part2-subtyping-and-variance.md) | 部分型と変性（width/depth、戻り共変、引数反変） | 前編P6、P7 |
+| [3](part3-generics-and-substitution.md) | ジェネリクスと型代入（`subst`、α 同値、変数捕獲、erasure） | 前編P8 |
+| [4](part4-recursive-types.md) | μ と余帰納でみる再帰型（発展：HKT/`App`+fuel） | 前編P6 |
+| [5](part5-real-inference.md) | 引数を埋める本物の型推論（能力収集、制約、単一化） | 前編P8 |
+| [6](part6-fact-store.md) | 完全なFactStore（6バケツ、stability、クロージャ捕獲、join） | 前編P3、P5 |
+| [7](part7-soundness.md) | 健全性と正規化、そして「わざとunsound」（gradualの2規律） | 前編P9 |
+| [8](part8-toward-rigor.md) | 本物のRigorへ（プラグイン、キャッシュ、LSP、ADR、性能） | 前編全体 |
 
 ## 動く設計スケッチ
 
