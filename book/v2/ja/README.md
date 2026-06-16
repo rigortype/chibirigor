@@ -82,13 +82,13 @@ $ ruby exe/chibirigor annotate path/to/file.rb   # 推論型の表示
 | [0](little/part0-introduction.md) | はじめに：推論を土台にした型チェッカー |
 | [1](little/part1-literals-and-arithmetic.md) | リテラルと算術 |
 | [2](little/part2-method-dispatch.md) | メソッド送信とディスパッチ |
-| [3](little/part3-scope-and-statements.md) | ローカル変数と不変 Scope |
-| [4](little/part4-union.md) | 型が一本に決まらない Union |
+| [3](little/part3-scope-and-statements.md) | ローカル変数と不変Scope |
+| [4](little/part4-union.md) | 型が一本に決まらないUnion |
 | [5](little/part5-narrowing.md) | 場合分けで型を絞るナローイング |
 | [6](little/part6-hash-and-tuple.md) | ハッシュと配列の型 |
 | [7](little/part7-accepts-and-trinary.md) | 受理判定と三値 |
-| [8](little/part8-rbs-and-signatures.md) | RBS と型シグネチャ |
-| [9](little/part9-gradual-philosophy.md) | gradual の哲学（最終章） |
+| [8](little/part8-rbs-and-signatures.md) | RBSと型シグネチャ |
+| [9](little/part9-gradual-philosophy.md) | gradualの哲学（最終章） |
 
 ### 後編 The Seasoned chibirigor（読み解く）
 
@@ -99,9 +99,9 @@ $ ruby exe/chibirigor annotate path/to/file.rb   # 推論型の表示
 | [3](seasoned/part3-generics-and-substitution.md) | ジェネリクスと型代入 |
 | [4](seasoned/part4-recursive-types.md) | μ と余帰納でみる再帰型 |
 | [5](seasoned/part5-real-inference.md) | 引数を埋める本物の型推論 |
-| [6](seasoned/part6-fact-store.md) | 完全な FactStore |
-| [7](seasoned/part7-soundness.md) | 健全性と正規化、そして「わざと unsound」 |
-| [8](seasoned/part8-toward-rigor.md) | 本物の Rigor へ（最終章） |
+| [6](seasoned/part6-fact-store.md) | 完全なFactStore |
+| [7](seasoned/part7-soundness.md) | 健全性と正規化、そして「わざとunsound」 |
+| [8](seasoned/part8-toward-rigor.md) | 本物のRigorへ（最終章） |
 
 ### 付録
 

@@ -7,9 +7,9 @@
 
 | ファイル | 対応章 | 何を確かめるか |
 |---|---|---|
-| [`subtype.rb`](subtype.rb) | Part 2 部分型と変性 | 幅／深さ部分型、**引数反変・戻り共変**（逆向きが false になる） |
-| [`mu_typeeq.rb`](mu_typeeq.rb) | Part 4 再帰型 | μ 型の畳/展開の等価、**α 同値**、**余帰納（`seen`）で停止** |
-| [`subst.rb`](subst.rb) | Part 3 ジェネリクスと型代入 | **シャドーイング**で止める、**変数捕獲**を fresh 変数で回避 |
+| [`subtype.rb`](subtype.rb) | Part 2部分型と変性 | 幅／深さ部分型、**引数反変・戻り共変**（逆向きがfalseになる） |
+| [`mu_typeeq.rb`](mu_typeeq.rb) | Part 4再帰型 | μ 型の畳/展開の等価、**α 同値**、**余帰納（`seen`）で停止** |
+| [`subst.rb`](subst.rb) | Part 3ジェネリクスと型代入 | **シャドーイング**で止める、**変数捕獲**をfresh変数で回避 |
 
 ```console
 $ ruby subtype.rb
