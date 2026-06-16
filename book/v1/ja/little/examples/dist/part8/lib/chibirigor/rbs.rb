@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # ごく小さな RBS 読み込み。本物の rbs gem の代わりに、最小限を自前で読む。
-  # 「型は別ファイル（RBS）に書く」という Ruby/RBS の世界観の縮図。
-  # Part 2 の手書き表を、この RBS テキストから生成した表に差し替える。
+  # A tiny RBS loader. Instead of the real rbs gem, read the bare minimum ourselves.
+  # A miniature of the Ruby/RBS worldview where "types live in a separate file (RBS)."
+  # Part 2's hand-written table is replaced by one generated from this RBS text.
   module Rbs
     module_function
 

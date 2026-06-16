@@ -5,9 +5,9 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # ソースを型チェックし、見つかった診断の配列を返す。
-  # 文ごとにスコープを縫って渡す（代入で型環境が育つ）。
-  # 例外で止めず、最後まで読み進める（止まらない・脅かさない）。
+  # Type-check the source and return the array of diagnostics found.
+  # Thread the scope through statement by statement (assignments grow the type environment).
+  # Don't stop on exceptions; read all the way through (don't halt, don't frighten).
   def check(source)
     program = Prism.parse(source).value
     diagnostics = []

@@ -5,7 +5,7 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # ソースを型チェックし、見つかった診断の配列を返す（止まらない・脅かさない）。
+  # Type-check the source and return the array of diagnostics found (don't halt, don't frighten).
   def check(source)
     program = Prism.parse(source).value
     diagnostics = []

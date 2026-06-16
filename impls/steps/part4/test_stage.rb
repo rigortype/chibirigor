@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Part 4 到達段階のスモークテスト。
-# Union 型：if の両枝がまとまって Union になる。
+# Smoke test for the Part 4 snapshot.
+# Union types: an if's two branches fold together into a Union.
 
 require 'chibirigor'
 
@@ -15,19 +15,19 @@ check = lambda do |desc, actual, expected|
   end
 end
 
-# 三項演算子の両枝が Union に
+# A ternary's two branches become a Union
 types = Chibirigor.annotate("x = c ? 1 : \"a\"\nx\n").map { |h| h[:type].to_s }
-check.call('三項の両枝が Union に', types[0], '1 | "a"')
-check.call('変数読み取りも Union を返す', types[1], '1 | "a"')
+check.call('the ternary branches become a Union', types[0], '1 | "a"')
+check.call('a variable read also returns the Union', types[1], '1 | "a"')
 
-# nil との Union
+# Union with nil
 types2 = Chibirigor.annotate("x = c ? 1 : nil\nx\n").map { |h| h[:type].to_s }
-check.call('nil との Union', types2[0], '1 | nil')
+check.call('Union with nil', types2[0], '1 | nil')
 
-# 同じ型の Union は単一に畳まれる
+# A Union of the same type folds down to a single one
 types3 = Chibirigor.annotate("x = c ? 1 : 2\nx\n").map { |h| h[:type].to_s }
-# Const[1] と Const[2] は別 Const → Union[[1, 2]]
-check.call('同型の Union は展開される', types3[0].include?('|'), true)
+# Const[1] and Const[2] are distinct Consts → Union[[1, 2]]
+check.call('a Union of similar types stays expanded', types3[0].include?('|'), true)
 
 if failures.empty?
   puts 'All Part 4 stage checks passed.'

@@ -3,17 +3,18 @@
 require 'prism'
 
 module Chibirigor
-  # 条件分岐の枝ごとに、変数の型を絞る（ナローイング）。
-  # 絞れない条件はスコープをそのまま返す（何も主張しない＝脅かさない）。
+  # Per branch of a conditional, narrow a variable's type (narrowing).
+  # If the condition can't narrow, return the scope unchanged (claim nothing = don't frighten).
   module Narrowing
-    # 互いに素だと確実に言える具象クラス（葉）。is_a? の到達不能判定は、
-    # この集合の中で*異なる*クラス同士のときだけ「起き得ない」と断言する。
-    # Numeric/Object のような上位クラスは祖先表を持たないので断言しない（FP 回避）。
+    # Concrete classes (leaves) we can be sure are pairwise disjoint. The is_a?
+    # unreachability check only asserts "can't happen" for *distinct* classes within
+    # this set. Superclasses like Numeric/Object have no ancestry table here, so we
+    # don't assert on them (avoids false positives).
     DISJOINT_LEAVES = %i[Integer Float String Symbol NilClass TrueClass FalseClass Array Hash].freeze
 
     module_function
 
-    # cond が真（truthy=true）／偽（false）になった枝のスコープを返す。
+    # Return the scope for the branch where cond came out true (truthy=true) or false (false).
     def narrow(scope, cond, truthy)
       return scope unless cond.is_a?(Prism::CallNode)
 
@@ -27,31 +28,32 @@ module Chibirigor
       narrowed ? scope.with_local(receiver.name, narrowed) : scope
     end
 
-    # 絞れたら新しい型を、絞れなければ nil を返す。
+    # Return the narrowed type if we can narrow, otherwise nil.
     def narrow_type(current, cond, truthy)
       case cond.name
       when :nil?
         truthy ? Type::Nominal[:NilClass] : remove_nil(current)
       when :is_a?, :kind_of?, :instance_of?
         klass = class_argument(cond)
-        # 真の枝だけ絞る。偽の枝は保守的に触らない（FP 安全）。
-        # しかも「そのクラスがあり得るとき」だけ絞る。Integer を String に
-        # 無理に絞ると、起き得ない枝（dead branch）を型付けして誤検知になる。
-        # Dynamic も絞らない（Rigor と同じく post-guard narrowing は FP 過多）。
+        # Narrow only the true branch. Leave the false branch conservatively untouched (FP-safe).
+        # And only narrow when "that class is possible." Forcing Integer down to String
+        # would type a dead branch and produce a false positive.
+        # Don't narrow Dynamic either (like Rigor, post-guard narrowing on it is too FP-heavy).
         klass && truthy && possible?(current, klass) ? Type::Nominal[klass] : nil
       end
     end
 
-    # current 型で klass があり得るか（Union のメンバにそのクラスがあるか）。
+    # Whether klass is possible under the current type (does a Union member have that class?).
     def possible?(current, klass)
       return false if current.is_a?(Type::Dynamic)
 
       members(current).any? { |member| Dispatch.class_of(member) == klass }
     end
 
-    # その枝が*証明可能に*到達不能か（条件が必ず偽 truthy=true／必ず真 truthy=false）。
-    # 真偽を断言できるのは「閉じた既知型（untyped を含まない）」のときだけ。
-    # 少しでも分からなければ false＝報告しない（誤検知ゼロ＝動くコードを脅かさない）。
+    # Whether this branch is *provably* unreachable (condition always false when truthy=true /
+    # always true when truthy=false). We can only assert truth or falsity for a
+    # "closed known type" (one that contains no untyped).
+    # If anything is uncertain, return false = don't report (zero false positives = don't frighten working code).
     def unreachable_branch?(scope, cond, truthy)
       return false unless cond.is_a?(Prism::CallNode)
 
@@ -63,7 +65,7 @@ module Chibirigor
 
       case cond.name
       when :nil?
-        # 真の枝＝nil でないと不可能／偽の枝＝nil でしか不可能。
+        # True branch = impossible unless non-nil / false branch = impossible unless nil.
         truthy ? members(current).none? { |m| nil_type?(m) } : members(current).all? { |m| nil_type?(m) }
       when :is_a?, :kind_of?, :instance_of?
         unreachable_is_a?(current, class_argument(cond), truthy)
@@ -72,8 +74,8 @@ module Chibirigor
       end
     end
 
-    # is_a? の枝が証明可能に空か。真の枝＝全メンバが klass と互いに素な葉／
-    # 偽の枝＝全メンバがちょうど klass（条件が恒真）。
+    # Whether the is_a? branch is provably empty. True branch = every member is a leaf
+    # disjoint from klass / false branch = every member is exactly klass (condition is a tautology).
     def unreachable_is_a?(current, klass, truthy)
       return false unless klass
 
@@ -84,7 +86,7 @@ module Chibirigor
       end
     end
 
-    # untyped を一切含まない閉じた型か（含むと白黒つけられない＝断言しない）。
+    # Whether the type is closed, containing no untyped at all (if it does, we can't decide either way = don't assert).
     def closed?(type)
       return false if type.is_a?(Type::Dynamic)
 

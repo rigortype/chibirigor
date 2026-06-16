@@ -24,13 +24,13 @@ module Chibirigor
     end
   end
 
-  # メソッド定義。本体を型チェックし、def 式の値（メソッド名シンボル）を返す。
+  # Method definition. Type-check the body and return the def expression's value (the method-name symbol).
   def type_of_def(node, scope, diagnostics)
     method_return_type(node, scope, diagnostics)
     Type::Const[node.name]
   end
 
-  # メソッドの戻り型を本体から合成する。仮引数は untyped。
+  # Synthesize a method's return type from its body. Params are untyped.
   def method_return_type(node, scope, diagnostics)
     body_scope = method_param_names(node).reduce(scope) { |s, name| s.with_local(name, Type::Dynamic.new) }
     type_of_body(node.body, body_scope, diagnostics)
@@ -96,12 +96,12 @@ module Chibirigor
     nil
   end
 
-  # ⇐ subsumption（照合モード）: expected 型に actual を照合する。
+  # ⇐ subsumption (checking mode): check actual against the expected type.
   def check_against(node, expected, actual, diagnostics)
     return if expected.is_a?(Type::Dynamic) || actual.is_a?(Type::Dynamic)
     return unless Accepts.call(expected, actual) == :no
 
-    diagnostics << diagnostic(node, "戻り型 #{expected} が宣言されていますが #{actual} を返します")
+    diagnostics << diagnostic(node, "return type #{expected} is declared but #{actual} is returned")
   end
 
   def diagnostic(node, message)

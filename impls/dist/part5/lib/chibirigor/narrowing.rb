@@ -3,8 +3,8 @@
 require 'prism'
 
 module Chibirigor
-  # 条件分岐の枝ごとに、変数の型を絞る（ナローイング）。
-  # 絞れない条件はスコープをそのまま返す（何も主張しない＝脅かさない）。
+  # Narrow a variable's type per conditional branch (narrowing).
+  # A condition that can't be narrowed returns the scope unchanged (claim nothing = don't frighten).
   module Narrowing
     module_function
 

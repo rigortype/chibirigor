@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# 極小プラグインフックのテスト（依存ゼロ）。
-# Chibirigor.register_method で登録したメソッドが dispatch に効くことを確認する。
+# Tests for the minimal plugin hook (zero-dependency).
+# Confirm that a method registered via Chibirigor.register_method takes effect in dispatch.
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'chibirigor'
 
@@ -15,10 +15,10 @@ assert = lambda do |desc, actual, expected|
   end
 end
 
-# 各テストの前に登録済みエントリを掃除する
+# Clean up registered entries before each test.
 Chibirigor::Plugin.reset!
 
-# ── テスト 1: 登録したメソッドの戻り型が annotate に反映される ──────────────
+# ── Test 1: a registered method's return type is reflected in annotate ───────
 Chibirigor.register_method(
   :String, :shout,
   params:  [],
@@ -28,7 +28,7 @@ Chibirigor.register_method(
 result = Chibirigor.annotate('"hello".shout')
 assert.call('registered method returns declared type', result.last[:type].to_s, 'String')
 
-# ── テスト 2: 登録したメソッドへの型エラーが検出される ─────────────────────
+# ── Test 2: a type error against a registered method is detected ─────────────
 Chibirigor::Plugin.reset!
 
 Chibirigor.register_method(
@@ -40,20 +40,20 @@ Chibirigor.register_method(
 diags = Chibirigor.check('1.repeat("bad")')
 assert.call('registered method rejects wrong argument type', diags.size, 1)
 
-# ── テスト 3: 正しい引数は診断なし ────────────────────────────────────────────
+# ── Test 3: a correct argument yields no diagnostic ──────────────────────────
 diags_ok = Chibirigor.check('1.repeat(3)')
 assert.call('registered method accepts correct argument type', diags_ok.size, 0)
 
-# ── テスト 4: FP ゼロ ― 未登録メソッドは Dynamic（untyped）に倒れる ─────────
+# ── Test 4: zero FP — an unregistered method falls to Dynamic (untyped) ──────
 Chibirigor::Plugin.reset!
 result_unknown = Chibirigor.annotate('"hello".unknown_method')
 assert.call('unknown method degrades to untyped', result_unknown.last[:type].to_s, 'untyped')
 
-# ── テスト 5: コア METHODS は書き換えない ─────────────────────────────────────
+# ── Test 5: the core METHODS table is not mutated ────────────────────────────
 Chibirigor.register_method(
   :Integer, :to_s,
   params:  [],
-  returns: Chibirigor::Type::Nominal[:Symbol]   # わざと間違った上書き
+  returns: Chibirigor::Type::Nominal[:Symbol]   # deliberately wrong override
 )
 result_core = Chibirigor.annotate('1.to_s')
 assert.call('plugin overrides core without mutating METHODS constant', result_core.last[:type].to_s, 'Symbol')

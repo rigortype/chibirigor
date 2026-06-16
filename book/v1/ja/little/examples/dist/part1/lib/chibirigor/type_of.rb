@@ -5,7 +5,7 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 式（AST ノード）から型を求める。知らないノードは untyped に逃がす（脅かさない）。
+  # Find a type from an expression (an AST node). Unknown nodes fall back to untyped (don't frighten).
   def type_of(node, diagnostics)
     case node
     when Prism::IntegerNode then Const[node.value]
@@ -15,7 +15,7 @@ module Chibirigor
     when Prism::FalseNode   then Const[false]
     when Prism::CallNode    then type_of_call(node, diagnostics)
     else
-      Dynamic.new # 知らないノードは「脅かさない」── だまって untyped を返す
+      Dynamic.new # unknown nodes "don't frighten" — quietly return untyped
     end
   end
 
@@ -26,21 +26,21 @@ module Chibirigor
     if node.name == :+ && integerish?(recv)
       arg = type_of(args.first, diagnostics)
       unless integerish?(arg)
-        diagnostics << diagnostic(node, "整数に #{arg} は足せません")
+        diagnostics << diagnostic(node, "can't add #{arg} to an integer")
         return Dynamic.new
       end
-      # ★ ここがポイント：Const[3] とは計算せず、Integer に「丸める」
+      # ★ The key point: don't compute Const[3] — "round" to Integer
       return Nominal[:Integer]
     end
 
-    Dynamic.new # それ以外のメソッドはまだ知らない → 脅かさない
+    Dynamic.new # other methods aren't known yet → don't frighten
   end
 
   def integerish?(t)
     (t.is_a?(Const) && t.value.is_a?(Integer)) || t == Nominal[:Integer]
   end
 
-  # 診断は「どの行の・何が問題か」を持つ小さなハッシュ
+  # A diagnostic is a small hash holding "which line, what's wrong"
   def diagnostic(node, message)
     { line: node.location.start_line, message: message }
   end

@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # 極小プラグインフック。Dispatch::METHODS を編集せず、外から型情報を足す一点拡張。
-  # 実 Rigor ADR-2（拡張 API）の体感デモ。
+  # A minimal plugin hook. A single extension point that adds type info from
+  # outside, without editing Dispatch::METHODS.
+  # A hands-on demo of real Rigor's ADR-2 (the extension API).
   #
-  # 使い方:
+  # Usage:
   #   Chibirigor.register_method(:MyClass, :my_method,
   #     params:  [Type::Nominal[:Integer]],
   #     returns: Type::Nominal[:String])

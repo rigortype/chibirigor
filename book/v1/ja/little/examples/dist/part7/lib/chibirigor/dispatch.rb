@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # メソッド送信の型付け。手書きのディスパッチ表＋三値受理判定（Accepts）。
+  # Method-send typing. A hand-written dispatch table plus the three-valued acceptance check (Accepts).
   module Dispatch
     I = Type::Nominal[:Integer]
     S = Type::Nominal[:String]
@@ -32,7 +32,7 @@ module Chibirigor
 
       if arg_types.size != signature[:params].size
         diagnostics << Chibirigor.diagnostic(
-          node, "#{name} の引数の数が違います（#{signature[:params].size} 個必要、#{arg_types.size} 個渡された）"
+          node, "wrong number of arguments for #{name} (#{signature[:params].size} expected, #{arg_types.size} given)"
         )
         return signature[:returns]
       end
@@ -40,7 +40,7 @@ module Chibirigor
       signature[:params].zip(arg_types).each do |param, arg|
         next unless Accepts.call(param, arg) == :no
 
-        diagnostics << Chibirigor.diagnostic(node, "#{param} が必要ですが #{arg} が渡されました")
+        diagnostics << Chibirigor.diagnostic(node, "expected #{param} but got #{arg}")
       end
 
       signature[:returns]

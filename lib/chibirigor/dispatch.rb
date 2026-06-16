@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # メソッド送信の型付け。Ruby は何でもメソッド送信なので、
-  # 「どのクラスのどのメソッドが、どんな引数を取り、何を返すか」を表で持つ。
-  # Part 7 でこの表を手書きから RBS 由来（Rbs.load）に差し替えた。
+  # Typing of method sends. Since everything in Ruby is a method send, we hold
+  # "which method of which class takes what arguments and returns what" in a table.
+  # In Part 7 we swapped this table from hand-written to RBS-derived (Rbs.load).
   module Dispatch
-    # [レシーバのクラス, メソッド名] => { params: [引数の型...], returns: 戻り型 }
+    # [receiver class, method name] => { params: [arg types...], returns: return type }
     METHODS = Rbs.load(Rbs::CORE)
 
-    # 畳める演算：両オペランドが「既知値の Const」のとき、実際に計算して Const に畳む。
+    # Foldable operations: when both operands are "Const of known value," actually compute and fold to Const.
     FOLD = {
       %i[Integer +] => ->(a, b) { a + b },
       %i[Integer -] => ->(a, b) { a - b },
@@ -17,30 +17,30 @@ module Chibirigor
       %i[String *] => ->(a, b) { a * b } # "a" * 3 → "aaa"
     }.freeze
 
-    # Const 爆発を防ぐ広げ規則（正規化予算の最小版）。これを超えたら畳まず丸める。
+    # Widening rules to prevent Const explosion (a minimal normalization budget). Past these, round instead of fold.
     INT_LIMIT = 1_000_000
     STR_LIMIT = 100
-    MEMBER_LIMIT = 4 # Union のメンバ数予算。超えたら Const をクラスに丸める
+    MEMBER_LIMIT = 4 # Union member-count budget. Past this, round Const to its class.
 
-    # ナローイングが特別扱いする述語（戻りは概念上 bool）。chibirigor は bool 型を持たないので
-    # Dynamic を返すが、これは「型を見失った」のではなく「述語をモデル化していない」だけ。
-    # よって fail-soft 地図（check --explain）には載せない（誤った沈黙地点を出さない）。
+    # Predicates narrowing treats specially (their return is conceptually bool). chibirigor has no bool
+    # type so it returns Dynamic, but this is not "lost the type" — it's just "we don't model the predicate."
+    # So we don't list them on the fail-soft map (check --explain) — don't emit a false silence site.
     GUARD_PREDICATES = %i[nil? is_a? kind_of? instance_of?].freeze
 
     module_function
 
-    # 型を「クラス名（シンボル）」に丸める。表のキー照合に使う。
+    # Round a type to its "class name (symbol)." Used to match the table's keys.
     def class_of(type)
       case type
       when Type::Const   then type.value.class.name.to_sym
       when Type::Nominal then type.name
       when Type::Generic then type.name # Array[Integer] → :Array
-      end # Dynamic などは nil（＝ディスパッチできない）
+      end # Dynamic etc. → nil (= can't dispatch)
     end
 
-    # 畳めるなら畳んだ Const（引数に Union があればメンバごとに畳んだ Union）を、
-    # 畳めない/丸めるべきなら nil を返す。
-    # 例: 1 + (1 | 2) → 2 | 3。組み合わせが MEMBER_LIMIT を超えたら畳まず丸める。
+    # Return the folded Const if foldable (a Union folded per member if an argument is a Union),
+    # or nil if it can't be folded / should be rounded.
+    # E.g. 1 + (1 | 2) → 2 | 3. If the combinations exceed MEMBER_LIMIT, round instead of fold.
     def foldable_result(receiver_type, name, arg_types)
       op = FOLD[[class_of(receiver_type), name]]
       return nil unless op && receiver_type.is_a?(Type::Const)
@@ -52,7 +52,7 @@ module Chibirigor
         result = begin
           op.call(receiver_type.value, *args.map(&:value))
         rescue StandardError
-          return nil # 計算が失敗する組があれば畳まない（型エラーは別途診断され、戻りは丸めに委ねる）
+          return nil # if any combination's computation fails, don't fold (the type error is diagnosed separately; the return is left to rounding)
         end
         return nil if widen?(result)
 
@@ -61,7 +61,7 @@ module Chibirigor
       Type.union(members)
     end
 
-    # 各引数を「Const のメンバ列」に展開して直積を返す。Const 以外が混じれば nil（畳めない）。
+    # Expand each argument into its "list of Const members" and return the product. nil if anything but Const is mixed in (can't fold).
     def const_combinations(arg_types)
       member_lists = arg_types.map do |type|
         members = type.is_a?(Type::Union) ? type.members : [type]
@@ -72,7 +72,7 @@ module Chibirigor
       member_lists.reduce([[]]) { |acc, members| acc.product(members).map { |combo, m| combo + [m] } }
     end
 
-    # 大きすぎる値は畳まない（予算超過 → 丸める）
+    # Don't fold a value that's too big (over budget → round)
     def widen?(value)
       case value
       when Integer then value.abs > INT_LIMIT
@@ -82,17 +82,17 @@ module Chibirigor
     end
 
     def dispatch(receiver_type, name, arg_types, node, diagnostics)
-      # Union レシーバはメンバごとにディスパッチして結果をまとめる（分配）。
+      # A Union receiver dispatches per member and combines the results (distribution).
       return dispatch_union(receiver_type, name, arg_types, node, diagnostics) if receiver_type.is_a?(Type::Union)
 
       key = [class_of(receiver_type), name]
       signature = Plugin.registry[key] || METHODS[key]
-      unless signature # 知らないメソッド → 脅かさない（ここが fail-soft 地点）
-        # untyped に倒した地点を provenance として記録（check --explain が地図化する）。
-        # 通常の check はこの :fail_soft を捨てるので、診断は増えない（挙動不変）。
-        # ナローイングの述語（is_a? 等）は型を見失ったわけではないので地図に載せない。
+      unless signature # unknown method → don't frighten it (this is the fail-soft site)
+        # Record the site we fell back to untyped as provenance (check --explain maps it).
+        # A normal check discards this :fail_soft, so diagnostics don't increase (behavior unchanged).
+        # A narrowing predicate (is_a? etc.) hasn't lost the type, so it isn't put on the map.
         unless GUARD_PREDICATES.include?(name)
-          diagnostics << Chibirigor.diagnostic(node, "ここで untyped に倒しました（`#{name}` の型が引けません）")
+          diagnostics << Chibirigor.diagnostic(node, "fell to untyped here (can't look up the type of `#{name}`)")
                                    .merge(kind: :fail_soft, severity: :info)
         end
         return Type::Dynamic.new
@@ -100,25 +100,25 @@ module Chibirigor
 
       if arg_types.size != signature[:params].size
         diagnostics << Chibirigor.diagnostic(
-          node, "#{name} の引数の数が違います（#{signature[:params].size} 個必要、#{arg_types.size} 個渡された）"
+          node, "wrong number of arguments for #{name} (#{signature[:params].size} expected, #{arg_types.size} given)"
         )
         return signature[:returns]
       end
 
       signature[:params].zip(arg_types).each do |param, arg|
-        # 怒るのは :no（確実に合わない）のときだけ。:yes も :maybe も黙る。
+        # Complain only on :no (definitely doesn't fit). Both :yes and :maybe stay quiet.
         next unless Accepts.call(param, arg) == :no
 
-        diagnostics << Chibirigor.diagnostic(node, "#{param} が必要ですが #{arg} が渡されました")
+        diagnostics << Chibirigor.diagnostic(node, "expected #{param} but got #{arg}")
       end
 
-      # 畳めれば畳む（Const）、無理なら表の戻り型に丸める。
+      # Fold if foldable (Const); otherwise round to the table's return type.
       foldable_result(receiver_type, name, arg_types) || signature[:returns]
     end
 
-    # Union レシーバの分配ディスパッチ。実行時はどのメンバにもなり得るので、
-    # エラーは「全メンバで失敗した」ときだけ表に出す（一部の失敗は :maybe ＝黙る）。
-    # :info（fail-soft 地図）は provenance なのでそのまま通す（重複だけ消す）。
+    # Distributive dispatch for a Union receiver. At run time it can be any member,
+    # so an error surfaces only when "all members failed" (a partial failure is :maybe = stay quiet).
+    # :info (the fail-soft map) is provenance, so pass it through as is (just drop duplicates).
     def dispatch_union(receiver_type, name, arg_types, node, diagnostics)
       buffers = []
       results = receiver_type.members.map do |member|
@@ -136,8 +136,8 @@ module Chibirigor
       merged
     end
 
-    # Union のメンバ数予算。MEMBER_LIMIT を超えたら Const をクラスに丸めて作り直す
-    # （widen? と同じ「正規化予算」パターンの Union 版）。
+    # Union member-count budget. Past MEMBER_LIMIT, round Const to its class and rebuild
+    # (the Union version of the same "normalization budget" pattern as widen?).
     def budgeted_union(types)
       result = Type.union(types)
       return result unless result.is_a?(Type::Union) && result.members.size > MEMBER_LIMIT

@@ -7,12 +7,12 @@ module Chibirigor
     Dynamic = Data.define         { def to_s = 'untyped' }
     Union   = Data.define(:members) { def to_s = members.map(&:to_s).join(' | ') }
 
-    # ハッシュの構造。キーごとの型を覚える。例: {foo: 1, bar: "a"}
+    # The shape of a hash: remembers a type per key. e.g. {foo: 1, bar: "a"}
     HashShape = Data.define(:fields) do
       def to_s = "{#{fields.map { |key, type| "#{key}: #{type}" }.join(', ')}}"
     end
 
-    # 配列を「位置ごとの型」で覚える。例: [1, "a"]
+    # An array remembered "type per position." e.g. [1, "a"]
     Tuple = Data.define(:elements) do
       def to_s = "[#{elements.map(&:to_s).join(', ')}]"
     end

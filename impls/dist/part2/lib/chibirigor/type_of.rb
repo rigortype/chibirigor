@@ -5,7 +5,7 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # Part 1 から置換：キャリアは `Type::` 名前空間に、呼び出しは Dispatch に委ねる。
+  # Replaces Part 1: carriers move to the `Type::` namespace, calls delegate to Dispatch.
   def type_of(node, diagnostics)
     case node
     when Prism::IntegerNode then Type::Const[node.value]

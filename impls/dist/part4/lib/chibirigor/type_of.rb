@@ -21,7 +21,7 @@ module Chibirigor
     end
   end
 
-  # if / 三項演算子。両枝の型を Union にまとめる（ナローイングはまだない）。
+  # if / ternary. Fold both branches' types into a Union (no narrowing yet).
   def type_of_if(node, scope, diagnostics)
     type_of(node.predicate, scope, diagnostics)
 
@@ -36,7 +36,7 @@ module Chibirigor
     Type.union([then_type, else_type])
   end
 
-  # 枝（文の並び）を評価し、最後の文の型を返す。枝の中でもスコープを縫う。
+  # Evaluate a branch (a statement sequence) and return the last statement's type. Threads scope inside branches too.
   def type_of_body(statements_node, scope, diagnostics)
     return Type::Const[nil] if statements_node.nil?
 

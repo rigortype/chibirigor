@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Part 6 到達段階のスモークテスト。
-# HashShape と Tuple：構造的な型で読み取りの型が流れる。
+# Smoke test for the Part 6 snapshot.
+# HashShape and Tuple: structural types let read types flow through.
 
 require 'chibirigor'
 

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# Union ディスパッチ（レシーバ分配＋畳み込み分配）のテスト（依存ゼロ）。
-# (1|2).+ はメンバごとにディスパッチして結果を union する。引数の Union は
-# 畳み込みで直積に分配する（1 + (1|2) → 2 | 3）。エラーは全メンバで失敗した
-# ときだけ表に出す（一部の失敗は :maybe ＝黙る、誤検知ゼロ）。
+# Tests for Union dispatch (receiver distribution + folding distribution; zero-dependency).
+# (1|2).+ dispatches per member and unions the results. A Union argument is
+# distributed over the Cartesian product by folding (1 + (1|2) → 2 | 3). An error
+# surfaces only when every member fails (a partial failure is :maybe = silent, zero FP).
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'chibirigor'
 
@@ -19,55 +19,55 @@ end
 
 last_type = ->(source) { Chibirigor.annotate(source).last[:type].to_s }
 
-# ── 畳み込みの Union 分配（引数が Union） ────────────────────────────────────
-assert.call('1 + (1|2) はメンバごとに畳む',
+# ── Folding Union distribution (the argument is a Union) ─────────────────────
+assert.call('1 + (1|2) folds per member',
             last_type.call("a = 1\nb = a + (rand == 0 ? 1 : 2)"), '2 | 3')
 
-# ── レシーバ分配（レシーバが Union） ────────────────────────────────────────
-assert.call('(1|2) - 1 はレシーバを分配して畳む',
+# ── Receiver distribution (the receiver is a Union) ──────────────────────────
+assert.call('(1|2) - 1 distributes the receiver and folds',
             last_type.call("b = rand == 0 ? 1 : 2\nc = b - 1"), '0 | 1')
 
-assert.call('分配の連鎖でも精度を保つ（(2|3) - 1 → 1 | 2）',
+assert.call('chained distribution keeps precision ((2|3) - 1 → 1 | 2)',
             last_type.call("a = 1\nb = a + (rand == 0 ? 1 : 2)\nc = b - a"), '1 | 2')
 
-assert.call('結果が重なれば union が 1 つにまとめる（(1|2) * 0 → 0）',
+assert.call('overlapping results collapse into one union ((1|2) * 0 → 0)',
             last_type.call("b = rand == 0 ? 1 : 2\nc = b * 0"), '0')
 
-# ── 異種 Union：畳めるメンバは畳み、畳めないメンバは表の戻り型へ丸める ──────
-assert.call('(1|"a") + 1 はメンバごとの結果の union（Integer 側だけ畳む）',
+# ── Heterogeneous Union: fold the foldable members, round the rest to the table's return type ──
+assert.call('(1|"a") + 1 is a union of per-member results (only the Integer side folds)',
             last_type.call(%(x = rand == 0 ? 1 : "a"\ny = x + 1)), '2 | String')
 
-# ── 診断方針：全メンバで失敗したときだけ怒る ────────────────────────────────
-assert.call('一部メンバの失敗は黙る（:maybe・誤検知ゼロ）',
+# ── Diagnostic policy: complain only when every member fails ─────────────────
+assert.call('a partial-member failure stays silent (:maybe, zero FP)',
             Chibirigor.check(%(x = rand == 0 ? 1 : "a"\ny = x + 1)).size, 0)
 
-assert.call('全メンバで失敗すれば 1 件だけ怒る',
+assert.call('if every member fails, complain exactly once',
             Chibirigor.check(%(x = rand == 0 ? 1 : 2\ny = x + "a")).size, 1)
 
-# ── gradual：未知メンバが混じれば untyped に倒す（fail-soft は地図に残る） ──
-assert.call('未知メンバ（nil.+）が混じれば untyped',
+# ── gradual: if an unknown member is mixed in, fall to untyped (fail-soft stays on the map) ──
+assert.call('an unknown member (nil.+) mixed in is untyped',
             last_type.call("x = rand == 0 ? 1 : nil\ny = x + 1"), 'untyped')
 
-assert.call('既定の check では診断ゼロ（fail-soft は隠れる）',
+assert.call('default check yields zero diagnostics (fail-soft is hidden)',
             Chibirigor.check("x = rand == 0 ? 1 : nil\ny = x + 1").size, 0)
 
-# 1 行目には rand / == の fail-soft もあるので、分配が起きた 2 行目だけ数える
+# Line 1 also has fail-soft from rand / ==, so count only line 2 where distribution happened.
 soft = Chibirigor.check("x = rand == 0 ? 1 : nil\ny = x + 1", explain: true)
-assert.call('explain では分配先の fail-soft 地点が 1 件（メンバ分の重複はしない）',
+assert.call('explain shows 1 fail-soft point at the distribution site (no per-member duplication)',
             soft.count { |d| d[:kind] == :fail_soft && d[:line] == 2 }, 1)
 
-# ── MEMBER_LIMIT：メンバ数予算を超えたらクラスに丸める ──────────────────────
+# ── MEMBER_LIMIT: round to the class once the member-count budget is exceeded ──
 five = "b = rand == 0 ? 1 : (rand == 0 ? 2 : (rand == 0 ? 3 : (rand == 0 ? 4 : 5)))\n"
-assert.call('5 メンバの Union への演算は Integer に丸める（メンバ数予算）',
+assert.call('an operation on a 5-member Union rounds to Integer (member-count budget)',
             last_type.call("#{five}c = b + 1"), 'Integer')
 
-assert.call('4 メンバまでは精度を保つ',
+assert.call('precision is kept up to 4 members',
             last_type.call("b = rand == 0 ? 1 : (rand == 0 ? 2 : (rand == 0 ? 3 : 4))\nc = b + 1"),
             '2 | 3 | 4 | 5')
 
 if failures.empty?
-  puts 'すべてのテストが通りました'
+  puts 'All tests passed.'
 else
-  puts "#{failures.size} 件失敗: #{failures.join(', ')}"
+  puts "#{failures.size} failed: #{failures.join(', ')}"
   exit 1
 end

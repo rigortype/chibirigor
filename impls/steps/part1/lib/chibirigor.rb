@@ -8,6 +8,6 @@ require_relative 'chibirigor/type_of'
 require_relative 'chibirigor/checker'
 require_relative 'chibirigor/annotator'
 
-# chibirigor ― 最小限の Ruby 型チェッカー（教材）／Part 1 到達段階
+# chibirigor — a minimal Ruby type checker (teaching material) / Part 1 snapshot
 module Chibirigor
 end

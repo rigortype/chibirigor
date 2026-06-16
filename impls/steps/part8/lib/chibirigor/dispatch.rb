@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # メソッド送信の型付け。Part 2 の手書き表を RBS 由来の表に差し替えた。
+  # Method-send typing. Part 2's hand-written table is replaced by one derived from RBS.
   module Dispatch
     METHODS = Rbs.load(Rbs::CORE)
 
@@ -20,7 +20,7 @@ module Chibirigor
 
       if arg_types.size != signature[:params].size
         diagnostics << Chibirigor.diagnostic(
-          node, "#{name} の引数の数が違います（#{signature[:params].size} 個必要、#{arg_types.size} 個渡された）"
+          node, "wrong number of arguments for #{name} (#{signature[:params].size} expected, #{arg_types.size} given)"
         )
         return signature[:returns]
       end
@@ -28,7 +28,7 @@ module Chibirigor
       signature[:params].zip(arg_types).each do |param, arg|
         next unless Accepts.call(param, arg) == :no
 
-        diagnostics << Chibirigor.diagnostic(node, "#{param} が必要ですが #{arg} が渡されました")
+        diagnostics << Chibirigor.diagnostic(node, "expected #{param} but got #{arg}")
       end
 
       signature[:returns]

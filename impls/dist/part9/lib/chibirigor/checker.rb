@@ -5,8 +5,8 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # ソースを型チェックし、見つかった診断の配列を返す。
-  # rbs: が渡されたときだけ戻り型照合（⇐）を実行する。
+  # Type-check the source and return the array of diagnostics found.
+  # Run return-type checking (⇐) only when rbs: is passed.
   def check(source, baseline = [], rbs: nil)
     program = Prism.parse(source).value
     diagnostics = []

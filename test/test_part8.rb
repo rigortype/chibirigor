@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Part 8 ― annotate を仕上げる（依存ゼロ・文字列ソース）
+# Part 8 — finishing annotate (zero-dependency, string sources)
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'chibirigor'
 
@@ -14,18 +14,18 @@ assert = lambda do |desc, actual, expected|
   end
 end
 
-# 本体から戻り型を合成し、RBS 風シグネチャで見せる
+# Synthesize the return type from the body and show it as an RBS-style signature.
 sig = Chibirigor.annotate("def greet\n  \"hi\".upcase\nend\n").first[:type]
 assert.call('return type synthesized from body', sig, 'def greet: () -> String')
 
-# 引数は untyped。untyped がどこに出るか＝推論の弱点の可視化
+# Params are untyped. Where untyped appears = visualizing the inference's weak spots.
 sig2 = Chibirigor.annotate("def mystery(x)\n  x\nend\n").first[:type]
 assert.call('untyped param yields untyped return', sig2, 'def mystery: (untyped) -> untyped')
 
-# def の本体も型チェックされる（check と annotate は同じ推論器を共有）
+# A def body is type-checked too (check and annotate share the same inference engine).
 assert.call('def body is type-checked', Chibirigor.check("def bad\n  1 + \"x\"\nend\n").size, 1)
 
-# untyped 引数は本体で誤検知しない（脅かさない）
+# An untyped param produces no false positive in the body (no alarms).
 assert.call('untyped param is FP-safe in the body', Chibirigor.check("def ok(x)\n  x + 1\nend\n"), [])
 
 if failures.empty?

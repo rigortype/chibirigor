@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # メソッド送信の型付けを「手書きのディスパッチ表」に委ねる（Part 2 新設）。
+  # Delegate method-send typing to a "hand-written dispatch table" (new in Part 2).
   module Dispatch
     I = Type::Nominal[:Integer]
     S = Type::Nominal[:String]
 
-    # [レシーバのクラス, メソッド名] => { params: [引数の型...], returns: 戻り型 }
+    # [receiver class, method name] => { params: [arg types...], returns: return type }
     METHODS = {
       %i[Integer +]      => { params: [I], returns: I },
       %i[Integer to_s]   => { params: [], returns: S },
@@ -20,17 +20,17 @@ module Chibirigor
       case type
       when Type::Const   then type.value.class.name.to_sym
       when Type::Nominal then type.name
-      end # Dynamic などは nil（＝引けない）
+      end # Dynamic etc. → nil (= can't look it up)
     end
 
     def dispatch(receiver_type, name, arg_types, node, diagnostics)
       signature = METHODS[[class_of(receiver_type), name]]
-      return Type::Dynamic.new unless signature # 知らないメソッド → 脅かさない（2-5）
+      return Type::Dynamic.new unless signature # unknown method → don't frighten (2-5)
 
       if arg_types.size != signature[:params].size
         diagnostics << Chibirigor.diagnostic(
           node,
-          "#{name} の引数の数が違います（#{signature[:params].size} 個必要、#{arg_types.size} 個渡された）"
+          "wrong number of arguments for #{name} (#{signature[:params].size} expected, #{arg_types.size} given)"
         )
         return signature[:returns]
       end
@@ -38,14 +38,14 @@ module Chibirigor
       signature[:params].zip(arg_types).each do |param, arg|
         next if matches?(param, arg)
 
-        diagnostics << Chibirigor.diagnostic(node, "#{param} が必要ですが #{arg} が渡されました")
+        diagnostics << Chibirigor.diagnostic(node, "expected #{param} but got #{arg}")
       end
 
       signature[:returns]
     end
 
     def matches?(param, arg)
-      return true if param.is_a?(Type::Dynamic) || arg.is_a?(Type::Dynamic) # 不明は通す
+      return true if param.is_a?(Type::Dynamic) || arg.is_a?(Type::Dynamic) # unknown passes
 
       class_of(param) == class_of(arg)
     end

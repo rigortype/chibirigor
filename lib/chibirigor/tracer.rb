@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # trace ― 型推論の手順をイベント列として記録し、端末でコマ送り再生する。
+  # trace — record the steps of type inference as an event stream and replay them frame by frame in the terminal.
   #
-  # 仕組み: コア（type_of / eval_statement / Type.union / Dispatch.dispatch）には
-  # 手を入れず、Module#prepend でフックを差し込む。Tracer.current（レコーダ）が
-  # nil のときフックは即 super するので、check / annotate 等の挙動は変わらない。
+  # How it works: the core (type_of / eval_statement / Type.union / Dispatch.dispatch) is left
+  # untouched; hooks are inserted with Module#prepend. When Tracer.current (the recorder) is
+  # nil, the hooks immediately super, so check / annotate etc. behave unchanged.
   #
-  # イベントの種類（= アニメーションの 1 コマ候補）:
-  #   :stmt     トップレベルの文の評価開始
-  #   :enter    type_of がノードに入った（既定の再生では出さない・--verbose で出す）
-  #   :result   ノードの型が確定した
-  #   :bind     代入で型環境（scope）に束縛が増えた
-  #   :union    Type.union が複数の型を 1 つにまとめた
-  #   :dispatch メソッド送信を表引きした（畳み込み / fail-soft もここで見える）
+  # Event kinds (= candidate frames of the animation):
+  #   :stmt     a top-level statement's evaluation begins
+  #   :enter    type_of entered a node (not shown in the default replay; shown with --verbose)
+  #   :result   a node's type was fixed
+  #   :bind     an assignment added a binding to the type environment (scope)
+  #   :union    Type.union combined several types into one
+  #   :dispatch a method send was looked up in the table (folding / fail-soft show up here too)
   module Tracer
     class << self
       attr_accessor :current
     end
 
-    # トレース中だけ Tracer.current にレコーダを置く
+    # Place a recorder on Tracer.current only while tracing
     def self.with(recorder)
       self.current = recorder
       yield
@@ -27,16 +27,16 @@ module Chibirigor
       self.current = nil
     end
 
-    # イベントを貯めるレコーダ。型・スコープは表示用文字列に落として記録する
-    # （あとから JSON にも端末にも出せる、自己完結なデータにするため）。
+    # The recorder that accumulates events. Types and scopes are recorded as display strings
+    # (so the data is self-contained — emittable later to JSON or to the terminal).
     class Recorder
       attr_reader :events
 
       def initialize
         @events = []
-        @stack = [] # 評価中ノードのラベル（パンくず）
-        @nodes = [] # 評価中ノードそのもの（union の位置決めに使う）
-        @scope = {} # 直近のスコープのスナップショット
+        @stack = [] # labels of the nodes being evaluated (breadcrumbs)
+        @nodes = [] # the nodes being evaluated themselves (used to position a union)
+        @scope = {} # a snapshot of the most recent scope
       end
 
       def stmt(node, index, scope)
@@ -92,10 +92,10 @@ module Chibirigor
 
       def label(node)
         case node
-        when Prism::CallNode then "#{node.name} の呼び出し"
-        when Prism::IfNode then 'if（三項含む）'
-        when Prism::LocalVariableReadNode then "変数 #{node.name}"
-        when Prism::LocalVariableWriteNode then "代入 #{node.name}"
+        when Prism::CallNode then "call to #{node.name}"
+        when Prism::IfNode then 'if (incl. ternary)'
+        when Prism::LocalVariableReadNode then "variable #{node.name}"
+        when Prism::LocalVariableWriteNode then "assignment #{node.name}"
         else short(node).sub(/Node\z/, '')
         end
       end
@@ -105,7 +105,7 @@ module Chibirigor
       end
     end
 
-    # ── フック（prepend で割り込む。レコーダが無ければ即 super） ──────────────
+    # ── Hooks (cut in with prepend; immediately super if there's no recorder) ──────────────
 
     module TypeOfHook
       def type_of(node, scope, diagnostics)
@@ -129,7 +129,7 @@ module Chibirigor
     module UnionHook
       def union(types)
         result = super
-        # 1 個をそのまま返すだけの呼び出しは「まとめ」ではないので記録しない
+        # A call that just returns a single type as is isn't a "combine," so don't record it
         Tracer.current&.union(types, result) if types.size >= 2
         result
       end
@@ -139,7 +139,7 @@ module Chibirigor
       def dispatch(receiver_type, name, arg_types, node, diagnostics)
         return super unless (recorder = Tracer.current)
 
-        distributed = receiver_type.is_a?(Type::Union) # Union レシーバはメンバへ分配される
+        distributed = receiver_type.is_a?(Type::Union) # a Union receiver is distributed to its members
         key = [Dispatch.class_of(receiver_type), name]
         signature = Plugin.registry[key] || Dispatch::METHODS[key]
         result = super
@@ -150,7 +150,7 @@ module Chibirigor
         result
       end
 
-      # Const か「Const だけの Union」（メンバごとに畳めた結果）か
+      # A Const, or a "Union of only Consts" (the result of folding per member)
       def const_only?(type)
         type.is_a?(Type::Const) ||
           (type.is_a?(Type::Union) && type.members.all?(Type::Const))
@@ -161,10 +161,10 @@ module Chibirigor
     Type.singleton_class.prepend(UnionHook)
     Dispatch.singleton_class.prepend(DispatchHook)
 
-    # ── 再生（端末アニメーション） ────────────────────────────────────────────
+    # ── Replay (terminal animation) ────────────────────────────────────────────
 
-    # 既定の再生では出さないイベント: enter（出入りの「入り」）と、
-    # 自明なリテラルの result（1 が Const[1] なのは見ても情報がない）。
+    # Events not shown in the default replay: enter (the "in" of in/out), and
+    # the result of a trivial literal (that 1 is Const[1] carries no information to look at).
     LITERAL_NODES = %w[IntegerNode FloatNode StringNode SymbolNode TrueNode FalseNode NilNode].freeze
 
     module_function
@@ -174,10 +174,10 @@ module Chibirigor
         (event[:kind] == :result && LITERAL_NODES.include?(event[:node]))
     end
 
-    # イベント列をコマ送り再生する。
-    #   delay: 秒数を与えると自動再生。nil なら Enter キーでステップ実行。
-    #   verbose: true で enter / リテラルの result も全部出す。
-    # out が端末でなければ（パイプ等）、画面クリアせず全コマを順に出力する。
+    # Replay the event stream frame by frame.
+    #   delay: given a number of seconds, auto-play. nil → step with the Enter key.
+    #   verbose: true shows enter / literal results in full too.
+    # If out is not a terminal (a pipe, etc.), print every frame in order without clearing the screen.
     def play(source, events, delay: nil, verbose: false, out: $stdout)
       frames = verbose ? events : events.reject { |e| skip_by_default?(e) }
       lines = source.lines.map(&:chomp)
@@ -189,12 +189,12 @@ module Chibirigor
         if delay
           sleep delay
         elsif animate && $stdin.tty?
-          out.print "\n[Enter] 次へ / [q] 終了 > "
+          out.print "\n[Enter] next / [q] quit > "
           input = $stdin.gets
           break if input.nil? || input.strip == 'q'
         end
       end
-      out.puts "\n── 再生おわり（全 #{frames.size} コマ）──"
+      out.puts "\n── playback done (#{frames.size} steps total) ──"
     end
 
     def draw(out, lines, event, index, total)
@@ -206,12 +206,12 @@ module Chibirigor
       end
       out.puts bar
       scope = event[:scope]
-      out.puts "型環境  : #{scope.empty? ? '（空）' : scope.map { |k, v| "#{k}: #{v}" }.join('   ')}"
-      out.puts "評価中  : #{event[:stack].empty? ? '（トップレベル）' : event[:stack].join(' › ')}"
+      out.puts "type env   : #{scope.empty? ? '(empty)' : scope.map { |k, v| "#{k}: #{v}" }.join('   ')}"
+      out.puts "evaluating : #{event[:stack].empty? ? '(top level)' : event[:stack].join(' › ')}"
       out.puts "► #{message(event)}"
     end
 
-    # イベントの範囲（start..end の行・列）を反転表示でハイライトする
+    # Highlight the event's range (start..end line/column) in inverse video
     def highlight(text, lineno, event)
       return text unless event[:line] && lineno.between?(event[:line], event[:end_line])
 
@@ -224,16 +224,16 @@ module Chibirigor
 
     def message(event)
       case event[:kind]
-      when :stmt then "文 #{event[:index]} の評価を始めます"
-      when :enter then "#{event[:label]} に入ります"
+      when :stmt then "start evaluating statement #{event[:index]}"
+      when :enter then "entering #{event[:label]}"
       when :result then "#{event[:label]} ⇒ #{event[:type]}"
-      when :bind then "束縛: #{event[:name]} ← #{event[:type]}（型環境に追加）"
+      when :bind then "bind: #{event[:name]} ← #{event[:type]} (added to type env)"
       when :union then "union: #{event[:inputs].join(' , ')} → #{event[:result]}"
       when :dispatch
-        note = if event[:distributed] then '（Union をメンバへ分配）'
-               elsif event[:folded] then '（定数畳み込み）'
-               elsif event[:fail_soft] then '（表に無い → fail-soft で untyped）'
-               else '（表の戻り型に丸め）'
+        note = if event[:distributed] then '(distribute Union to members)'
+               elsif event[:folded] then '(constant folding)'
+               elsif event[:fail_soft] then '(not in table → fail-soft to untyped)'
+               else '(round to the table\'s return type)'
                end
         "dispatch: #{event[:receiver]}.#{event[:method]}(#{event[:args].join(', ')}) → #{event[:result]} #{note}"
       else event[:kind].to_s
@@ -243,8 +243,8 @@ module Chibirigor
 
   module_function
 
-  # ソースを推論しながらイベント列を記録して返す（trace コマンドの本体）。
-  # 戻り値は自己完結な Hash の配列（そのまま JSON 化できる）。
+  # Infer the source while recording the event stream and return it (the body of the trace command).
+  # The return value is an array of self-contained Hashes (JSON-serializable as is).
   def trace(source)
     program = Prism.parse(source).value
     recorder = Tracer::Recorder.new

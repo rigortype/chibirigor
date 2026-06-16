@@ -5,16 +5,16 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # ソースを型チェックし、見つかった診断の配列を返す。
-  # 文ごとにスコープを縫って渡す（代入で型環境が育つ）。
-  # 例外で止めず、最後まで読み進める（止まらない・脅かさない）。
-  # baseline に「既に呑んだ診断」を渡すと、それらは差し引いて*新規だけ*返す。
-  # 照合は「行＋メッセージ」で行う（列・長さは含めない ― 同じ行を編集して桁がズレても
-  # baseline が外れないように）。
-  # explain: true なら、推論が untyped に倒した地点（fail-soft）を :info 診断として併せて返す
-  #   （実 Rigor の `rigor check --explain` の極小版）。
-  # unreachable: true なら、証明可能に到達不能な枝を :info 診断として併せて返す（ADR-47 縮小版）。
-  # どちらも既定（false）は挙動不変＝本物の型エラーだけを返す。
+  # Type-check the source and return the array of diagnostics found.
+  # Thread the scope through statement by statement (assignments grow the type environment).
+  # Don't stop on exceptions; read all the way through (don't halt, don't frighten).
+  # Pass already-accepted diagnostics as baseline and they're subtracted out, returning *only the new ones*.
+  # Matching is by "line + message" (no column or length — so editing the same line and
+  # shifting columns doesn't knock the baseline loose).
+  # explain: true also returns the points where inference fell back to untyped (fail-soft) as :info
+  #   diagnostics (a tiny version of real Rigor's `rigor check --explain`).
+  # unreachable: true also returns provably unreachable branches as :info diagnostics (a scaled-down ADR-47).
+  # Both default to false, leaving behavior unchanged = returning only real type errors.
   def check(source, baseline = [], rbs: nil, explain: false, unreachable: false)
     program = Prism.parse(source).value
     diagnostics = []
@@ -23,8 +23,8 @@ module Chibirigor
       _type, scope = eval_statement(stmt, scope, diagnostics)
     end
 
-    # 戻り型照合（opt-in）: rbs: が渡されたときだけ ⇐ を実行する。
-    # 宣言がない def・untyped 宣言は黙って通す（gradual 保証）。
+    # Return-type checking (opt-in): run ⇐ only when rbs: is passed.
+    # A def with no declaration, or an untyped declaration, passes silently (the gradual guarantee).
     if rbs
       user_sigs = Rbs.load(rbs)
       program.statements.body.each do |node|
@@ -33,21 +33,21 @@ module Chibirigor
         sig = user_sigs.find { |(_klass, meth), _| meth == node.name }&.last
         next unless sig
 
-        # 本体の型を求めるだけ（診断は捨てる ― 本文エラーは既に上で収集済み）
+        # Just synthesize the body's type (discard diagnostics — body errors were collected above).
         body_type = method_return_type(node, scope, [])
         check_against(node, sig[:returns], body_type, diagnostics)
       end
     end
 
-    # 付帯イベント（:kind 付き）は本物の型エラーと分けて持つ。
+    # Keep incidental events (those with :kind) separate from real type errors.
     special, errors = diagnostics.partition { |d| d[:kind] }
 
     seen = baseline.map { |d| d.slice(:line, :message) }
     result = errors.reject { |d| seen.include?(d.slice(:line, :message)) }
 
-    # dump_type(式) は基本機能：フラグ不要で常に併載する（:info・型印字）。
+    # dump_type(expr) is a core feature: always include it, no flag needed (:info, type printout).
     result += special.select { |d| d[:kind] == :dump_type }.uniq
-    # 残りはフラグが立っているときだけ併載する（完全に同一のイベントのみ重複排除）。
+    # Include the rest only when the flag is set (dedupe only fully identical events).
     result += special.select { |d| d[:kind] == :fail_soft }.uniq if explain
     result += special.select { |d| d[:kind] == :unreachable }.uniq if unreachable
     result

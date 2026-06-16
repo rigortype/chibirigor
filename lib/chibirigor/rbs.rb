@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # ごく小さな RBS 読み込み。本物の rbs gem の代わりに、最小限を自前で読む。
-  # 「型は別ファイル（RBS）に書く」という Ruby/RBS の世界観の縮図。
-  # Part 2 の手書き表を、この RBS テキストから生成した表に差し替える。
+  # A tiny RBS loader. Instead of the real rbs gem, we read the bare minimum ourselves.
+  # A miniature of the Ruby/RBS worldview where "types live in a separate file (RBS)."
+  # Replaces Part 2's hand-written table with one generated from this RBS text.
   module Rbs
     module_function
 
     CLASS_LINE = /\A\s*class\s+(\S+)\s*\z/
     DEF_LINE   = /\A\s*def\s+(\S+):\s*\((.*)\)\s*->\s*(\S+)\s*\z/
 
-    # コア型のシグネチャ。Part 2 の手書き表と同じ内容（差し替えても診断は変わらない）。
+    # Signatures for the core types. Same content as Part 2's hand-written table (swapping it in leaves diagnostics unchanged).
     CORE = <<~RBS
       class Integer
         def +: (Integer) -> Integer
@@ -26,7 +26,7 @@ module Chibirigor
       end
     RBS
 
-    # RBS テキストを [クラス, メソッド] => { params:, returns: } の表にする。
+    # Turn RBS text into a [class, method] => { params:, returns: } table.
     def load(source)
       table = {}
       current = nil

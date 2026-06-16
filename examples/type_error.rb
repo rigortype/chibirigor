@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-# わざと型エラーを含むサンプル（4 行目）
+# Sample with a deliberate type error (line 4)
 1 + true

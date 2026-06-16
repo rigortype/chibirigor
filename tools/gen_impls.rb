@@ -1,18 +1,19 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# 段スナップショット生成器（accidents を減らすための「生成物」化）。
+# Stage-snapshot generator (turning the trees into generated artifacts to reduce accidents).
 #
-# 真実の源は impls/steps/partN/lib/ ―― 各章で *変わった/新しいファイルだけ* を置く。
-# この生成器が part1..partN を順に重ねて（later overrides earlier）、各到達段階の
-# 完全なツリーを impls/dist/partN/ に出力する。dist/ は生成物なので手で編集しない。
+# The source of truth is impls/steps/partN/lib/ -- each chapter holds *only the files that
+# changed or are new*. This generator stacks part1..partN in order (later overrides earlier)
+# and writes the full tree for each stage to impls/dist/partN/. dist/ is generated, so never
+# edit it by hand.
 #
-# 使い方：
-#   ruby tools/gen_impls.rb            # 生成のみ
-#   ruby tools/gen_impls.rb --verify   # 生成 ＋ 各段の test_stage.rb を実行
+# Usage:
+#   ruby tools/gen_impls.rb            # generate only
+#   ruby tools/gen_impls.rb --verify   # generate + run each stage's test_stage.rb
 #
-# CI ゲート例（Makefile の impls-check）：生成して `git diff --exit-code impls/dist`
-#   で「dist が steps と同期しているか（手編集されていないか）」を検証する。
+# CI gate example (impls-check in the Makefile): generate, then `git diff --exit-code impls/dist`
+#   to verify that dist is in sync with steps (i.e. has not been hand-edited).
 
 require 'fileutils'
 
@@ -24,7 +25,7 @@ EXAMPLES_DIR = File.join(ROOT, 'book', 'v1', 'ja', 'little', 'examples', 'dist')
 steps = Dir[File.join(STEPS_DIR, 'part*')]
         .select { |d| File.directory?(d) }
         .sort_by { |d| File.basename(d)[/\d+/].to_i }
-abort "段ソースが見つかりません: #{STEPS_DIR}" if steps.empty?
+abort "no stage sources found: #{STEPS_DIR}" if steps.empty?
 
 verify = ARGV.include?('--verify')
 failed = []
@@ -37,7 +38,7 @@ steps.each_index do |idx|
   name = File.basename(steps[idx])
   dest = File.join(DIST_DIR, name)
 
-  # part1..partN の lib/ を順に重ねる（同じパスは後の段が上書き＝置換）
+  # Stack the lib/ trees of part1..partN in order (a later stage overrides = replaces the same path)
   cumulative.each do |sdir|
     libsrc = File.join(sdir, 'lib')
     next unless File.directory?(libsrc)
@@ -52,7 +53,7 @@ steps.each_index do |idx|
     end
   end
 
-  # book/v1/ja/little/examples/dist/partN/lib にも同期（examples 単体完結のため）
+  # Also sync into book/v1/ja/little/examples/dist/partN/lib (so the examples are self-contained)
   ex_dest = File.join(EXAMPLES_DIR, name, 'lib')
   FileUtils.mkdir_p(ex_dest)
   FileUtils.cp_r(File.join(dest, 'lib', '.'), ex_dest)
@@ -64,7 +65,7 @@ steps.each_index do |idx|
 
   test = File.join(steps[idx], 'test_stage.rb')
   unless File.exist?(test)
-    puts "  (#{name}: test_stage.rb なし ― スキップ)"
+    puts "  (#{name}: no test_stage.rb -- skipped)"
     next
   end
   ok = system('ruby', '-I', File.join(dest, 'lib'), test)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # 型キャリア（型を表すデータ）。
+  # Type carriers (data that represents a type).
   module Type
     Const     = Data.define(:value) { def to_s = value.inspect }
     Nominal   = Data.define(:name)  { def to_s = name.to_s }
@@ -12,11 +12,11 @@ module Chibirigor
 
     module_function
 
-    # 型の配列を 1 つの型にまとめる。入れ子の Union をならし、重複を消す。
+    # Fold an array of types into one. Flatten nested Unions and drop duplicates.
     def union(types)
       flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
       return Dynamic.new if flat.empty?
-      return Dynamic.new if flat.any?(Dynamic) # untyped が混じれば全体 untyped（gradual）
+      return Dynamic.new if flat.any?(Dynamic) # any untyped makes the whole thing untyped (gradual)
       return flat.first if flat.size == 1
 
       Union[flat.freeze]

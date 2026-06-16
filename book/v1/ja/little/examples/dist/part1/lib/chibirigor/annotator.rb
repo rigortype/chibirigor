@@ -5,11 +5,11 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 各文の推論型を { line:, type: } の配列で返す（診断は捨てる）。
+  # Return each statement's inferred type as an array of { line:, type: } (diagnostics discarded).
   def annotate(source)
     program = Prism.parse(source).value
     program.statements.body.map do |stmt|
-      type = type_of(stmt, []) # 文句は今は捨てる
+      type = type_of(stmt, []) # discard diagnostics for now
       { line: stmt.location.start_line, type: type }
     end
   end

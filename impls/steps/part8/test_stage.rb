@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Part 8 到達段階のスモークテスト。
-# RBS 派生の dispatch 表＋ def の本体型チェックとシグネチャ合成。
+# Smoke test for the Part 8 snapshot.
+# RBS-derived dispatch table plus def body type-checking and signature synthesis.
 
 require 'chibirigor'
 
@@ -15,20 +15,20 @@ check = lambda do |desc, actual, expected|
   end
 end
 
-# Rbs.load が class / def を表にする
+# Rbs.load turns class / def into a table
 table = Chibirigor::Rbs.load("class Foo\n  def bar: (Integer) -> String\nend\n")
 check.call('rbs parses a param type', table[%i[Foo bar]][:params].map(&:to_s), ['Integer'])
 check.call('rbs parses the return type', table[%i[Foo bar]][:returns].to_s, 'String')
 
-# コア表は RBS 由来でも挙動は変わらない
+# The core table is RBS-derived but the behavior is unchanged
 check.call('RBS-backed dispatch still reports', Chibirigor.check('1 + "x"').size, 1)
 check.call('RBS-backed dispatch still passes', Chibirigor.check('1 + 2'), [])
 
-# def の本体型チェック
+# def body type-checking
 check.call('def body is type-checked', Chibirigor.check("def bad\n  1 + \"x\"\nend\n").size, 1)
 check.call('untyped param is FP-safe', Chibirigor.check("def ok(x)\n  x + 1\nend\n"), [])
 
-# annotate が RBS 風シグネチャを返す
+# annotate returns an RBS-style signature
 sig = Chibirigor.annotate("def greet\n  \"hi\".upcase\nend\n").first[:type]
 check.call('return type synthesized from body', sig, 'def greet: () -> String')
 

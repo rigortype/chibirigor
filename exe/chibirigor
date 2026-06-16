@@ -6,11 +6,11 @@ require "chibirigor"
 
 command = ARGV[0]
 args = ARGV[1..] || []
-explain = !args.delete("--explain").nil?         # fail-soft 地図を併載
-unreachable = !args.delete("--unreachable").nil? # 到達不能アーム診断を併載
-verbose = !args.delete("--verbose").nil?         # trace: enter/リテラルも全コマ出す
-json = !args.delete("--json").nil?               # trace: イベント列を JSON で出す
-delay = nil                                      # trace: 秒数指定で自動再生
+explain = !args.delete("--explain").nil?         # also emit the fail-soft map
+unreachable = !args.delete("--unreachable").nil? # also emit unreachable-arm diagnostics
+verbose = !args.delete("--verbose").nil?         # trace: show every frame, including enter/literals
+json = !args.delete("--json").nil?               # trace: emit the event stream as JSON
+delay = nil                                      # trace: auto-play with the given delay in seconds
 if (i = args.index("--delay"))
   delay = args[i + 1]&.to_f
   abort "usage: chibirigor trace --delay SEC FILE" if delay.nil?
@@ -25,8 +25,8 @@ end
 file = arg
 source = File.read(file)
 
-# 診断 1 件を「file:line:col: [info: ]message」＋ 該当行＋キャレットで描く。
-# severity が :info（fail-soft 地図）なら "info:" を付け、終了コードは汚さない。
+# Render one diagnostic as "file:line:col: [info: ]message" plus the source line and a caret.
+# When severity is :info (the fail-soft map), prefix "info:" and leave the exit code untouched.
 def render_diagnostic(diagnostic, file, lines)
   column = diagnostic[:column] || 0
   length = [diagnostic[:length] || 1, 1].max
@@ -41,11 +41,11 @@ case command
 when "check"
   diagnostics = Chibirigor.check(source, explain: explain, unreachable: unreachable)
   if diagnostics.empty?
-    puts "型エラーはありません"
+    puts "No type errors"
   else
     lines = source.lines
     diagnostics.each { |d| render_diagnostic(d, file, lines) }
-    # :info（fail-soft）だけなら成功扱い。本物のエラーがあるときだけ exit 1。
+    # Treat :info-only (fail-soft) output as success; exit 1 only on real errors.
     exit 1 if diagnostics.any? { |d| d[:severity] != :info }
   end
 when "annotate"

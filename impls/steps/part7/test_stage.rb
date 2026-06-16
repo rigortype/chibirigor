@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Part 7 到達段階のスモークテスト。
-# 受理判定（三値）：:yes/:no/:maybe で Union を正しく捌く。
+# Smoke test for the Part 7 snapshot.
+# The three-valued acceptance check: :yes/:no/:maybe handle Union correctly.
 
 require 'chibirigor'
 
@@ -24,15 +24,15 @@ check.call('concrete match is yes',   acc.call(int, const[1]),   :yes)
 check.call('concrete mismatch is no', acc.call(int, const['x']), :no)
 check.call('dynamic is maybe',        acc.call(int, dyn.new),    :maybe)
 
-# Union のうち全員が Integer → :yes（誤検知を消す）
+# Every member of the Union is Integer → :yes (removes the false positive)
 check.call('union of integers is no longer a false positive',
            Chibirigor.check("x = c ? 1 : 2\n1 + x"), [])
 
-# Union に String が混じる → :no → エラーが出る
+# A String mixed into the Union → :no → an error is reported
 check.call('union with a bad member is reported',
            Chibirigor.check("x = c ? 1 : \"a\"\n1 + x").size, 1)
 
-# untyped は黙る
+# untyped stays quiet
 check.call('dynamic arg stays silent', Chibirigor.check('1 + foo.bar'), [])
 
 if failures.empty?

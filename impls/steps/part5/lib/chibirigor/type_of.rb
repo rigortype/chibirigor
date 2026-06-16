@@ -21,7 +21,7 @@ module Chibirigor
     end
   end
 
-  # if / 三項演算子。両枝の型をまとめ、枝ごとに型を絞る（ナローイング）。
+  # if / ternary. Fold both branches' types and narrow the type per branch (narrowing).
   def type_of_if(node, scope, diagnostics)
     type_of(node.predicate, scope, diagnostics)
 

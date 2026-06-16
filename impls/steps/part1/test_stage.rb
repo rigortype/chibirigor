@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# Part 1 到達段階のスモークテスト。
-# 生成された impls/dist/part1/lib に対して `ruby -I .../lib test_stage.rb` で走る。
-# この段の挙動（リテラル→値・加算は丸めて Integer・不明は untyped・止まらない）を固定する。
+# Smoke test for the Part 1 snapshot.
+# Runs against the generated impls/dist/part1/lib via `ruby -I .../lib test_stage.rb`.
+# Pins this stage's behavior (literal → value, addition rounds to Integer, unknown is untyped, don't halt).
 
 require 'chibirigor'
 
@@ -16,13 +16,13 @@ check = lambda do |desc, actual, expected|
   end
 end
 
-check.call('1 + 2 は診断なし', Chibirigor.check('1 + 2'), [])
-check.call('型不一致を診断', Chibirigor.check('1 + "x"'),
-           [{ line: 1, message: '整数に "x" は足せません' }])
-check.call('知らないメソッドは黙る', Chibirigor.check('foo.bar'), [])
+check.call('1 + 2 has no diagnostics', Chibirigor.check('1 + 2'), [])
+check.call('type mismatch is diagnosed', Chibirigor.check('1 + "x"'),
+           [{ line: 1, message: 'can\'t add "x" to an integer' }])
+check.call('unknown method stays quiet', Chibirigor.check('foo.bar'), [])
 
 ann = Chibirigor.annotate("42\n1 + 2\nfoo.bar\n").map { |h| "#{h[:line]}: #{h[:type]}" }
-check.call('annotate: 値そのもの／加算は丸めて Integer／不明は untyped',
+check.call('annotate: value itself / addition rounds to Integer / unknown is untyped',
            ann, ['1: 42', '2: Integer', '3: untyped'])
 
 if failures.empty?

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Part 3 ― ローカル変数と不変 Scope（依存ゼロ・文字列ソース）
+# Part 3 — local variables and immutable Scope (zero-dependency, string sources)
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'chibirigor'
 
@@ -14,21 +14,21 @@ assert = lambda do |desc, actual, expected|
   end
 end
 
-# 代入した変数を後で使える
+# An assigned variable can be used later.
 assert.call('local is usable after assignment', Chibirigor.check("x = 1\nx + 2"), [])
 
-# 変数はその型をエラー検出まで運ぶ
+# A variable carries its type through to error detection.
 assert.call('local carries its type', Chibirigor.check("x = \"a\"\nx + 1").size, 1)
 
-# 再代入で型が変わる
+# Reassignment changes the type.
 assert.call('reassignment changes the type', Chibirigor.check("x = 1\nx = \"a\"\nx + 1").size, 1)
 
-# annotate が変数の型とその変化を見せる
+# annotate shows a variable's type and how it changes.
 types = Chibirigor.annotate("x = 1\nx\nx = \"a\"\nx\n").map { |a| a[:type].to_s }
 assert.call('annotate shows local type', types[1], '1')
 assert.call('annotate shows reassigned type', types[3], '"a"')
 
-# 代入していない裸の名前はメソッド呼び出し扱い → 黙って degrade
+# An unassigned bare name is treated as a method call → degrades silently.
 assert.call('unbound bare name degrades silently', Chibirigor.check('y + 1'), [])
 
 if failures.empty?

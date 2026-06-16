@@ -14,6 +14,6 @@ require_relative 'chibirigor/evaluator'
 require_relative 'chibirigor/checker'
 require_relative 'chibirigor/annotator'
 
-# chibirigor ― 最小限の Ruby 型推論器（教材）／Part 8 到達段階
+# chibirigor — a minimal Ruby type inferencer (teaching material) / Part 8 snapshot
 module Chibirigor
 end

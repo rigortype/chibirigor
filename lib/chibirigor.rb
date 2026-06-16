@@ -16,11 +16,11 @@ require_relative 'chibirigor/checker'
 require_relative 'chibirigor/annotator'
 require_relative 'chibirigor/tracer'
 
-# chibirigor ― 最小限の Ruby 型推論器（教材）
+# chibirigor — a minimal Ruby type inferencer (teaching material).
 #
-# 提供機能:
-#   Chibirigor.check(source)         => 診断の配列
-#   Chibirigor.annotate(source)      => 各文の推論型の配列
-#   Chibirigor.trace(source)         => 推論手順のイベント列（trace）
+# Provided features:
+#   Chibirigor.check(source)         => array of diagnostics
+#   Chibirigor.annotate(source)      => array of each statement's inferred type
+#   Chibirigor.trace(source)         => the sequence of inference-step events (trace)
 module Chibirigor
 end

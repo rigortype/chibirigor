@@ -5,8 +5,8 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 式（Prism のノード）から型を求める。型チェッカーの心臓。
-  # scope は型環境（変数名→型）。わからなければ Dynamic を返す（脅かさない）。
+  # Find a type from an expression (a Prism node). The heart of the type checker.
+  # scope is the type environment (variable name → type). If unknown, return Dynamic (don't frighten).
   def type_of(node, scope, diagnostics)
     case node
     when Prism::IntegerNode then Type::Const[node.value]

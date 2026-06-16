@@ -5,8 +5,8 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 式（Prism のノード）から型を求める。型チェッカーの心臓。
-  # scope は型環境（変数名→型）。わからなければ Dynamic を返す（脅かさない）。
+  # Find a type from an expression (a Prism node). The heart of the type checker.
+  # scope is the type environment (variable name → type). If unknown, return Dynamic (don't frighten).
   def type_of(node, scope, diagnostics)
     case node
     when Prism::IntegerNode then Type::Const[node.value]
@@ -26,13 +26,13 @@ module Chibirigor
     end
   end
 
-  # メソッド定義。本体を型チェックし、def 式の値（メソッド名シンボル）を返す。
+  # Method definition. Type-check the body and return the def expression's value (the method-name symbol).
   def type_of_def(node, scope, diagnostics)
-    method_return_type(node, scope, diagnostics) # 本体を型チェック（診断収集）
+    method_return_type(node, scope, diagnostics) # type-check the body (collect diagnostics)
     Type::Const[node.name]
   end
 
-  # メソッドの戻り型を本体から合成する。仮引数は untyped（本編は引数推論しない）。
+  # Synthesize a method's return type from its body. Params are untyped (the main volume doesn't infer arguments).
   def method_return_type(node, scope, diagnostics)
     body_scope = method_param_names(node).reduce(scope) { |s, name| s.with_local(name, Type::Dynamic.new) }
     type_of_body(node.body, body_scope, diagnostics)
@@ -42,7 +42,7 @@ module Chibirigor
     node.parameters&.requireds&.map(&:name) || []
   end
 
-  # ハッシュリテラル → HashShape（symbol キーのみ覚える）。
+  # Hash literal → HashShape (remembers symbol keys only).
   def type_of_hash(node, scope, diagnostics)
     fields = {}
     node.elements.each do |assoc|
@@ -53,11 +53,11 @@ module Chibirigor
     Type::HashShape[fields.freeze]
   end
 
-  # if / 三項演算子。両枝の型をまとめ、枝ごとに型を絞る（ナローイング）。
+  # if / ternary. Combine both branches' types, narrowing the type per branch.
   def type_of_if(node, scope, diagnostics)
-    type_of(node.predicate, scope, diagnostics) # 条件も型チェック（入れ子のエラー検出）
+    type_of(node.predicate, scope, diagnostics) # type-check the condition too (catch nested errors)
 
-    # 証明可能に到達不能な枝を記録（check(unreachable: true) のときだけ表に出る・既定は無害）。
+    # Record a provably-unreachable branch (surfaces only with check(unreachable: true); harmless by default).
     if Narrowing.unreachable_branch?(scope, node.predicate, true)
       diagnostics << unreachable_diagnostic(node.statements || node, true)
     end
@@ -70,26 +70,26 @@ module Chibirigor
         end
         type_of_body(node.subsequent.statements, Narrowing.narrow(scope, node.predicate, false), diagnostics)
       else
-        Type::Const[nil] # else が無ければ偽のとき nil
+        Type::Const[nil] # no else → nil when false
       end
 
     Type.union([then_type, else_type])
   end
 
-  # 到達不能アーム診断（ADR-47 の縮小版）。:info・kind :unreachable で持つ。
-  # truthy=true の枝は「条件が必ず偽」、false の枝は「条件が必ず真（else が死ぬ）」。
+  # Unreachable-arm diagnostic (a reduced version of ADR-47). Held as :info, kind :unreachable.
+  # A truthy=true branch means "the condition is always false"; a false branch "always true (the else dies)."
   def unreachable_diagnostic(node, truthy)
-    reason = truthy ? "条件が必ず偽になります" : "条件が必ず真になります"
-    diagnostic(node, "この枝には到達しません（#{reason}）").merge(kind: :unreachable, severity: :info)
+    reason = truthy ? "the condition is always false" : "the condition is always true"
+    diagnostic(node, "this branch is unreachable (#{reason})").merge(kind: :unreachable, severity: :info)
   end
 
-  # dump_type(式) の型印字（:info・kind :dump_type）。値素通しなので型エラーではない。
-  # check がフラグなしで常に併載する基本機能（実 Rigor の Rigor::Testing.dump_type に相当）。
+  # Type printout for dump_type(expr) (:info, kind :dump_type). The value passes through, so it isn't a type error.
+  # A basic feature check always co-emits with no flag (corresponds to real Rigor's Rigor::Testing.dump_type).
   def dump_type_diagnostic(node, type)
     diagnostic(node, "dump_type: #{type}").merge(kind: :dump_type, severity: :info)
   end
 
-  # 枝（文の並び）を評価し、最後の文の型を返す。枝の中でもスコープを縫う。
+  # Evaluate a branch (a statement sequence) and return the last statement's type. Threads scope inside branches too.
   def type_of_body(statements_node, scope, diagnostics)
     return Type::Const[nil] if statements_node.nil?
 
@@ -98,11 +98,11 @@ module Chibirigor
     last
   end
 
-  # メソッド送信。レシーバと各引数の型を求め、ディスパッチ表に委ねる。
-  # （Part 1 の `+` 場当たり特別扱いを、Part 2 で手書きの表に一般化した。）
+  # Method send. Find the types of the receiver and each argument, then hand them to the dispatch table.
+  # (Part 1's ad-hoc `+` special case was generalized into a hand-written table in Part 2.)
   def type_of_call(node, scope, diagnostics)
-    # dump_type(式) ― その位置の推論型を :info で印字する基本機能（実 Rigor の
-    # Rigor::Testing.dump_type 相当）。実行時は値をそのまま返すので、型も引数の型を返す。
+    # dump_type(expr) — a basic feature printing the inferred type at that position as :info (corresponds to
+    # real Rigor's Rigor::Testing.dump_type). At run time it returns the value as is, so the type is the argument's type.
     if node.receiver.nil? && node.name == :dump_type && (node.arguments&.arguments || []).size == 1
       t = type_of(node.arguments.arguments.first, scope, diagnostics)
       diagnostics << dump_type_diagnostic(node, t)
@@ -112,20 +112,20 @@ module Chibirigor
     receiver = node.receiver ? type_of(node.receiver, scope, diagnostics) : Type::Dynamic.new
     arg_nodes = node.arguments&.arguments || []
 
-    # ブロック付き反復（generics 5b/5c）：既知の配列なら要素型をブロック仮引数へ押し下げる。
+    # Block iteration (generics 5b/5c): for a known array, push the element type down to the block parameter.
     if node.block.is_a?(Prism::BlockNode)
       blocked = type_of_block(receiver, node.name, node.block, scope, diagnostics)
       return blocked if blocked
     end
 
-    # 構造的な型の添字読み（h[:k] / a[0]）はリテラルのキー/添字だけ特別扱い。
+    # Index read of a structural type (h[:k] / a[0]) — special-case only a literal key/index.
     if node.name == :[] && arg_nodes.size == 1
       indexed = read_index(receiver, arg_nodes.first)
       return indexed if indexed
     end
 
-    # 要素型の読み（generics 5a）：既知の配列／ハッシュから要素型 Elem を読む。
-    # arr.first / arr.last / 非リテラル添字 arr[i] → 要素型、h.values / h.keys → 値・キー型。
+    # Element-type read (generics 5a): read the element type Elem from a known array / hash.
+    # arr.first / arr.last / non-literal index arr[i] → element type; h.values / h.keys → value / key type.
     element = element_read(receiver, node.name, arg_nodes)
     return element if element
 
@@ -133,9 +133,9 @@ module Chibirigor
     Dispatch.dispatch(receiver, node.name, arg_types, node, diagnostics)
   end
 
-  # 要素型の読み（generics 5a）。読めなければ nil（通常ディスパッチに回す）。
-  # Tuple/Array[Elem]/HashShape という*既知の形*からだけ要素型を取り出す。生 Dynamic の
-  # 受信はここで拾わず untyped に倒す（埋まらねば untyped＝誤検知ゼロ）。
+  # Element-type read (generics 5a). nil if not readable (falls through to ordinary dispatch).
+  # Reads the element type only from a *known shape* — Tuple/Array[Elem]/HashShape. A raw Dynamic
+  # receiver isn't picked up here and falls back to untyped (untyped if it can't be filled = zero false positives).
   def element_read(receiver, name, arg_nodes)
     if (elem = element_type_of(receiver))
       case name
@@ -150,9 +150,9 @@ module Chibirigor
     end
   end
 
-  # 配列の要素型 Elem。Tuple は全要素を寄せ集め（リテラル精度は class に丸める）、
-  # Array[Elem] はその型引数。空配列は要素が分からないので untyped（FP 安全）。
-  # 配列でなければ nil（＝「要素を読める形」ではない）。
+  # An array's element type Elem. A Tuple gathers all elements (literal precision rounded to a class);
+  # an Array[Elem] is its type argument. An empty array's element is unknown, so untyped (FP-safe).
+  # If it's not an array, nil (= "not a shape whose elements can be read").
   def element_type_of(receiver)
     case receiver
     when Type::Tuple then Type.union(receiver.elements.map { |t| widen_element(t) })
@@ -164,29 +164,29 @@ module Chibirigor
     Type.union(shape.fields.values.map { |t| widen_element(t) })
   end
 
-  # symbol キーのみ覚える（Part 5）ので、キー型は Symbol。空なら untyped。
+  # We remember symbol keys only (Part 5), so the key type is Symbol. Empty → untyped.
   def hash_key_type(shape)
     shape.fields.empty? ? Type::Dynamic.new : Type::Nominal[:Symbol]
   end
 
-  # 要素型では「この値そのもの（Const）」をクラスに広げる（`[1,2].first` は `1` でなく Integer）。
+  # For element types, widen "this value itself (Const)" to its class (`[1,2].first` is Integer, not `1`).
   def widen_element(type)
     type.is_a?(Type::Const) ? Type::Nominal[Dispatch.class_of(type)] : type
   end
 
-  # 第1仮引数＝要素という関係が確実な反復子だけを扱う（FP 安全）。
-  # each_with_index（|x, i|）や reduce（|acc, x|）は仮引数の意味が違うので含めない。
+  # Handle only iterators where "the first parameter = the element" is certain (FP-safe).
+  # each_with_index (|x, i|) and reduce (|acc, x|) have different parameter meanings, so they aren't included.
   ELEMENT_ITERATORS = %i[map collect each select filter reject find_all].freeze
 
-  # ブロック付き反復の型付け（generics 5b/5c）。既知の配列の要素型 Elem をブロック仮引数へ
-  # 押し下げ、本体を型チェックする。配列でない／未知の反復子なら nil（通常ディスパッチへ）。
-  #   map/collect → Array[本体の型]（5c の戻り多相）／each → レシーバ（self を返す）／
-  #   select/filter/reject/find_all → Array[Elem]（要素型は不変）。
+  # Typing of block iteration (generics 5b/5c). Push a known array's element type Elem down to the block
+  # parameter and type-check the body. If it's not an array / an unknown iterator, nil (to ordinary dispatch).
+  #   map/collect → Array[body's type] (5c return polymorphism) / each → the receiver (returns self) /
+  #   select/filter/reject/find_all → Array[Elem] (element type unchanged).
   def type_of_block(receiver, name, block, scope, diagnostics)
     return nil unless ELEMENT_ITERATORS.include?(name)
 
     elem = element_type_of(receiver)
-    return nil if elem.nil? # 既知の配列でなければ手を出さない（untyped に倒す＝FP なし）
+    return nil if elem.nil? # don't touch it unless it's a known array (fall back to untyped = no FP)
 
     body_type = type_of_body(block.body, bind_block_params(block, elem, scope), diagnostics)
 
@@ -197,7 +197,7 @@ module Chibirigor
     end
   end
 
-  # ブロック仮引数を束縛したスコープを返す。第1仮引数＝要素型 Elem、以降は安全側で untyped。
+  # Return a scope with the block parameters bound. First parameter = element type Elem; the rest are untyped (safe side).
   def bind_block_params(block, elem, scope)
     block_param_names(block).each_with_index.reduce(scope) do |s, (name, index)|
       s.with_local(name, index.zero? ? elem : Type::Dynamic.new)
@@ -208,10 +208,10 @@ module Chibirigor
     block.parameters&.parameters&.requireds&.map(&:name) || []
   end
 
-  # 構造的な型からの読み出し。読めなければ nil（通常ディスパッチに回す）。
+  # Reading out of a structural type. nil if not readable (falls through to ordinary dispatch).
   def read_index(receiver, arg_node)
     if receiver.is_a?(Type::HashShape) && arg_node.is_a?(Prism::SymbolNode)
-      # 未知キーは nil（実 Ruby が nil を返すから。エラーにしない）
+      # unknown key is nil (because real Ruby returns nil. don't error)
       return receiver.fields.fetch(arg_node.unescaped.to_sym, Type::Const[nil])
     end
     if receiver.is_a?(Type::Tuple) && arg_node.is_a?(Prism::IntegerNode)
@@ -221,17 +221,17 @@ module Chibirigor
     nil
   end
 
-  # ⇐ subsumption（照合モード）: expected 型に actual を照合する。
-  # :no のときだけ診断を出す。untyped が絡んだら黙る（gradual の約束）。
-  # `⇐` が診断を出す最初の口。呼び出し引数照合（dispatch）も同じ原則で動いている。
+  # ⇐ subsumption (checking mode): check actual against the expected type.
+  # Emit a diagnostic only on :no. Stay quiet if untyped is involved (gradual's promise).
+  # The first mouth where `⇐` emits a diagnostic. The call-argument check (dispatch) runs on the same principle.
   def check_against(node, expected, actual, diagnostics)
     return if expected.is_a?(Type::Dynamic) || actual.is_a?(Type::Dynamic)
     return unless Accepts.call(expected, actual) == :no
 
-    diagnostics << diagnostic(node, "戻り型 #{expected} が宣言されていますが #{actual} を返します")
+    diagnostics << diagnostic(node, "return type #{expected} is declared but #{actual} is returned")
   end
 
-  # 診断は「どこの・何が問題か」。位置（行・列・長さ）はキャレット表示に使う。
+  # A diagnostic is "which line, what's wrong." The position (line, column, length) is used for the caret display.
   def diagnostic(node, message)
     location = node.location
     {

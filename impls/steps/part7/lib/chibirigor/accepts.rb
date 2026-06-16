@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # 受理判定：「expected の所に actual を渡して合うか」を三値で答える。
-  # :yes（確実に合う）/ :no（確実に合わない）/ :maybe（わからない）。
+  # Acceptance check: answers "does passing actual where expected is wanted fit?" with three values.
+  # :yes (definitely fits) / :no (definitely doesn't) / :maybe (unknown).
   module Accepts
     module_function
 

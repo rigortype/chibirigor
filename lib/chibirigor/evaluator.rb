@@ -5,8 +5,8 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 文を 1 つ評価し、[その文の型, 更新後のスコープ] を返す。
-  # スコープを増やすのは代入だけ。それ以外はスコープを変えない。
+  # Evaluate one statement and return [the statement's type, the updated scope].
+  # Only assignments grow the scope; everything else leaves it unchanged.
   def eval_statement(node, scope, diagnostics)
     case node
     when Prism::LocalVariableWriteNode

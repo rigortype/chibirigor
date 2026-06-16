@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # メソッド送信の型付け。RBS 由来の表＋定数畳み込み＋プラグイン拡張。
-  # Part 7 でこの表を手書きから RBS 由来（Rbs.load）に差し替えた。
+  # Method-send typing. An RBS-derived table plus constant folding plus a plugin extension.
+  # In Part 7 this table was swapped from hand-written to RBS-derived (Rbs.load).
   module Dispatch
     METHODS = Rbs.load(Rbs::CORE)
 
@@ -52,7 +52,7 @@ module Chibirigor
 
       if arg_types.size != signature[:params].size
         diagnostics << Chibirigor.diagnostic(
-          node, "#{name} の引数の数が違います（#{signature[:params].size} 個必要、#{arg_types.size} 個渡された）"
+          node, "wrong number of arguments for #{name} (#{signature[:params].size} expected, #{arg_types.size} given)"
         )
         return signature[:returns]
       end
@@ -60,7 +60,7 @@ module Chibirigor
       signature[:params].zip(arg_types).each do |param, arg|
         next unless Accepts.call(param, arg) == :no
 
-        diagnostics << Chibirigor.diagnostic(node, "#{param} が必要ですが #{arg} が渡されました")
+        diagnostics << Chibirigor.diagnostic(node, "expected #{param} but got #{arg}")
       end
 
       foldable_result(receiver_type, name, arg_types) || signature[:returns]

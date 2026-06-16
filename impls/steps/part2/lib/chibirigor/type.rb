@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # 2-0 で型キャリアを `Type::` 名前空間にまとめ直す（Part 1 の素朴な定義を置換）。
+  # 2-0 regroups the type carriers under the `Type::` namespace (replacing Part 1's naive definitions).
   module Type
     Const   = Data.define(:value) { def to_s = value.inspect }
     Nominal = Data.define(:name)  { def to_s = name.to_s }

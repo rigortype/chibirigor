@@ -6,14 +6,14 @@ module Chibirigor
     Nominal = Data.define(:name)  { def to_s = name.to_s }
     Dynamic = Data.define         { def to_s = 'untyped' }
 
-    # 型が一本に決まらないとき。例: Integer | String
+    # When the type doesn't collapse to one. e.g. Integer | String
     Union = Data.define(:members) do
       def to_s = members.map(&:to_s).join(' | ')
     end
 
     module_function
 
-    # 型の配列を 1 つの型にまとめる。入れ子の Union をならし、重複を消す。
+    # Fold an array of types into one. Flatten nested Unions and drop duplicates.
     def union(types)
       flat = types.flat_map { |t| t.is_a?(Union) ? t.members : [t] }.uniq
       return Dynamic.new if flat.empty?

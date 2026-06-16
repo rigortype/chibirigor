@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Chibirigor
-  # 極小プラグインフック。Dispatch::METHODS を編集せず、外から型情報を足す一点拡張。
+  # A tiny plugin hook. A single extension point for adding type info from outside, without editing Dispatch::METHODS.
   module Plugin
     @registry = {}
 

@@ -5,7 +5,7 @@ require 'prism'
 module Chibirigor
   module_function
 
-  # 各トップレベル文の推論結果を { line:, type: } の配列で返す。
+  # Return each top-level statement's inferred result as an array of { line:, type: }.
   def annotate(source)
     program = Prism.parse(source).value
     scope = Scope.new
