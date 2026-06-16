@@ -1,7 +1,7 @@
 # The Seasoned chibirigor — runnable design sketches
 
 The Seasoned volume's core algorithms, made into **minimal Ruby that runs standalone.** In the same
-manner the Little volume "verified its code by actually running it," the Seasoned volume's claims are
+way the Little volume "verified its code by actually running it," the Seasoned volume's claims are
 backed up in a form that *runs and goes green.* Zero dependencies, Ruby 3.4+ (no test framework,
 either). Each file has a self-check at the end; if `PASS` lines up with `ruby <file>`, it succeeded.
 
@@ -21,7 +21,7 @@ $ ruby subst.rb
 
 > These are *educational design sketches*, not real Rigor's code (both the type representation and the
 > judgment are minimal). Even so, you can confirm that the mechanisms the Seasoned volume explained in
-> words — contravariance, coinduction, capture-avoidance — actually run in your hands and return the
+> words — contravariance, coinduction, capture-avoidance — actually run on your machine and return the
 > right answer.
 
 ## Drift prevention — mechanically sync the prose code and the examples

@@ -102,7 +102,7 @@ end
 "plugins take priority, the core stays unchanged" holds.
 
 **Zero-FP guarantee.** A method not in `Plugin.registry` is left to `METHODS` as before. If not in
-`METHODS` either, it topples to `Dynamic` (untyped) — the Little volume's promise "quietly untyped if
+`METHODS` either, it falls back to `Dynamic` (untyped) — the Little volume's promise "quietly untyped if
 you don't know" is kept here too.
 
 **Contrast with real Rigor.** chibirigor's "single-point registry" corresponds to the skeleton of Rigor

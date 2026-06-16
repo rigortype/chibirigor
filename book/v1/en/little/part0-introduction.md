@@ -148,7 +148,7 @@ And now, before anything else, let's put the core principle that runs through th
 into words — no jargon needed:
 
 > **A diagnostic (a type error) only ever appears where an expected type is fixed.** And once
-> "don't know" (`untyped`) is involved, it never gets angry. So — code whose type is unknown
+> "don't know" (`untyped`) is involved, it never complains. So — code whose type is unknown
 > but that nonetheless works is never blamed.
 
 This is the true form of Rigor's motto **"never frighten working code."** chibirigor, too,

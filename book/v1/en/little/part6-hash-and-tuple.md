@@ -116,12 +116,12 @@ called **width subtyping** (『しくみ』, too, adopts this width subtyping in
 properties).
 
 Rigor, too, makes `HashShape` **a fit.** What differs is the *motive and scope*. It's not handling
-statically-written records for soundness; the counterpart is **Ruby's option hashes**, and the
+statically-written records for soundness; the counterpart is **Ruby's options hashes**, and the
 aim is **not producing false positives**:
 
-- In Ruby, "build a big option hash, and each method picks just the keys it needs" is **the
+- In Ruby, "build a big options hash, and each method picks just the keys it needs" is **the
   standard move.**
-- If you got angry every time there was an extra key, **properly working code would go bright
+- If you balked every time there was an extra key, **properly working code would go bright
   red.**
 
 So Rigor's HashShape, seen from the expecting side, is **"as long as it has *at least* these

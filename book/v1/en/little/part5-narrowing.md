@@ -260,7 +260,7 @@ This chapter's three voices:
 ---
 
 **Next chapter (Part 6):** we give types to hash and array literals (`HashShape` / `Tuple`). In
-Ruby, awash in "symbol-keyed option hashes," we step into the story of how *requiring types by
+Ruby, awash in "symbol-keyed options hashes," we step into the story of how *requiring types by
 exact match becomes a storm of false positives*.
 
 ---

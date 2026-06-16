@@ -11,7 +11,7 @@ sidebar:
 > "build it" one** — we give proper names to the mechanism we built *unconsciously* in the Little
 > volume, and read the back of it in formal language. This chapter writes almost no new code. It's
 > an overview (a map) revealing what the things we already wrote actually were — though at the end
-> we peek, in just one place, at the mouth through which checking `⇐` emits a diagnostic.
+> we peek, in just one place, at the point where checking `⇐` emits a diagnostic.
 
 In the Little volume (The Little chibirigor), we built two functions as the heart of the
 inferencer:
@@ -63,7 +63,7 @@ two arrows of opposite direction:
 ## 1-2. Writing the rules formally
 
 In the Seasoned volume we don't fear notation. A typing rule writes the "premises" above a
-horizontal line and the "conclusion" below. There are two judgements:
+horizontal line and the "conclusion" below. There are two judgments:
 
 - Synthesis: `Γ ⊢ e ⇒ T` (under environment Γ, synthesizing the type of expression e gives T)
 - Checking: `Γ ⊢ e ⇐ T` (under environment Γ, expression e checks against expected type T)
@@ -82,7 +82,7 @@ for a variable reference:
 
 "If `x : T` is in Γ, then `x`'s type is synthesized as `T`." The Little volume's
 `scope.local(node.name) || Dynamic` is exactly this rule (with a chibirigor-style footnote: if it
-isn't there, topple to `untyped`).
+isn't there, fall back to `untyped`).
 
 And the most important rule, tying the two directions together — **subsumption**:
 
@@ -123,7 +123,7 @@ reasons, both corresponding to the Little volume's Part 9 "deliberately miss":
    a diagnostic.
 
 To sum up — working code goes unfrightened not because "there's no `⇐` position" but because
-**"synthesis topples the unknown to `untyped`, and checking doesn't punish `untyped`."** It's a
+**"synthesis collapses the unknown to `untyped`, and checking doesn't punish `untyped`."** It's a
 property statable only by laying chibirigor's two gradual design judgments (① totalizing synthesis,
 ② lenient checking) onto the bidirectional framework. Seasoned Part 7's "deliberately let go of
 soundness" catches these same two points in the language of progress/preservation — we recover, late
@@ -143,7 +143,7 @@ bidirectionally, this is *the direction itself*:
 
 The robustness principle Rigor upholds (Postel's law: "strict in what you return, liberal in what
 you accept") overlaps the two directions of bidirectional typing exactly, on one sheet. In the
-Little volume it appeared as a manner; in the Seasoned volume, as theory.
+Little volume it appeared as a practice; in the Seasoned volume, as theory.
 
 ---
 
@@ -182,7 +182,7 @@ With the map of bidirectionality in hand, the rest of the Seasoned chapters are 
 - **Part 4 Recursive types: μ and coinduction:** how `⇒`/`⇐` handle a type that references itself
   (μ-types / coinduction ↔ Rigor's HKT). Adjacent to Part 3, tying up the mutual reference of
   α-equivalence.
-- **Part 5 Real type inference:** fill in what the Little volume toppled to `untyped` with `⇒` —
+- **Part 5 Real type inference:** fill in what the Little volume fell back to `untyped` with `⇒` —
   *arguments* in particular — from how they're used in the body. Widening `⇒`'s coverage (the
   frontier of 『しくみ』 ch. 9's exercises). The TypeProf comparison is consolidated here too.
 - **Part 6 The complete FactStore:** extend the environment Γ into a flow-sensitive set of facts.
@@ -207,13 +207,13 @@ We wrote almost no new code. Instead we gave names to what we built in the Littl
 
 ---
 
-### 1-7-a A note — the first mouth where `⇐` emits a diagnostic (`check(rbs:)` mode)
+### 1-7-a A note — the first point where `⇐` emits a diagnostic (`check(rbs:)` mode)
 
 In §1-3 we said "a diagnostic only appears in checking (`⇐`)." The `check` up to the Little volume
 used checking only in "`dispatch`'s argument check." Add to it a `check(source, rbs:)` mode that
 **checks the body against a declared return type**, and a scene arises where `⇐` works outside the
 "caller side" too. The only code we peek at this chapter is this one — a small window for seeing
-where checking `⇐` opens a mouth for diagnostics.
+where checking `⇐` first raises a diagnostic.
 
 ```ruby
 rbs = <<~RBS
@@ -247,7 +247,7 @@ def check_against(node, expected, actual, diagnostics)
 end
 ```
 
-This is the minimal mouth that makes `⇐` work outside "arguments." Recall §1-4's robustness
+This is the minimal point at which `⇐` does work outside "arguments." Recall §1-4's robustness
 principle — "**the return type strictly** (checked with `⇐`)" appears in the implementation for the
 first time here. It pairs with the Little volume's `dispatch` "checking arguments with `⇐`."
 

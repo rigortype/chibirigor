@@ -305,8 +305,8 @@ Two points:
 And here's the payoff back into the main line — in the actual `chibirigor`, this folding lives
 not as a special case of `+` but on the method **table** side (this chapter's `Dispatch`). So it
 works for any operation the table looks up, and if a variable *carries a known `Const`*, as in
-`x = 1; 1 + x`, that folds to `2` too. The reason `1 + 2` shows up as `3` in your hands with
-`exe/chibirigor` is that the folding lives on the Dispatch side.
+`x = 1; 1 + x`, that folds to `2` too. The reason `1 + 2` shows up as `3` when you run
+`exe/chibirigor` yourself is that the folding lives on the Dispatch side.
 
 ---
 

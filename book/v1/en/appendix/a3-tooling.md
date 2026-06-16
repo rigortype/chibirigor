@@ -74,7 +74,7 @@ that makes that silence itself visible.**
 
 The table above marks this book as "making silence visible = no mechanism," but we added a **tiny
 version** here too. Add `check --explain` and it also emits, as `:info` diagnostics, the sites where
-inference toppled to `untyped` (the dispatch of an unknown method):
+inference fell back to `untyped` (the dispatch of an unknown method):
 
 ```console
 $ printf 'x = mystery_call\ny = x + 2\n' > demo.rb
@@ -88,7 +88,7 @@ demo.rb:2:5: info: fell to untyped here (can't look up the type of `+`)
 ```
 
 What to notice is **line 2.** `mystery_call`'s type is unknown so `x` becomes `untyped`, and the
-`+` against that `x` can't look up a type either and topples to `untyped` — the **silence
+`+` against that `x` can't look up a type either and falls back to `untyped` — the **silence
 propagating** shows up on the map. Without `--explain` it just stays quiet with `No type errors`
 (since it produces no false positives). `:info` doesn't soil the exit code (`exit 0`), so you can
 peek at "where the type vanished" without stopping CI.

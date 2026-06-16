@@ -28,7 +28,7 @@ questions with your own hands:
 - What does **"never frighten working code"** actually mean as a design stance?
 
 When you're done, you'll have a small, working type checker with two commands — `check` (type
-diagnostics) and `annotate` (show the inferred types) — and a running start on reading real
+diagnostics) and `annotate` (show the inferred types) — and a head start on reading real
 Rigor's source.
 
 ## Who this is for, and what's assumed

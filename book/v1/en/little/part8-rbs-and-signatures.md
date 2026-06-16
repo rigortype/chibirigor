@@ -270,7 +270,7 @@ feature) — the `untyped` in a generated RBS points to "where a human should ad
 > Leaving `def double(n)`'s argument `n` as `untyped` here is a **design judgment.** Ruby's
 > bundled TypeProf would find **where `double` is called**, as in `double(3)`, work `n` backward
 > to `Integer`, and fill in `(Integer) -> Integer`. chibirigor (and Rigor) deliberately don't —
-> instead of tracing every caller, they look at each method locally and topple an unknown argument
+> instead of tracing every caller, they look at each method locally and default an unknown argument
 > to `untyped` (it scales better, and produces no false positives). **The "real inference" that
 > guesses arguments from how they're used is taken on head-on in Seasoned Part 5.**
 

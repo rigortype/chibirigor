@@ -153,19 +153,19 @@ x = cond ? 1 : "a" ; x + 1      # 2: 2 | String (fold the Integer side; the Stri
 
 This behavior is continuous with the zero-false-positive principle. What to do when **the
 distribution splits** — for `x = cond ? 1 : "a"`, the `x + 1` passes for `1 + 1` and is a type
-error for `"a" + 1`. But at run time, if `x` fell to the `Integer` side, it works. So we **get
-angry only when all members fail, and stay quiet about a partial failure** (`:maybe`). Only an
+error for `"a" + 1`. But at run time, if `x` fell to the `Integer` side, it works. So we **complain
+only when all members fail, and stay quiet about a partial failure** (`:maybe`). Only an
 expression that fails for *either* of `(1 | 2)`, like `x + "a"`, becomes a single diagnostic.
 **If there's an unknown member**, we're more conservative still: for `x = cond ? 1 : nil`, the
-`x + 1` topples the whole Union to `untyped` the moment `nil.+` isn't in the table (lose track of
+`x + 1` collapses the whole Union to `untyped` the moment `nil.+` isn't in the table (lose track of
 even one type, and we don't assert precision for the whole).
 
 The real behavior's spec-cum-samples is **`test/test_union_dispatch.rb`** (covering receiver
-distribution, the argument product, getting angry only when all members fail, `untyped` on an
+distribution, the argument product, complaining only when all members fail, `untyped` on an
 unknown member, and rounding to a class on the member-count budget). Read it as the *sequel* to
 4-1's `annotate` output (`rand < 0.5 ? 1 : "a"` → `1 | "a"`): send a method to that `x` and
-distribution happens. The reason `(1 | 2) + 1` shows up as `2 | 3` in your hands with
-`exe/chibirigor` (the chapter's minimal version would say `untyped`) is that this distribution
+distribution happens. The reason `(1 | 2) + 1` shows up as `2 | 3` when you run
+`exe/chibirigor` yourself (the chapter's minimal version would say `untyped`) is that this distribution
 lives on the Dispatch side.
 
 > **In real Rigor**, a `Union` receiver is specified as "dispatch each member individually; if

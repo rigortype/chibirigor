@@ -106,7 +106,7 @@ But we're dealing with *real Ruby*. Unknown things will certainly turn up. When 
 don't error — we return `Dynamic` (untyped)** — that's Rigor's stance, right at the entrance.
 
 > **A principle to remember:** `type_of` *never fails.* If it can't tell the type, it just
-> returns `Dynamic`. So "getting angry because code has no type" simply can't happen in the
+> returns `Dynamic`. So "complaining because code has no type" simply can't happen in the
 > first place.
 
 ### What happens with `1 + 2`?
@@ -254,7 +254,7 @@ real Rigor's `sig-gen` idea).
 > The code so far only *rounds* `1 + 2` to `Integer`. But `1` and `2` are both known values, so
 > there's actually room to **actually add them and fold to `3`.** This "fold it if you can"
 > constant folding is treated in Part 2's note (it's why `exe/chibirigor` shows `3` for `1 + 2`
-> in your hands).
+> when you run it yourself).
 
 ---
 

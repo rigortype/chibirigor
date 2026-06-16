@@ -95,7 +95,7 @@ is this:
 
 On the preservation side (the type is kept under evaluation), chibirigor doesn't *strongly assert* it
 to begin with — when things get doubtful it widens to `untyped`, so preservation is trivially kept in
-the sense of consistency (`~`) (when types stop fitting, just topple to `untyped`). **What it lets go
+the sense of consistency (`~`) (when types stop fitting, just fall back to `untyped`). **What it lets go
 of is mainly progress** — that's the true form of these four places.
 
 Formally: **chibirigor gives up soundness — progress in particular — in a limited way, in exchange for
@@ -149,7 +149,7 @@ relation between annotation amount and behavior*:
 > **Adding or removing** annotations, the program's meaning (passes / doesn't, behavior) changes
 > *continuously.* Reducing type annotations just makes checking looser; it doesn't suddenly break.
 
-chibirigor's design of "topple to `untyped`" and "make no checking position where there's no
+chibirigor's design of "fall back to `untyped`" and "make no checking position where there's no
 annotation" is a naive expression of this gradual guarantee. Adding one annotation doesn't suddenly
 turn an unrelated spot bright red — this is the second meaning of **soundness is let go, but it isn't
 anarchic.**
@@ -208,7 +208,7 @@ it correctly** (subtyping as the greatest fixed point, TAPL ch. 21).
 Rigor doesn't implement recursive types directly with μ + coinduction; it makes a lightweight HKT
 (`Type::App`) + a **fuel budget** the alternative (a point sent from Seasoned Part 4 §4-5). It consumes
 a counter each time it unfolds a higher-order type, cutting off at the ceiling (default 64 steps). This
-is a solution that **stops when it gets dangerous** — when fuel runs out it topples the result to
+is a solution that **stops when it gets dangerous** — when fuel runs out it drops the result to
 `:maybe` and escapes to `untyped`, landing on the safe side.
 
 | Way to stop | Character | Where |
@@ -227,7 +227,7 @@ The *beauty of theory* "a type system guarantees normalization" is replaced, in 
 by the *engineering* of "**cut off the analysis with a budget.**" Coinduction (stop correctly) → fuel →
 budget (stop when dangerous) is the same answer, at varying scales, to the same question of "how to stop
 the unfolding." That a practical checker can choose "stop when dangerous" was because of gradual's
-settling: "topple to `untyped` when you can't tell."
+settling: "fall back to `untyped` when you can't tell."
 
 ---
 

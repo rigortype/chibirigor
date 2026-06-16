@@ -1,6 +1,6 @@
 ---
 title: Part 5 — Real type inference: filling in arguments
-description: "Treat the constraint-based inference that derives the argument types the Little volume toppled to `untyped`, from how they're used in the body."
+description: "Treat the constraint-based inference that derives the argument types the Little volume fell back to `untyped`, from how they're used in the body."
 sidebar:
   order: 15
 ---
@@ -8,15 +8,15 @@ sidebar:
 # The Seasoned chibirigor Part 5 — Real type inference: filling in arguments
 
 > References (optional): TAPL ch. 22 "Type reconstruction" / 『しくみ』 ch. 9 exercises, afterword.
-> This chapter derives the *argument* types the Little volume toppled to `untyped`, from how they're
+> This chapter derives the *argument* types the Little volume fell back to `untyped`, from how they're
 > used in the body — the frontier of inference, where 『しくみ』 gave up the answer as "we don't know
 > the solution."
 
 In Part 4 we treated recursive types, where a type references *itself*. From here we change
-direction and go to fill in the arguments we *toppled to untyped* in the Little volume.
+direction and go to fill in the arguments we *fell back to untyped* in the Little volume.
 
 In Little Part 8, a method's **return type** could be synthesized from the body
-(`def shout; "hi".upcase; end` → `() -> String`). But the **argument** stayed toppled to `untyped` —
+(`def shout; "hi".upcase; end` → `() -> String`). But the **argument** stayed `untyped` —
 `def double(n); n * 2; end` was `(untyped) -> untyped`.
 
 This chapter goes to fill in that `untyped`. This is the biggest mountain we *deliberately avoided*
@@ -295,7 +295,7 @@ A/B's §5-4).
 
 Zero false positives stays invariant too: an empty array `[].map { ... }` has `untyped` elements so
 the body is `untyped` too, and an unknown receiver `foo.map { ... }` "doesn't presume it's an array,"
-so it doesn't check the body and topples to `untyped`.
+so it doesn't check the body and falls back to `untyped`.
 
 ## 5-7. Summary
 

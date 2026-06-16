@@ -45,7 +45,7 @@ before" — Scope is that *mental note* turned into data a program can hold. A t
 a person, needs a note it can consult when it sees a variable: "what was this again?"
 
 The point is that it's **immutable.** `with_local` *doesn't change* the original Scope; it
-returns a new Scope with a binding added. The same manner in which 『しくみ』 copied
+returns a new Scope with a binding added. The same way 『しくみ』 copied
 `{ ...tyEnv, x: type }` without destroying `tyEnv` — we just gave it object form.
 
 Why go to the trouble of making it *immutable*? Rewriting an ordinary `Hash` with
@@ -81,7 +81,7 @@ and arguments' types, too). If unbound, it's `Dynamic` (don't frighten it).
 > A small Ruby subtlety: **a bare name with no assignment (`y`) is a method call (`self.y`), not
 > a variable.** So "you used `y` before assigning it" is not a reference to an unbound variable
 > but a call to an *unknown method*, which flows into Part 2's dispatch and quietly degrades to
-> `Dynamic`. It doesn't get angry.
+> `Dynamic`. It doesn't complain.
 
 ---
 

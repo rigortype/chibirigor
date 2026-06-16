@@ -31,7 +31,7 @@ for an expression it can't tell (we decided so in Part 1). So:
 
 > An `untyped` arrived where an `Integer` is wanted. — Does it fit?
 
-Answer `true` and you might miss a real bug. Answer `false` and you might **get angry at code
+Answer `true` and you might miss a real bug. Answer `false` and you might **flag code
 that works fine.** Both are lies. The true answer is **"don't know (maybe)."**
 
 So `accepts`'s answer is three-way: `:yes` / `:no` / `:maybe`.
@@ -156,7 +156,7 @@ are all `Integer` it's `:yes` = stay quiet (no false positive). If a `String` mi
   conclusion = union-subtyping).
 - **② In Ruby:** `c ? 1 : 2` is `Integer | Integer`, so no problem. `c ? 1 : "a"` becomes a Union,
   and passing it to an expression expecting `Integer` is `:no`.
-- **③ In Rigor:** even checking against a Union, "if unknown, `:maybe`." We can only get angry when
+- **③ In Rigor:** even checking against a Union, "if unknown, `:maybe`." We can only complain when
   everyone is `:yes`.
 
 ![Figure 7-1 — accepts's three-valued verdict: untyped is :maybe, a Union the weakest answer](../figures/svg/little-7-1.svg)
@@ -193,7 +193,7 @@ def check_call(recv_type, name, arg_types, diagnostics)
 end
 ```
 
-As you can see, **we get angry only on `:no`.** `:yes` of course, but **on `:maybe` too, we stay
+As you can see, **we complain only on `:no`.** `:yes` of course, but **on `:maybe` too, we stay
 quiet.**
 
 ```ruby
@@ -211,7 +211,7 @@ Here we set down the single most important sentence in this book. No jargon need
 
 > **An error only appears where the wanted type is fixed. And once untyped mixes in it's
 > `:maybe`, and `:maybe` is not punished. So — code whose type is unknown but that nonetheless
-> works is never gotten angry at.**
+> works is never flagged.**
 
 『しくみ』 ch. 7 had a column with a very similar concern: "a sound type system *rejecting good
 programs* is a false positive." 『しくみ』 worked in the direction of *reducing* false positives.
@@ -232,11 +232,11 @@ One last small observation. Right now we,
   `Integer`).
 
 This asymmetry — **"strict and precise about what you return, lenient and liberal about what you
-accept"** — isn't an accident; it's a manner Rigor deliberately keeps. Make acceptance strict and
+accept"** — isn't an accident; it's a discipline Rigor deliberately keeps. Make acceptance strict and
 the caller is forced to write needless type conversions and gets cramped. Make the return lenient
 and whoever uses that value loses out. So we invert them.[^postel]
 
-[^postel]: This manner of "strict in returns, liberal in arguments" has a name too, but you needn't
+[^postel]: This practice of "strict in returns, liberal in arguments" has a name too, but you needn't
     memorize it. Why this asymmetry is correct — arriving at the same rule from separate starting
     points in type theory and in object-oriented substitutability — we confirm head-on in Seasoned
     Part 2.
@@ -246,7 +246,7 @@ and whoever uses that value loses out. So we invert them.[^postel]
 ## 7-6. This chapter's summary
 
 What we added is the function `accepts` (returning `:yes` / `:no` / `:maybe`), and the mechanism
-where `check` uses it to **get angry only on `:no`.** The code is just `accepts`'s body of 4 lines
+where `check` uses it to **complain only on `:no`.** The code is just `accepts`'s body of 4 lines
 + a few extra lines for Union + swapping out `check`. No new type carrier was added.
 
 This chapter's three voices:
