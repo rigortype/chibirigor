@@ -3,8 +3,8 @@ use ruby_prism::{CallNode, Node};
 use crate::scope::Scope;
 use crate::type_::{class_of, Type, Value};
 
-/// 条件分岐の枝ごとに変数の型を絞る。
-/// 絞れない条件はスコープをそのまま返す（脅かさない）。
+/// Narrow a variable's type per branch of a conditional.
+/// For conditions we can't narrow, return the scope unchanged (don't scare the user).
 pub fn narrow<'pr>(scope: &Scope, cond: Node<'pr>, truthy: bool) -> Scope {
     let Some(call) = cond.as_call_node() else { return scope.clone() };
     let Some(recv) = call.receiver() else { return scope.clone() };
@@ -21,7 +21,7 @@ pub fn narrow<'pr>(scope: &Scope, cond: Node<'pr>, truthy: bool) -> Scope {
     }
 }
 
-/// 絞れたら新しい型を、絞れなければ None を返す。
+/// Return the new type if we can narrow, or None otherwise.
 fn narrow_type<'pr>(current: &Type, method: &str, call: &CallNode<'pr>, truthy: bool) -> Option<Type> {
     match method {
         "nil?" => {
@@ -33,7 +33,7 @@ fn narrow_type<'pr>(current: &Type, method: &str, call: &CallNode<'pr>, truthy: 
         }
         "is_a?" | "kind_of?" | "instance_of?" => {
             let klass = class_argument(call)?;
-            // 真の枝だけ絞る。そのクラスが current に含まれるときだけ。
+            // Narrow only the truthy branch, and only when that class is part of current.
             if truthy && possible(current, &klass) {
                 Some(Type::Nominal(klass))
             } else {
@@ -44,7 +44,7 @@ fn narrow_type<'pr>(current: &Type, method: &str, call: &CallNode<'pr>, truthy: 
     }
 }
 
-/// current 型で klass があり得るか。
+/// Whether klass is possible for the current type.
 fn possible(current: &Type, klass: &str) -> bool {
     if matches!(current, Type::Dynamic) {
         return false;
@@ -57,7 +57,7 @@ fn possible(current: &Type, klass: &str) -> bool {
     members.iter().any(|m| class_of(m) == Some(klass))
 }
 
-/// Union から NilClass を除く。
+/// Remove NilClass from a Union.
 fn remove_nil(ty: &Type) -> Option<Type> {
     if let Type::Union(members) = ty {
         let filtered: Vec<Type> = members
@@ -66,7 +66,7 @@ fn remove_nil(ty: &Type) -> Option<Type> {
             .cloned()
             .collect();
         if filtered.len() == members.len() {
-            None // 変わらない
+            None // unchanged
         } else {
             Some(crate::type_::union(filtered))
         }
@@ -75,7 +75,7 @@ fn remove_nil(ty: &Type) -> Option<Type> {
     }
 }
 
-/// `is_a?(ClassName)` の引数からクラス名を取り出す。
+/// Extract the class name from the argument of `is_a?(ClassName)`.
 fn class_argument<'pr>(call: &CallNode<'pr>) -> Option<String> {
     let arg = call
         .arguments()?

@@ -3,8 +3,8 @@ use crate::diagnostic::Diagnostic;
 use crate::scope::Scope;
 use crate::type_of::{eval_statement, line_of, method_return_type};
 
-/// Ruby ソースを型チェックし、診断の Vec を返す。
-/// baseline を渡すと「行＋メッセージ」で差し引いた新規診断だけ返す。
+/// Type-check Ruby source and return a Vec of diagnostics.
+/// If a baseline is given, return only the new diagnostics after subtracting by "line + message".
 pub fn check(source: &[u8], baseline: &[Diagnostic]) -> Vec<Diagnostic> {
     let result = ruby_prism::parse(source);
     let mut diagnostics = Vec::new();
@@ -17,13 +17,13 @@ pub fn check(source: &[u8], baseline: &[Diagnostic]) -> Vec<Diagnostic> {
         scope = new_scope;
     }
 
-    // 戻り型照合（opt-in）: rbs パラメータが渡されたときの相当処理は
-    // Rust 版では check_with_rbs を別関数として提供する。
+    // Return-type checking (opt-in): in the Rust version the equivalent handling for when an
+    // rbs parameter is passed is provided as a separate function, check_with_rbs.
 
     subtract_baseline(diagnostics, baseline)
 }
 
-/// RBS シグネチャ文字列を渡すと戻り型照合も行う。
+/// When an RBS signature string is passed, also perform return-type checking.
 pub fn check_with_rbs(source: &[u8], rbs_source: &str, baseline: &[Diagnostic]) -> Vec<Diagnostic> {
     use crate::rbs;
     use ruby_prism::parse;
@@ -39,14 +39,14 @@ pub fn check_with_rbs(source: &[u8], rbs_source: &str, baseline: &[Diagnostic]) 
         scope = new_scope;
     }
 
-    // 戻り型照合
+    // Return-type checking
     let user_sigs = rbs::load(rbs_source);
     for stmt in program_node.statements().body().iter() {
         let Some(def_node) = stmt.as_def_node() else { continue };
         let method_name = String::from_utf8_lossy(def_node.name().as_slice()).into_owned();
         let line = line_of(source, stmt.location().start_offset());
 
-        // クラス無し（トップレベル）は "Object" として照合
+        // No class (top level) is matched as "Object"
         let sig = user_sigs.get(&("Object".to_string(), method_name.clone()))
             .or_else(|| user_sigs.iter().find(|((_, m), _)| m == &method_name).map(|(_, s)| s));
 
@@ -58,7 +58,7 @@ pub fn check_with_rbs(source: &[u8], rbs_source: &str, baseline: &[Diagnostic]) 
             diagnostics.push(Diagnostic {
                 line,
                 message: format!(
-                    "戻り型 {} が宣言されていますが {} を返します",
+                    "return type {} is declared but {} is returned",
                     sig.returns, body_ty
                 ),
             });

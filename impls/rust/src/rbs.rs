@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use crate::type_::{Type, Value};
 
-/// メソッドシグネチャ。
+/// A method signature.
 #[derive(Debug, Clone)]
 pub struct Signature {
     pub params: Vec<Type>,
     pub returns: Type,
 }
 
-/// コア型のシグネチャ（Ruby 版の Rbs::CORE と同内容）。
+/// Signatures of the core types (same content as Rbs::CORE in the Ruby version).
 pub const CORE: &str = "
 class Integer
   def +: (Integer) -> Integer
@@ -25,8 +25,8 @@ class String
 end
 ";
 
-/// RBS テキストを `(class, method) → Signature` の表にする。
-/// Ruby 版 `Rbs.load` の直接移植。
+/// Turn RBS text into a `(class, method) → Signature` table.
+/// A direct port of the Ruby version's `Rbs.load`.
 pub fn load(source: &str) -> HashMap<(String, String), Signature> {
     let mut table = HashMap::new();
     let mut current: Option<String> = None;
@@ -45,12 +45,12 @@ pub fn load(source: &str) -> HashMap<(String, String), Signature> {
     table
 }
 
-/// `def name: (T, ...) -> R` を解析して `(method_name, Signature)` を返す。
+/// Parse `def name: (T, ...) -> R` and return `(method_name, Signature)`.
 fn parse_def_line(line: &str) -> Option<(String, Signature)> {
     let rest = line.strip_prefix("def ")?;
     let colon = rest.find(": (")?;
     let name = rest[..colon].to_string();
-    let rest = &rest[colon + 3..]; // ": (" の 3 文字を読み飛ばす
+    let rest = &rest[colon + 3..]; // skip the 3 characters of ": ("
 
     let close = rest.find(") -> ")?;
     let params_str = &rest[..close];
@@ -75,8 +75,8 @@ fn parse_type(s: &str) -> Type {
     }
 }
 
-/// Dispatch で「値を畳める」か判定し、畳んだ結果を返す。
-/// 両オペランドが Const のときだけ畳む。大きすぎるなら None。
+/// Decide whether dispatch can "fold the value" and return the folded result.
+/// Fold only when both operands are Const. Return None if it gets too large.
 pub fn foldable_result(recv: &Type, method: &str, args: &[Type]) -> Option<Type> {
     use Type::Const;
     use Value::{Int, Str};

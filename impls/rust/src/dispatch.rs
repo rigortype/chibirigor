@@ -13,10 +13,10 @@ fn methods() -> &'static HashMap<(String, String), Signature> {
     METHODS.get_or_init(|| rbs::load(rbs::CORE))
 }
 
-/// メソッド送信の型付け。
-/// 1. Plugin 登録を優先
-/// 2. RBS から生成した METHODS を参照
-/// 3. 知らないメソッドは Dynamic（脅かさない）
+/// Typing of a method send.
+/// 1. Prefer plugin registrations
+/// 2. Fall back to METHODS generated from RBS
+/// 3. Unknown methods become Dynamic (don't scare the user)
 pub fn dispatch(
     receiver: &Type,
     method: &[u8],
@@ -31,7 +31,7 @@ pub fn dispatch(
 
     let klass = match class_of(receiver) {
         Some(k) => k,
-        None => return Type::Dynamic, // HashShape / Tuple / Dynamic → 脅かさない
+        None => return Type::Dynamic, // HashShape / Tuple / Dynamic → don't scare the user
     };
 
     let sig = plugin::lookup(klass, method_str)
@@ -39,14 +39,14 @@ pub fn dispatch(
 
     let sig = match sig {
         Some(s) => s,
-        None => return Type::Dynamic, // 知らないメソッド → 脅かさない
+        None => return Type::Dynamic, // unknown method → don't scare the user
     };
 
     if args.len() != sig.params.len() {
         diagnostics.push(Diagnostic {
             line,
             message: format!(
-                "{method_str} の引数の数が違います（{} 個必要、{} 個渡された）",
+                "wrong number of arguments for {method_str} ({} expected, {} given)",
                 sig.params.len(),
                 args.len()
             ),
@@ -58,11 +58,11 @@ pub fn dispatch(
         if accepts(param, arg) == Verdict::No {
             diagnostics.push(Diagnostic {
                 line,
-                message: format!("{param} が必要ですが {arg} が渡されました"),
+                message: format!("expected {param} but got {arg}"),
             });
         }
     }
 
-    // 畳めれば Const に畳む、無理なら表の戻り型。
+    // Fold to a Const if possible; otherwise use the table's return type.
     foldable_result(receiver, method_str, args).unwrap_or_else(|| sig.returns.clone())
 }

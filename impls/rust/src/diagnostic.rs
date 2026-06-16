@@ -1,4 +1,4 @@
-/// 型エラーの診断情報。
+/// Diagnostic information for a type error.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Diagnostic {
     pub line: u32,

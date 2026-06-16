@@ -1,63 +1,72 @@
-# impls ― 各章末の到達段階スナップショット
+# impls ― end-of-chapter snapshots of where the code has reached
 
-chibivue の [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book/impls)
-にならい、本文の各 Part を読み終えた時点で手元のコードが**どこまで来ているか**を、丸ごと動く
-ツリーとして展開します。ただし chibivue が全コピーを手で維持するのに対し、ここは
-**「変わったファイルだけ」を真実の源にして、完全ツリーは機械生成**します（事故＝ドリフトを減らすため）。
+Following chibivue's [`book/impls`](https://github.com/chibivue-land/chibivue/tree/main/book/impls),
+we lay out, as a fully working tree, **how far the code in your hands has come** at the point you
+finish reading each Part of the prose. But whereas chibivue maintains every full copy by hand, here
+we **treat "only the files that changed" as the source of truth and machine-generate the complete
+tree** (to reduce accidents, i.e. drift).
 
-## 仕組み（単一ソース → 生成物 → 検証ゲート）
+## How it works (single source → generated artifacts → verification gates)
 
 ```
 impls/
-├── steps/            ← 真実の源（手で編集する）
+├── steps/            ← source of truth (edited by hand)
 │   ├── part1/
-│   │   ├── lib/...           その章で *新規/置換した* ファイルだけ
-│   │   └── test_stage.rb     その段の到達挙動を固定するスモークテスト
+│   │   ├── lib/...           only the files *newly added/replaced* in that chapter
+│   │   └── test_stage.rb     a smoke test that pins down the behavior reached at that stage
 │   └── part2/
-│       ├── lib/chibirigor/dispatch.rb   （新規）
-│       ├── lib/chibirigor/type.rb       （置換：Type:: 名前空間へ）
-│       ├── lib/chibirigor/type_of.rb    （置換：Dispatch へ委譲）
-│       ├── lib/chibirigor.rb            （置換：require 追加）
+│       ├── lib/chibirigor/dispatch.rb   (new)
+│       ├── lib/chibirigor/type.rb       (replace: into the Type:: namespace)
+│       ├── lib/chibirigor/type_of.rb    (replace: delegate to Dispatch)
+│       ├── lib/chibirigor.rb            (replace: add a require)
 │       └── test_stage.rb
-└── dist/             ← 生成物（手で編集しない。閲覧用に commit する）
-    ├── part1/lib/... 完全ツリー（part1 を読み終えた状態）
-    └── part2/lib/... 完全ツリー（part1 + part2 の差分を重ねた状態）
+└── dist/             ← generated artifacts (not edited by hand; committed for browsing)
+    ├── part1/lib/... complete tree (state after finishing part1)
+    └── part2/lib/... complete tree (part1 + part2 diffs overlaid)
 ```
 
-`tools/gen_impls.rb` が `steps/part1..partN` の `lib/` を**順に重ねて**（同じパスは後の段が
-上書き＝置換）、各到達段階の**完全ツリー**を `dist/partN/` に出力します。
+`tools/gen_impls.rb` **overlays in order** the `lib/` directories of `steps/part1..partN` (the same
+path in a later stage overwrites, i.e. replaces, the earlier one) and emits the **complete tree** for
+each stage reached into `dist/partN/`.
 
 ```console
-$ make impls          # dist を生成
-$ make impls-verify   # 生成 + 各段の test_stage.rb を実行（段ごとの挙動が緑か）
-$ make impls-check    # 生成し直して dist が手編集されていないか（steps と同期か）を検証
+$ make impls          # generate dist
+$ make impls-verify   # generate + run each stage's test_stage.rb (is each stage's behavior green?)
+$ make impls-check    # regenerate and verify dist hasn't been hand-edited (in sync with steps)
 ```
 
-## なぜ「patch 直列」ではなく「ファイル単位の前方 compose」か
+## Why "per-file forward compose" rather than "a chain of patches"
 
-- **patch 直列**（`0N.patch` を累積 apply）は位置依存で、早い段の変更が後続 patch を
-  カスケード衝突させる。本書は章を組み替える（reorder した実績がある）ので相性が悪い。
-- **ファイル単位の前方 compose** は、章を入れ替えても**ディレクトリ名を振り直すだけ**。
-  変更は「その段で変わったファイル」に局所化され、衝突しない。
-- **最終 `lib/` を後ろから削る逆射影**は、最終 lib が全 Part 織り込み済み（`checker.rb` が
-  baseline/rbs を、`annotator.rb` が sig 合成を既に持つ）なので困難。前方 compose なら、
-  各段の*教えるコードそのもの*が源になる。
+- **A chain of patches** (cumulatively applying `0N.patch`) is position-dependent: a change in an
+  early stage makes later patches cascade into conflicts. This book reorders chapters (we have a
+  track record of doing so), so that approach is a poor fit.
+- **Per-file forward compose** means that even when chapters are swapped, you **only renumber the
+  directory names**. Changes are localized to "the files that changed at that stage" and don't
+  conflict.
+- **A reverse projection that strips the final `lib/` from the back** is hard, because the final lib
+  already weaves in all Parts (`checker.rb` already has baseline/rbs, `annotator.rb` already has sig
+  synthesis). With forward compose, *the teaching code itself* at each stage is the source.
 
-## 事故を減らす 3 点
+## Three points that reduce accidents
 
-1. **単一の真実**：各段で変わったファイルは `steps/` の 1 箇所だけ（N 個のコピーを手維持しない）。
-2. **スナップショットは生成物**：`dist/` は機械生成。手で触らない（`make impls-check` が検出）。
-3. **段ごとの検証ゲート**：`test_stage.rb` が「Part N の到達挙動」を固定（例：Part 1 は加算を
-   **丸めて Integer**、Part 2 も dispatch 経由で Integer）。`make all` に組み込み済み。
+1. **Single source of truth**: each stage's changed files live in exactly one place under `steps/`
+   (no maintaining N copies by hand).
+2. **Snapshots are generated artifacts**: `dist/` is machine-generated. Don't touch it by hand
+   (`make impls-check` detects it).
+3. **A per-stage verification gate**: `test_stage.rb` pins down "the behavior reached at Part N"
+   (e.g. Part 1 **rounds addition to Integer**, and Part 2 also yields Integer via dispatch). It's
+   already wired into `make all`.
 
-## 本文との接続（次の一歩）
+## Connecting to the prose (the next step)
 
-本文のコードブロックを `<!-- include: ../../impls/dist/partN/lib/... #region -->` で
-**スナップショットから直接引く**ようにすれば、本文 ↔ スナップショット ↔ 段テストが
-一つの源に束ねられ、ドリフトが原理的に消えます（既存の `check_docs.rb` と同じ発想を段に拡張）。
+If we make the prose's code blocks **pull directly from the snapshots** via
+`<!-- include: ../../impls/dist/partN/lib/... #region -->`, then the prose ↔ snapshot ↔ stage tests
+are bound to a single source, and drift disappears in principle (extending the same idea as the
+existing `check_docs.rb` to the stages).
 
-## 現状
+## Current status
 
-- **Part 1・Part 2 の試作のみ**（仕組みの実証）。Part 3 以降は `steps/partN/` に
-  「その章で変わったファイル＋ test_stage.rb」を足していけば、`make impls` が自動で
-  完全ツリーを生成します。最終段は `lib/`（＝完成形）と一致させるのが目標。
+- **Only the Part 1 / Part 2 prototype** (a proof of concept). For Part 3 onward, add "the files
+  that changed in that chapter plus a `test_stage.rb`" to `steps/partN/`, and `make impls` will
+  generate the complete tree automatically. The goal is to make the final stage match `lib/` (i.e.
+  the finished form).

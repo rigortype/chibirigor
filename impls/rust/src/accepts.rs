@@ -1,6 +1,6 @@
 use crate::type_::{class_of, Type};
 
-/// 受理判定の三値。
+/// The three-valued acceptance verdict.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Verdict {
     Yes,
@@ -8,24 +8,24 @@ pub enum Verdict {
     Maybe,
 }
 
-/// 「expected の所に actual を渡して合うか」を三値で答える。
-/// untyped が絡んだら Maybe（gradual の核）。
+/// Answer, in three values, "does passing actual where expected is wanted fit?"
+/// If untyped is involved, the answer is Maybe (the core of gradual typing).
 pub fn accepts(expected: &Type, actual: &Type) -> Verdict {
     if matches!(expected, Type::Dynamic) || matches!(actual, Type::Dynamic) {
         return Verdict::Maybe;
     }
 
-    // actual が Union：全メンバが通って初めて Yes。一番弱い結論を採る。
+    // actual is a Union: Yes only when every member passes. Take the weakest conclusion.
     if let Type::Union(members) = actual {
         return weakest(members.iter().map(|m| accepts(expected, m)));
     }
 
-    // expected が Union：どれか 1 つに合えばよい。一番強い結論を採る。
+    // expected is a Union: matching any one is enough. Take the strongest conclusion.
     if let Type::Union(members) = expected {
         return strongest(members.iter().map(|m| accepts(m, actual)));
     }
 
-    // 素朴な部分型：クラスが一致するか。
+    // Naive subtyping: do the classes match?
     if class_of(expected) == class_of(actual) {
         Verdict::Yes
     } else {
@@ -33,7 +33,7 @@ pub fn accepts(expected: &Type, actual: &Type) -> Verdict {
     }
 }
 
-/// :no があれば No、無ければ :maybe があれば Maybe、でなければ Yes。
+/// No if any :no; otherwise Maybe if any :maybe; otherwise Yes.
 fn weakest(mut results: impl Iterator<Item = Verdict>) -> Verdict {
     let mut seen_maybe = false;
     for v in &mut results {
@@ -46,7 +46,7 @@ fn weakest(mut results: impl Iterator<Item = Verdict>) -> Verdict {
     if seen_maybe { Verdict::Maybe } else { Verdict::Yes }
 }
 
-/// :yes があれば Yes、無ければ :maybe があれば Maybe、でなければ No。
+/// Yes if any :yes; otherwise Maybe if any :maybe; otherwise No.
 fn strongest(mut results: impl Iterator<Item = Verdict>) -> Verdict {
     let mut seen_maybe = false;
     for v in &mut results {

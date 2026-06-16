@@ -1,21 +1,21 @@
-/// 型キャリア。Ruby 実装の `Chibirigor::Type` に対応。
+/// The type carrier. Corresponds to `Chibirigor::Type` in the Ruby implementation.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
-    /// リテラル値そのものを表す型。例: Const(Value::Int(1))
+    /// A type representing a literal value itself. Example: Const(Value::Int(1))
     Const(Value),
-    /// 名前付きクラス。例: Nominal("Integer")
+    /// A named class. Example: Nominal("Integer")
     Nominal(String),
-    /// 「知らない」型。gradual typing の要。
+    /// The "unknown" type. The crux of gradual typing.
     Dynamic,
-    /// Union 型。例: Integer | String
+    /// A Union type. Example: Integer | String
     Union(Vec<Type>),
-    /// ハッシュの構造。キーごとの型を覚える。例: {foo: 1, bar: "a"}
+    /// The shape of a hash. Remembers the type per key. Example: {foo: 1, bar: "a"}
     HashShape(Vec<(String, Type)>),
-    /// 配列を「位置ごとの型」で覚える。例: [1, "a"]
+    /// Remembers an array as a "type per position". Example: [1, "a"]
     Tuple(Vec<Type>),
 }
 
-/// Const 型が保持できる値の種類（Ruby の主なリテラルに対応）。
+/// The kinds of value a Const type can hold (corresponding to Ruby's main literals).
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Int(i64),
@@ -61,7 +61,7 @@ impl std::fmt::Display for Type {
     }
 }
 
-/// 複数の型を 1 つに畳む。入れ子 Union をならし、重複を消す。
+/// Fold multiple types into one. Flatten nested Unions and remove duplicates.
 pub fn union(types: Vec<Type>) -> Type {
     let mut flat = Vec::new();
     for t in types {
@@ -84,7 +84,7 @@ pub fn union(types: Vec<Type>) -> Type {
     }
 }
 
-/// 型を Ruby クラス名に丸める。Dispatch テーブルのキー照合に使う。
+/// Reduce a type to a Ruby class name. Used to match keys in the dispatch table.
 pub fn class_of(t: &Type) -> Option<&str> {
     match t {
         Type::Const(Value::Int(_)) => Some("Integer"),

@@ -31,7 +31,7 @@ mod tests {
         (ty, diags)
     }
 
-    // --- リテラル ---
+    // --- literals ---
 
     #[test]
     fn int_literal() {
@@ -70,12 +70,12 @@ mod tests {
         );
     }
 
-    // --- 演算 ---
+    // --- operations ---
 
     #[test]
     fn int_plus_int_folds_const() {
         let (ty, diags) = first_type(b"1 + 2");
-        assert_eq!(ty, Type::Const(Value::Int(3))); // 畳まれる
+        assert_eq!(ty, Type::Const(Value::Int(3))); // folded
         assert!(diags.is_empty());
     }
 
@@ -88,17 +88,17 @@ mod tests {
     #[test]
     fn int_plus_string_error() {
         let (ty, diags) = first_type(b"1 + \"x\"");
-        // 型エラーでも宣言された戻り型（Integer）を返す（Ruby 版と同じ挙動）
+        // Even on a type error, return the declared return type (Integer) (same behavior as the Ruby version)
         assert_eq!(ty, Type::Nominal("Integer".into()));
         assert_eq!(diags.len(), 1);
-        assert!(diags[0].message.contains("が必要ですが"));
+        assert!(diags[0].message.contains("but got"));
     }
 
     #[test]
     fn wrong_arg_count_error() {
         let (_, diags) = first_type(b"1.to_s(42)");
         assert_eq!(diags.len(), 1);
-        assert!(diags[0].message.contains("引数の数"));
+        assert!(diags[0].message.contains("wrong number of arguments"));
     }
 
     // --- if / narrowing ---
@@ -117,7 +117,7 @@ mod tests {
 
     #[test]
     fn narrowing_nil_check() {
-        // x が Integer | nil のとき、if x.nil? 真枝では NilClass に絞れる
+        // When x is Integer | nil, the truthy branch of `if x.nil?` narrows to NilClass
         let source = b"x = if true; 1; else; nil; end\nif x.nil?\n  x\nend";
         let diags = check(source, &[]);
         assert!(diags.is_empty());
@@ -142,7 +142,7 @@ mod tests {
         let source = b"1 + \"bad\"";
         let diags_full = check(source, &[]);
         assert_eq!(diags_full.len(), 1);
-        // 同じ診断を baseline に渡すと差し引かれる
+        // Passing the same diagnostic as a baseline subtracts it
         let diags_sub = check(source, &diags_full);
         assert!(diags_sub.is_empty());
     }
@@ -189,7 +189,7 @@ mod tests {
         let anns = annotate(b"x = 1\nx + 2");
         assert_eq!(anns.len(), 2);
         assert_eq!(anns[0].type_, Type::Const(Value::Int(1)));
-        assert_eq!(anns[1].type_, Type::Const(Value::Int(3))); // 畳まれる
+        assert_eq!(anns[1].type_, Type::Const(Value::Int(3))); // folded
     }
 
     #[test]
@@ -206,5 +206,5 @@ mod tests {
 }
 
 fn main() {
-    println!("chibirigor Rust 試作 — `cargo test` でテストを実行してください。");
+    println!("chibirigor Rust prototype — run `cargo test` to run the tests.");
 }

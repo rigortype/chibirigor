@@ -6,12 +6,12 @@ use crate::narrowing::narrow;
 use crate::scope::Scope;
 use crate::type_::{union, Type, Value};
 
-/// ソース内のバイトオフセットを 1-based 行番号に変換する。
+/// Convert a byte offset within the source into a 1-based line number.
 pub fn line_of(source: &[u8], offset: usize) -> u32 {
     source[..offset.min(source.len())].iter().filter(|&&b| b == b'\n').count() as u32 + 1
 }
 
-/// 文を 1 つ評価し、(型, 更新後スコープ) を返す。代入だけスコープを更新する。
+/// Evaluate a single statement and return (type, updated scope). Only assignments update the scope.
 pub fn eval_statement<'pr>(
     node: Node<'pr>,
     scope: Scope,
@@ -27,7 +27,7 @@ pub fn eval_statement<'pr>(
     (type_of(node, &scope, diagnostics, source), scope)
 }
 
-/// 式（Prism ノード）から型を求める。型チェッカーの心臓。
+/// Compute the type of an expression (a Prism node). The heart of the type checker.
 pub fn type_of<'pr>(node: Node<'pr>, scope: &Scope, diagnostics: &mut Vec<Diagnostic>, source: &[u8]) -> Type {
     if let Some(n) = node.as_integer_node() {
         let val: i32 = n.value().try_into().unwrap_or(0);
@@ -88,7 +88,7 @@ pub fn type_of<'pr>(node: Node<'pr>, scope: &Scope, diagnostics: &mut Vec<Diagno
     Type::Dynamic
 }
 
-/// ハッシュリテラル → HashShape（symbol キーのみ覚える）。
+/// Hash literal → HashShape (only symbol keys are remembered).
 fn type_of_hash<'pr>(
     elements: impl Iterator<Item = Node<'pr>>,
     scope: &Scope,
@@ -106,7 +106,7 @@ fn type_of_hash<'pr>(
     Type::HashShape(fields)
 }
 
-/// メソッド送信の型推論。
+/// Type inference for method sends.
 fn type_of_call<'pr>(node: CallNode<'pr>, scope: &Scope, diagnostics: &mut Vec<Diagnostic>, source: &[u8]) -> Type {
     let recv_ty = node.receiver().map(|r| type_of(r, scope, diagnostics, source)).unwrap_or(Type::Dynamic);
 
@@ -119,10 +119,10 @@ fn type_of_call<'pr>(node: CallNode<'pr>, scope: &Scope, diagnostics: &mut Vec<D
     dispatch(&recv_ty, node.name().as_slice(), &arg_types, line, diagnostics)
 }
 
-/// if 式の型推論。両枝の型を union し、枝ごとに型を絞る。
+/// Type inference for an if expression. Union the types of both branches and narrow per branch.
 fn type_of_if<'pr>(node: IfNode<'pr>, scope: &Scope, diagnostics: &mut Vec<Diagnostic>, source: &[u8]) -> Type {
     let pred = node.predicate();
-    let _ = type_of(pred, scope, diagnostics, source); // 条件も型チェック
+    let _ = type_of(pred, scope, diagnostics, source); // type-check the condition too
 
     let then_scope = narrow(scope, node.predicate(), true);
     let else_scope = narrow(scope, node.predicate(), false);
@@ -142,7 +142,7 @@ fn type_of_if<'pr>(node: IfNode<'pr>, scope: &Scope, diagnostics: &mut Vec<Diagn
     union(vec![then_ty, else_ty])
 }
 
-/// メソッド定義の型推論。本体を型チェックし、診断を収集する。
+/// Type inference for a method definition. Type-check the body and collect diagnostics.
 fn type_of_def<'pr>(node: DefNode<'pr>, scope: &Scope, diagnostics: &mut Vec<Diagnostic>, source: &[u8]) -> Type {
     let body_scope = node
         .parameters()
@@ -161,12 +161,12 @@ fn type_of_def<'pr>(node: DefNode<'pr>, scope: &Scope, diagnostics: &mut Vec<Dia
         let _ = type_of_stmts(body, &body_scope, diagnostics, source);
     }
 
-    // def 式の値はメソッド名シンボル
+    // The value of a def expression is the method-name symbol
     let name = String::from_utf8_lossy(node.name().as_slice()).into_owned();
     Type::Const(Value::Symbol(name))
 }
 
-/// StatementsNode を評価し、最後の文の型を返す。文の中でもスコープを縫う。
+/// Evaluate a StatementsNode and return the type of the last statement. Thread the scope through the statements.
 pub fn type_of_stmts<'pr>(
     stmts: StatementsNode<'pr>,
     scope: &Scope,
@@ -183,7 +183,7 @@ pub fn type_of_stmts<'pr>(
     last
 }
 
-/// メソッドの戻り型を本体から合成する（return type check 用）。
+/// Synthesize a method's return type from its body (for return-type checking).
 pub fn method_return_type<'pr>(
     node: DefNode<'pr>,
     scope: &Scope,
