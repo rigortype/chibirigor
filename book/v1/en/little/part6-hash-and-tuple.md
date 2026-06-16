@@ -115,6 +115,11 @@ different story: "you can pass `{name:, admin:}` where `{name:}` is wanted" is s
 called **width subtyping** (『しくみ』, too, adopts this width subtyping in ch. 7, allowing extra
 properties).
 
+This can read backwards at first — *more* keys, yet the *smaller* type? — until you think in
+values: *fewer* hashes qualify as `{name:, admin:}` than as `{name:}`, so the one with more keys
+is the narrower, more specific one. (The word "subtype" we take head-on in Part 7; here, just hold
+on to the plain policy below.)
+
 Rigor, too, makes `HashShape` **a fit.** What differs is the *motive and scope*. It's not handling
 statically-written records for soundness; the counterpart is **Ruby's options hashes**, and the
 aim is **not producing false positives**:

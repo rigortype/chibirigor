@@ -12,8 +12,9 @@ Ruby, returning a different type per branch of an `if` or a ternary is everyday.
 happens, instead of forcing the type to one, we hold it together as "either one" — that's
 Union.
 
-> The Union we build (an **untagged union** like `Integer | String`) is in fact the starting
-> point the reference books *deliberately avoided*. Both 『しくみ』 and TAPL hold *tagged*
+> *(A side note you'll get more from once §4-1 just below has actually built a Union — skim now,
+> circle back later.)* The Union we build (an **untagged union** like `Integer | String`) is in
+> fact the starting point the reference books *deliberately avoided*. Both 『しくみ』 and TAPL hold *tagged*
 > variants — values labeled with a tag to tell them apart — which is a different thing from an
 > untagged union. But for us, dealing with Ruby, an untagged union is essential. (For the
 > difference, see appendix [a5-4](../appendix/a5-other-languages.md).)

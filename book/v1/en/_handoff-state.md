@@ -156,12 +156,35 @@ Ran the multi-lens battery (independent-context subagents, layered 真→読→�
 Notes committed to `book/v1/en/.reviews/` (tracked, like the JA side). Verification after fixes:
 em-dash clean, no residual flagged calques, links unchanged (only the 5 shared `examples/*.rb`).
 
+## Review iteration 2 — DONE (L2 伝 teaching, the layer iteration 1 skipped)
+
+Ran the two target-reader personas on the **English** Little volume (independent contexts):
+- `_java-reader-review` (Java mid, no type theory) — **teaches cleanly, zero STUCK.**
+- `_ruby-reader-review` (Ruby/Rails junior, "type ≈ class", no annotation model) — **lands, zero
+  BLOCK.** Both praised the same load-bearing moves: P1 "a type is *data*, flip one switch" riding
+  in on `Data.define`, P3 Scope = "a mental note turned into data", the P5/a5-1 null-safety reframe.
+
+Convergent teaching-clarity fixes **applied** (additive glosses, no new Rigor claim, fidelity-safe):
+- **part6 §6-3** — added a value-set gloss defusing the counterintuitive "more keys = the *smaller*
+  type", and deferred the word "subtype" to Part 7 (both readers snagged here).
+- **part4 §4-1** — prefixed the untagged/tagged-variant note with a "skim now, circle back after
+  §4-1 builds a Union" orientation (both readers hit the jargon before the Union existed).
+- **part8 §8-1** — led with "read each line as a Ruby `def` header with types penciled in", started
+  from the simpler `() -> String`, and split the `->`-is-not-a-lambda gotcha into its own aside
+  (the Ruby reader's milestone — first type they ever read).
+
+Not applied (deliberately): naming Liskov in the part7 §7-5 footnote (Seasoned P2 owns it);
+folding the part0 §0.1 "annotation" gloss inline (matches JA, FRICTION not BLOCK). Logged in the
+notes.
+
+> **Candidate JA back-ports:** the three fixes above address gaps the *Japanese* original shares
+> (the note-ordering in P4, the early "subtype" lean in P6, the dense first-RBS read in P8). The
+> EN now reads slightly ahead of the JA here. Consider re-converging by back-porting to
+> `book/v1/ja/` so both editions stay in sync (per STYLE "Sync with the Japanese source").
+
 ## Next (in order)
 
-1. **Optional review iteration 2** — iteration 1 drove the book to "near-publication"; a second
-   full round would be low-yield. Worth doing only after the open shared-tree decision lands or a
-   substantive prose edit. A Ruby/Rails-junior + Java-mid reader pass (the JA battery's L2 伝
-   personas) could be added for teaching-clarity if desired.
+1. **Open shared-tree decision** (author call) — see below; the only substantive open item.
 2. **Resolve the open shared-tree decision** (author call) — see below. If "migrate to English,"
    the `seasoned/examples/*.rb` links resolve and the snapshot/CLI click-throughs match the prose.
 3. **Optional: curly-quote pass** — prose currently uses curly quotes/apostrophes inline; a

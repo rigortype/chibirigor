@@ -37,14 +37,16 @@ class Integer
 end
 ```
 
-Since this may be the first notation in which you've "written" a type, let's read it out.
-`def +: (Integer) -> Integer` means "`Integer#+` **takes one `Integer` and returns an
-`Integer`**." The right of `:` is the type, `(...)` the argument types, the right of `->` the
-**return type**. `def to_s: () -> String` means "takes no arguments, returns `String`." — It's
-enough to read it as just the head of a Ruby `def` with the argument and return types penned
-in. (In Ruby `->` is the symbol that makes a lambda [`square = ->(x) { x * x }`], but in RBS it's
-a *different arrow* meaning "take arguments → return a type." Make peace with the same symbol
-meaning different things.)
+Since this may be the first notation in which you've "written" a type, here's the reassuring part
+first: **read each line as the head of a Ruby `def`, with the argument and return types penciled
+in.** Take the simpler one — `def to_s: () -> String` means "takes no arguments, returns
+`String`." Then `def +: (Integer) -> Integer` means "`Integer#+` **takes one `Integer` and returns
+an `Integer`**." The right of `:` is the type, `(...)` the argument types, the right of `->` the
+**return type**.
+
+One Ruby gotcha, kept as its own aside: that `->` is *not* the lambda arrow. In Ruby `->` makes a
+lambda (`square = ->(x) { x * x }`); in RBS it's a *different arrow* meaning "take these arguments
+→ return this type." Same symbol, different job — make peace with it.
 
 This is the Ruby/RBS worldview. "The code knows nothing about types. Types are given from
 outside." Rigor reads this RBS as **truth**, and adds more precision on top of it.
