@@ -7,13 +7,13 @@ sidebar:
 
 # The Little chibirigor（前編）
 
-最小の Ruby 型チェッカー `chibirigor` を、ステップバイステップで作りながら学ぶ前編です。
-`check`（型診断）と `annotate`（推論した型の表示）が動く最小実装を Part 0〜9 で作り切ります。
+最小のRuby型チェッカー`chibirigor`を、ステップバイステップで作りながら学ぶ前編です。
+`check`（型診断）と`annotate`（推論した型の表示）が動く最小実装をPart 0〜9で作り切ります。
 コードは前編だけで動き切り、形式的な理論は後編へ譲ります。
 
-> はじめての方は、二巻共通の入口 [README](../README.md)（動機、対象読者、環境構築）から読み始めてください。
-> 用語は [用語集](../glossary.md)、巻をまたぐ参照情報は [付録](../appendix/) で引けます。
-> 各章は「① 型理論 ↔ ② Ruby/RBS ↔ ③ Rigor 実装」という三つの視点から書かれ、章末に演習があります（くわしい読み方は [Part 0](part0-introduction.md) で）。
+> はじめての方は、二巻共通の入口[README](../README.md)（動機、対象読者、環境構築）から読み始めてください。
+> 用語は[用語集](../glossary.md)、巻をまたぐ参照情報は[付録](../appendix/)で引けます。
+> 各章は「① 型理論 ↔ ② Ruby/RBS ↔ ③ Rigor実装」という三つの視点から書かれ、章末に演習があります（くわしい読み方は[Part 0](part0-introduction.md)で）。
 
 ## 章立て
 
@@ -30,4 +30,4 @@ sidebar:
 | [8](part8-rbs-and-signatures.md) | RBS と型シグネチャ（RBS 由来の表 → `def` から戻り型合成） |
 | [9](part9-gradual-philosophy.md) | gradual の哲学（最終章） |
 
-読み終えたら、後編 [The Seasoned chibirigor](../seasoned/README.md)（読み解く巻）へ続きます。
+読み終えたら、後編[The Seasoned chibirigor](../seasoned/README.md)（読み解く巻）へ続きます。
