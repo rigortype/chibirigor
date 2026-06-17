@@ -94,8 +94,8 @@ organized in the [appendices](appendix/).)
   type. The Little volume's `accepts`.
 - **bidirectional typing** 〔Seasoned P1〕 — the framework that splits typing into the two
   directions, synthesis and checking.
-- **type reconstruction / HM** 〔Seasoned P5〕 — inference that recovers types from
-  annotations. TAPL ch. 22.
+- **type reconstruction / HM** 〔Seasoned P5〕 — inference that recovers types *without*
+  annotations, from how terms are used (it reconstructs the omitted ones). TAPL ch. 22.
 - **unification** 〔Seasoned P5〕 — the operation that finds the substitution making two types
   equal. The core of type reconstruction.
 - **erasure (dropping precision at the boundary)** 〔Little P1 (preview: appendix a3-2) /

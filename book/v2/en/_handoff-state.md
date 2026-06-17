@@ -98,13 +98,14 @@ skill itself targets `book/v1/ja/`, so it doesn't apply to EN prose). Notes in
    v2/ja's 3-row table. This looks like a v2/ja oversight (v1 had all five) — consider
    back-porting the two missing rows to `book/v2/ja/seasoned/examples/README.md`, after which the
    EN table should be re-synced.
-2. **Candidate source-side fix (shared JA+EN) — HM / "type reconstruction" definition.** The
-   glossary entry reads "type reconstruction / HM — inference that recovers types *from*
-   annotations" (`glossary.md`, EN; `glossary.md` 「注釈から型を復元する推論」, JA). This inverts
-   the defining property: HM recovers types *without* annotations (it reconstructs the *omitted*
-   ones; TAPL ch. 22). The FP-researcher lens flagged it as the one finding with real teeth. It
-   was **not** EN-patched, because it lives in the canonical JA too — fix both together at source
-   (suggested: "infer types **without annotations**, from how terms are used"), then re-sync EN.
+2. **HM / "type reconstruction" definition — EN fixed, JA back-port pending.** The glossary
+   entry used to read "recovers types *from* annotations," which inverts the defining property:
+   HM recovers types *without* annotations (it reconstructs the *omitted* ones; TAPL ch. 22). The
+   FP-researcher lens flagged it as the one finding with real teeth. **EN now reads
+   "recovers types *without* annotations, from how terms are used (it reconstructs the omitted
+   ones)"** (`glossary.md`). The **canonical JA still carries the old wording**
+   (`book/v2/ja/glossary.md:55` 「注釈から型を復元する推論」) — back-port the same fix at source
+   (in Zenn → 逆輸入), so the EN currently reads slightly ahead here.
 3. **Optional: wire `check_docs.rb` against `book/v2/en/`** (the EN prose currently omits the
    `<!-- include/run -->` markers; output is verified by reading). Same open follow-up noted in
    the examples README's English-edition note.
