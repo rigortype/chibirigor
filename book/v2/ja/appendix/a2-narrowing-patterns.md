@@ -29,7 +29,7 @@ if x.is_a?(Integer) && x > 0
 end
 ```
 
-左側の`is_a?(Integer)`が通過した時点で`x`の型が`Integer`に絞られ、その状態で右側の`x > 0`が評価されます。「`Integer`かつ`> 0`」が積み重なるので、Rigorはこれを**`positive-int`リファインメント**（→ a2-6）として扱えます。
+左側の`is_a?(Integer)`が通過した時点で`x`の型が`Integer`に絞られ、その状態で右側の`x > 0`が評価されます。「`Integer`かつ`> 0`」が積み重なるので、Rigorはこれを **`positive-int`リファインメント**（→ a2-6）として扱えます。
 
 逆に`||`チェーンは「どちらか一方が成立した場合」なので、合流点でjoin（共通事実のみ残す。後編Part 6のjoin）が走り、片方にしかない事実は消えます。
 
@@ -141,7 +141,7 @@ end
 
 ## a2-6. refinement carrierはなぜDifference型（集合差）か
 
-`non-empty-string`、`positive-int`、`literal-string`のような、**述語で絞り込まれた型**をRigorは**refinement carrier（細粒度キャリア）**と呼びます。`unless s.empty?`を通った後の`s`は`non-empty-string`になる、というように、フロー事実から自動的に生まれます（後編Part 6で`payload`が運ぶ値）。
+`non-empty-string`、`positive-int`、`literal-string`のような、**述語で絞り込まれた型**をRigorは **refinement carrier（細粒度キャリア）** と呼びます。`unless s.empty?`を通った後の`s`は`non-empty-string`になる、というように、フロー事実から自動的に生まれます（後編Part 6で`payload`が運ぶ値）。
 
 これは前編Part 1の`Const[42]`（「値が42」という超精密な型）とは別概念です。`Const`は特定の1つの値、refinement carrierは述語を満たす値の集合を表します。
 

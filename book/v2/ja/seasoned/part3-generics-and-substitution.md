@@ -130,7 +130,7 @@ PASS: capture is avoided (inner U becomes U@1, distinct from the substituted U)
 
 ## 3-4. 型変数下の等価判定（α 同値）
 
-`<A>(x: A) => A`と`<B>(x: B) => B`は同じ型です（束縛変数の名前が違うだけ）。これを**α 同値（alpha-equivalence）**と呼びます。等価判定は、名前の対応表を引き回して解きます：
+`<A>(x: A) => A`と`<B>(x: B) => B`は同じ型です（束縛変数の名前が違うだけ）。これを **α 同値（alpha-equivalence）** と呼びます。等価判定は、名前の対応表を引き回して解きます：
 
 ```
 typeEq(TypeAbs[p1, b1], TypeAbs[p2, b2], map):

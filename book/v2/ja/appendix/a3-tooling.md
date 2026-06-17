@@ -39,7 +39,7 @@ app/models/user.rb:51:3: info: fell soft to Dynamic[Top] here (param `opts` is u
 
 ### なぜ「地図」が描けるのか（`Dynamic[Top]`マーカーの回収）
 
-この一覧が成り立つのは、前編Part 1で触れた**`Dynamic[Top]`の`Dynamic`マーカー**が、fail-softした箇所に**消えずに残っている**からです。`untyped`を「ただの穴」ではなく「`Dynamic`という印の付いた`Top`」として持つことで、「どこで黙ったか」が**構造として残ります**。だからこそ、後から`--explain`で一覧に起こせます。
+この一覧が成り立つのは、前編Part 1で触れた **`Dynamic[Top]`の`Dynamic`マーカー** が、fail-softした箇所に**消えずに残っている**からです。`untyped`を「ただの穴」ではなく「`Dynamic`という印の付いた`Top`」として持つことで、「どこで黙ったか」が**構造として残ります**。だからこそ、後から`--explain`で一覧に起こせます。
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
@@ -118,7 +118,7 @@ demo.rb:2:1: info: dump_type: 1 | "a"
 | ② | **shape dispatch** | `HashShape`のキー読み出しなど、**型の構造に直接触れる**操作を構造から直接解く | ③ へ |
 | ③ | **RBS** | コア、stdlib、プラグインが提供する**RBSの型**で引く（本書の手書き`METHODS`表の実物） | ④ へ |
 | ④ | **in-source**（本体推論） | RBSに無いメソッドは、**本体を推論**して戻り型を合成する（前編Part 8の戻り型合成の実物） | ⑤ へ |
-| ⑤ | **fallback** | どの段でも当たらなければ**`Dynamic[Top]`**にdegrade（脅かさない） | （ここで止まる） |
+| ⑤ | **fallback** | どの段でも当たらなければ **`Dynamic[Top]`** にdegrade（脅かさない） | （ここで止まる） |
 
 ### 流れの読み方
 

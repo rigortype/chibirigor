@@ -41,10 +41,10 @@
 ## 図7-1（最優先）― `accepts`の三値判定フロー ＋ Union畳み込み
 
 - **配置**：Part 7 `part7-accepts-and-trinary.md`、§7-3a（Union畳み込み）の直後。
-- **伝える一点**：`accepts(expected, actual)`は**`:yes`／`:no`／`:maybe`の三値**を返す。とりわけ
+- **伝える一点**：`accepts(expected, actual)`は **`:yes`／`:no`／`:maybe`の三値** を返す。とりわけ
   **untypedが絡めば`:maybe`（白黒つけない＝脅かさない）**、**Unionは全メンバを回して一番弱い答えを採る**。
 - **本文と一致させる判定の順序**（§7-3・7-3aのコードそのもの）：
-  1. `expected`か`actual`が**`Dynamic`（untyped）→ `:maybe`**（グレー）。
+  1. `expected`か`actual`が **`Dynamic`（untyped）→ `:maybe`**（グレー）。
   2. `actual`が**Union → 全メンバを`accepts`にかけ「一番弱い答え」**：1つでも`:no`なら`:no`／
      `:no`無く`:maybe`あれば`:maybe`／全部`:yes`なら`:yes`。
   3. `expected`がUnion → 「一番強い答え」（どれか1つ`:yes`なら`:yes`）。※副筋。主役は2。
