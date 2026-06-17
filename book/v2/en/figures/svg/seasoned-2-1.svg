@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" role="img" aria-label="Figure 2-1 the subtyping lattice">
+<defs>
+ <marker id="fseasoned21_a" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-ink,#0E1116)"></path></marker>
+ <marker id="fseasoned21_aA" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-accent,#7A2A2A)"></path></marker>
+ <marker id="fseasoned21_aE" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-error,#B5302B)"></path></marker>
+ <marker id="fseasoned21_aK" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-success,#2E6F3F)"></path></marker>
+ <marker id="fseasoned21_aI" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-info,#2D5C9E)"></path></marker>
+ <marker id="fseasoned21_aM" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rigor-type-untyped,#6E7480)"></path></marker>
+</defs>
+  <title>Figure 2-1 the subtyping lattice</title>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="280" y1="58" x2="120" y2="130"></line>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="280" y1="58" x2="290" y2="130"></line>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="280" y1="58" x2="450" y2="130"></line>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="120" y1="172" x2="280" y2="244"></line>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="290" y1="172" x2="280" y2="244"></line>
+  <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5" x1="450" y1="172" x2="280" y2="244"></line>
+
+  <rect style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="232" y="22" width="96" height="38"></rect>
+  <text x="280" y="46" text-anchor="middle">Top ⊤</text>
+
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="60" y="130" width="120" height="42"></rect>
+  <text x="120" y="156" text-anchor="middle">{name:}</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="230" y="130" width="120" height="42"></rect>
+  <text x="290" y="156" text-anchor="middle">Integer</text>
+  <rect style="fill:none;stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="392" y="130" width="116" height="42"></rect>
+  <text x="450" y="156" text-anchor="middle">String</text>
+
+  <rect style="fill:var(--rigor-paper-2,#EFEBE0);stroke:var(--rigor-ink,#0E1116);stroke-width:1.5" x="232" y="242" width="96" height="38"></rect>
+  <text x="280" y="266" text-anchor="middle">Bot ⊥</text>
+
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="540" y="40" text-anchor="end">bigger types ↑</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="540" y="266" text-anchor="end">smaller types ↓</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="120" y="190" text-anchor="middle">width: {name:,age:} &lt;: {name:}</text>
+
+</svg>
