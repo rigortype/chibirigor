@@ -10,11 +10,15 @@ either). Each file has a self-check at the end; if `PASS` lines up with `ruby <f
 | [`subtype.rb`](subtype.rb) | Part 2 Subtyping and variance | width/depth subtyping, **contravariant arguments / covariant returns** (the reverse comes out false) |
 | [`mu_typeeq.rb`](mu_typeeq.rb) | Part 4 Recursive types | equivalence of a μ-type's fold/unfold, **α-equivalence**, **termination by coinduction (`seen`)** |
 | [`subst.rb`](subst.rb) | Part 3 Generics and type substitution | stop on **shadowing**, avoid **variable capture** with fresh variables |
+| [`unification.rb`](unification.rb) | Part 5 Real type inference | gather constraints and solve by **unification** (a generic stays generic; a conflict raises) |
+| [`fact_invalidation.rb`](fact_invalidation.rb) | Part 6 The complete FactStore | an immutable fact store, **bucket-specified invalidation** (reassignment / method call) |
 
 ```console
 $ ruby subtype.rb
 $ ruby mu_typeeq.rb
 $ ruby subst.rb
+$ ruby unification.rb
+$ ruby fact_invalidation.rb
 ```
 
 > These are *educational design sketches*, not real Rigor's code (both the type representation and the
