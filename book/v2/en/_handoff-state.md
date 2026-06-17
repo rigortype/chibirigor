@@ -89,27 +89,35 @@ skill itself targets `book/v1/ja/`, so it doesn't apply to EN prose). Notes in
 - Commit per logical unit, `git add <individual files>` (not `-A`), Japanese commit messages;
   **don't push until asked** (current branch `master`).
 
+## EN → JA → Zenn sync — DONE
+
+By author direction the flow was reversed for this round (EN → JA → Zenn export, overriding the
+usual Zenn → source 逆輸入):
+
+- **EN finished:** `seasoned/examples/README.md` completed to all 5 sketches (was 3).
+- **Reflected into canonical JA** (`book/v2/ja`): HM/type-reconstruction glossary def (注釈から →
+  注釈なし); examples/README 3→5; removed stray `</content></invoke>` authoring artifacts from
+  `little/part8` + `seasoned/part2`; 逆輸入'd the Zenn part0 hand-edits (参考書 links, line-breaks,
+  ③の/①の spacing, 『The Seasoned chibirigor』, スローガン paragraph split, ①②③ bullets,
+  『TAPL』, `原著 *Types`). Net: re-exporting now reproduces the author's part0 byte-for-byte.
+- **Exporter hardened** (`tools/export_zenn.rb`): it used to hardcode `published:false`/`price:0`
+  and emit title-only frontmatter — re-export would have **unpublished the live ¥1500 book and
+  dropped its 5 free chapters**. Now it **preserves** the existing config's publishing meta and
+  emits `free: true` for the free set (about/part0/part1/a1/a4), and gives the glossary a title.
+- **Exported:** `ruby tools/export_zenn.rb` regenerated the Zenn book (`/Users/megurine/repo/
+  site/zenn-book`, the Little volume only). Left **uncommitted in the zenn-book repo for author
+  review** (not committed/pushed). WIP backup of the pre-export hand-edit at `/tmp/zenn-part0.handedit.bak`.
+
 ## Open items for the author (flagged, not resolved here)
 
-1. **`seasoned/examples/README.md` lists only 3 sketches.** v2/ja's `examples/README.md` table
-   (and its `$ ruby …` block) lists only `subtype.rb` / `mu_typeeq.rb` / `subst.rb`, while the
-   Seasoned volume intro and the chapters reference all **five** (adds `unification.rb` Part 5,
-   `fact_invalidation.rb` Part 6), and all five files exist. The EN edition faithfully reproduces
-   v2/ja's 3-row table. This looks like a v2/ja oversight (v1 had all five) — consider
-   back-porting the two missing rows to `book/v2/ja/seasoned/examples/README.md`, after which the
-   EN table should be re-synced.
-2. **HM / "type reconstruction" definition — EN fixed, JA back-port pending.** The glossary
-   entry used to read "recovers types *from* annotations," which inverts the defining property:
-   HM recovers types *without* annotations (it reconstructs the *omitted* ones; TAPL ch. 22). The
-   FP-researcher lens flagged it as the one finding with real teeth. **EN now reads
-   "recovers types *without* annotations, from how terms are used (it reconstructs the omitted
-   ones)"** (`glossary.md`). The **canonical JA still carries the old wording**
-   (`book/v2/ja/glossary.md:55` 「注釈から型を復元する推論」) — back-port the same fix at source
-   (in Zenn → 逆輸入), so the EN currently reads slightly ahead here.
-3. **Optional: wire `check_docs.rb` against `book/v2/en/`** (the EN prose currently omits the
-   `<!-- include/run -->` markers; output is verified by reading). Same open follow-up noted in
-   the examples README's English-edition note.
-4. **Minor, faithful to JA (no action needed):** a4-2's Little-Part-8 row cites TAPL ch. 23/22
+1. **Optional: wire `check_docs.rb` against `book/v2/en/`** (the EN prose currently omits the
+   `<!-- include/run -->` markers; output is verified by reading).
+2. **Minor, faithful to JA (no action needed):** a4-2's Little-Part-8 row cites TAPL ch. 23/22
    (the homes of Seasoned P3/P5) under an explicit "partial / distant relative" hedge — matches
    the JA a4 table. a4-1's 『しくみ』 "Japanese only — the text says so plainly" is a deliberate
    EN-audience addition (consistent with README / Part 0).
+3. **Zenn book diverged-from-source check (part0 done; others reconcile-on-demand).** This round
+   surfaced that the published Zenn book was *stale* vs source; the export brought it up to date
+   (legitimate). part0 was the one chapter with un-逆輸入'd hand-edits, now reconciled. If any
+   other chapter's older Zenn-only tweaks matter, diff `git -C …/zenn-book diff` before committing
+   the export there.
