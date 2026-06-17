@@ -124,7 +124,7 @@ This is Rigor's stance, right at the entrance.
 
 > [!IMPORTANT]
 > **A principle to remember:** `type_of` *never fails.* If it can't tell the type, it just
-> returns `Dynamic`. So "complaining because code has no type" simply can't happen in the
+> returns `Dynamic`. So "complaining because code has no type" can't happen in the
 > first place.
 
 ### What happens with `1 + 2`?
