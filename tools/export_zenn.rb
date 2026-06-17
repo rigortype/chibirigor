@@ -29,25 +29,26 @@ ZBOOK    = '/Users/megurine/repo/site/zenn-book/books/the-little-chibirigor'
 ZIMG_DIR = '/Users/megurine/repo/site/zenn-book/images/the-little-chibirigor'
 IMG_BASE = '/images/the-little-chibirigor'
 
-# [slug, 相対ソース, 種別(:about or nil), Zenn 章タイトルの上書き(nil=ソースの title を使う)]
+# [slug, 相対ソース, 種別(:about or nil), Zenn 章タイトルの上書き(nil=ソースの title を使う), 無料公開か]
+# free: Zenn の無料公開章（有料本のプレビュー）。true なら frontmatter に free: true を出す。
 CHAPTERS = [
-  ['about',                       'README.md',                          :about, 'この本について'],
-  ['part0-introduction',          'little/part0-introduction.md',          nil, nil],
-  ['part1-literals-and-arithmetic','little/part1-literals-and-arithmetic.md', nil, nil],
-  ['part2-method-dispatch',       'little/part2-method-dispatch.md',       nil, nil],
-  ['part3-scope-and-statements',  'little/part3-scope-and-statements.md',  nil, nil],
-  ['part4-union',                 'little/part4-union.md',                 nil, nil],
-  ['part5-narrowing',             'little/part5-narrowing.md',             nil, nil],
-  ['part6-hash-and-tuple',        'little/part6-hash-and-tuple.md',        nil, nil],
-  ['part7-accepts-and-trinary',   'little/part7-accepts-and-trinary.md',   nil, nil],
-  ['part8-rbs-and-signatures',    'little/part8-rbs-and-signatures.md',    nil, nil],
-  ['part9-gradual-philosophy',    'little/part9-gradual-philosophy.md',    nil, nil],
-  ['a1-special-types',            'appendix/a1-special-types.md',          nil, nil],
-  ['a2-narrowing-patterns',       'appendix/a2-narrowing-patterns.md',     nil, nil],
-  ['a3-tooling',                  'appendix/a3-tooling.md',                nil, nil],
-  ['a4-bibliography',             'appendix/a4-bibliography.md',           nil, nil],
-  ['a5-other-languages',          'appendix/a5-other-languages.md',        nil, nil],
-  ['glossary',                    'glossary.md',                           nil, nil],
+  ['about',                       'README.md',                          :about, 'この本について', true],
+  ['part0-introduction',          'little/part0-introduction.md',          nil, nil, true],
+  ['part1-literals-and-arithmetic','little/part1-literals-and-arithmetic.md', nil, nil, true],
+  ['part2-method-dispatch',       'little/part2-method-dispatch.md',       nil, nil, false],
+  ['part3-scope-and-statements',  'little/part3-scope-and-statements.md',  nil, nil, false],
+  ['part4-union',                 'little/part4-union.md',                 nil, nil, false],
+  ['part5-narrowing',             'little/part5-narrowing.md',             nil, nil, false],
+  ['part6-hash-and-tuple',        'little/part6-hash-and-tuple.md',        nil, nil, false],
+  ['part7-accepts-and-trinary',   'little/part7-accepts-and-trinary.md',   nil, nil, false],
+  ['part8-rbs-and-signatures',    'little/part8-rbs-and-signatures.md',    nil, nil, false],
+  ['part9-gradual-philosophy',    'little/part9-gradual-philosophy.md',    nil, nil, false],
+  ['a1-special-types',            'appendix/a1-special-types.md',          nil, nil, true],
+  ['a2-narrowing-patterns',       'appendix/a2-narrowing-patterns.md',     nil, nil, false],
+  ['a3-tooling',                  'appendix/a3-tooling.md',                nil, nil, false],
+  ['a4-bibliography',             'appendix/a4-bibliography.md',           nil, nil, true],
+  ['a5-other-languages',          'appendix/a5-other-languages.md',        nil, nil, false],
+  ['glossary',                    'glossary.md',                           nil, '用語集', false],
 ].freeze
 
 ALERT_RE = /\A> \[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*\z/
@@ -209,7 +210,7 @@ def about_cleanup(body)
   out.join("\n")
 end
 
-def transform(text, kind, title_override)
+def transform(text, kind, title_override, free)
   fm, body = split_frontmatter(text)
   title = title_override || fm['title'].to_s.gsub("　", ' ')
   body = about_cleanup(body) if kind == :about
@@ -220,7 +221,9 @@ def transform(text, kind, title_override)
   body = tidy_text(body)
   body = remove_empty_zenn_blocks(body)
   body = body.gsub(/\n{3,}/, "\n\n").strip
-  out = "---\ntitle: \"#{title.gsub('"', '\\"')}\"\n---\n\n#{body}\n"
+  fm_lines = ["title: \"#{title.gsub('"', '\\"')}\""]
+  fm_lines << 'free: true' if free # 有料本の無料公開章を保持
+  out = "---\n#{fm_lines.join("\n")}\n---\n\n#{body}\n"
   [out, svgs]
 end
 
@@ -240,9 +243,9 @@ end
 FileUtils.mkdir_p(ZIMG_DIR)
 all_svgs = []
 slugs = []
-CHAPTERS.each do |slug, rel, kind, title_override|
+CHAPTERS.each do |slug, rel, kind, title_override, free|
   src = File.join(SRC, rel)
-  out, svgs = transform(File.read(src, encoding: 'UTF-8'), kind, title_override)
+  out, svgs = transform(File.read(src, encoding: 'UTF-8'), kind, title_override, free)
   File.write(File.join(ZBOOK, "#{slug}.md"), out, encoding: 'UTF-8')
   all_svgs.concat(svgs)
   slugs << slug
@@ -251,17 +254,27 @@ end
 
 all_svgs.uniq.each { |n| convert_svg(n); puts "image:   #{n}.png" }
 
-config = <<~YAML
-  title: "最小のRuby型チェッカーを作りながら学ぶ（The Little chibirigor）"
-  summary: "本物の漸進的型チェッカー Rigor を「小さく作り直して」学ぶ前編。数十〜数百行の Ruby で check / annotate が動く最小の型チェッカーを Part 0〜9 で作り切り、付録と用語集まで収めた一冊。"
-  topics: ["ruby", "rbs", "型システム", "prism", "rigor"]
-  published: false
-  price: 0
-  chapters:
-  #{slugs.map { |s| "  - #{s}" }.join("\n")}
-YAML
-File.write(File.join(ZBOOK, 'config.yaml'), config, encoding: 'UTF-8')
-puts "config:  config.yaml (#{slugs.size} chapters)"
+# config.yaml の publishing メタ（title/summary/topics/published/price）は著者が手で
+# 整えた公開状態（published: true / price 等）を持つので **保持** し、chapters 一覧だけ
+# 再生成する。既存が無い初回のみ未公開のひな型を出す（誤公開を避けるため published: false）。
+chapters_yaml = "chapters:\n#{slugs.map { |s| "  - #{s}" }.join("\n")}\n"
+cfg_path = File.join(ZBOOK, 'config.yaml')
+config =
+  if File.exist?(cfg_path)
+    prefix = File.read(cfg_path, encoding: 'UTF-8').sub(/\nchapters:.*\z/m, "\n")
+    "#{prefix.rstrip}\n#{chapters_yaml}"
+  else
+    <<~YAML
+      title: "最小のRuby型チェッカーを作りながら学ぶ（The Little chibirigor）"
+      summary: "本物の漸進的型チェッカー Rigor を「小さく作り直して」学ぶ前編。数十〜数百行の Ruby で check / annotate が動く最小の型チェッカーを Part 0〜9 で作り切り、付録と用語集まで収めた一冊。"
+      topics: ["ruby", "rbs", "型システム", "prism", "rigor"]
+      published: false
+      price: 0
+      #{chapters_yaml}
+    YAML
+  end
+File.write(cfg_path, config, encoding: 'UTF-8')
+puts "config:  config.yaml (#{slugs.size} chapters; publishing メタは保持)"
 
 # 雛形ファイルの掃除
 %w[example1.md example2.md].each do |f|
