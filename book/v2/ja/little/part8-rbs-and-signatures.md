@@ -277,5 +277,3 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 ---
 
 > **この章の実装（演習の答え合わせにも）** → [`impls/dist/part8/lib`](https://github.com/rigortype/chibirigor/tree/master/impls/dist/part8/lib)
-</content>
-</invoke>

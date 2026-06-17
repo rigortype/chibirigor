@@ -248,5 +248,3 @@ PASS: Num </: Bool
 ---
 
 > **この章の設計スケッチ** → [`examples/subtype.rb`](examples/subtype.rb)（`ruby subtype.rb`で自己チェック）
-</content>
-</invoke>

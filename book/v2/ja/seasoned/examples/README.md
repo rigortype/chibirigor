@@ -7,11 +7,15 @@
 | [`subtype.rb`](subtype.rb) | Part 2部分型と変性 | 幅／深さ部分型、**引数反変・戻り共変**（逆向きがfalseになる） |
 | [`mu_typeeq.rb`](mu_typeeq.rb) | Part 4再帰型 | μ 型の畳/展開の等価、**α 同値**、**余帰納（`seen`）で停止** |
 | [`subst.rb`](subst.rb) | Part 3ジェネリクスと型代入 | **シャドーイング**で止める、**変数捕獲**をfresh変数で回避 |
+| [`unification.rb`](unification.rb) | Part 5本物の型推論 | 制約を集めて**単一化**で解く（ジェネリックは自由なまま、矛盾は例外） |
+| [`fact_invalidation.rb`](fact_invalidation.rb) | Part 6完全なFactStore | 不変な事実ストア、**バケツ指定の無効化**（再代入／メソッド呼び出し） |
 
 ```console
 $ ruby subtype.rb
 $ ruby mu_typeeq.rb
 $ ruby subst.rb
+$ ruby unification.rb
+$ ruby fact_invalidation.rb
 ```
 
 > これらは*教育用の設計スケッチ*で、本物のRigorのコードではありません（型の表現も判定も最小限）。それでも、後編が言葉で説明した仕組み ― 反変・余帰納・捕獲回避 ― が、実際に手元で走って正しい答えを返すことを確かめられます。
