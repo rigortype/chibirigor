@@ -8,7 +8,7 @@ sidebar:
 # The Seasoned chibirigor Part 6　完全なFactStore
 
 > [!TIP]
-> 参考書（任意）：フロー解析の一般論（データフロー解析）。型理論の教科書（TAPL、『しくみ』）には直接の対応章はありません。ここはgradualな実用チェッカーの独自地形です。前編の素朴な`Scope`、`narrow`を、Rigorの本物の**FactStore**へ拡張する章です。
+> 参考書（任意）：フロー解析の一般論（データフロー解析）。型理論の教科書（『TAPL』、『しくみ』）には直接の対応章はありません。ここはgradualな実用チェッカーの独自地形です。前編の素朴な`Scope`、`narrow`を、Rigorの本物の**FactStore**へ拡張する章です。
 
 前編[Part 3（Scope）](../little/part3-scope-and-statements.md)で私たちは型環境を`Scope`（変数名→型のHash）として持ち、前編[Part 5（ナローイング）](../little/part5-narrowing.md)でナローイングを「枝ごとに`Scope`を差し替える」素朴な仕組みで実装しました。実用規模ではこれでは足りません。何が足りないか、そしてRigorがどう埋めたかを見ます。
 

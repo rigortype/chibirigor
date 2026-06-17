@@ -125,7 +125,7 @@ chibirigorを作り終えたいま、RigorのADRを読むと、その多くが**
 
 最後に、この旅の地図をたどります：
 
-1. **『しくみ』／TAPLの終着点が、chibirigorの出発点。** 静的で健全なチェッカーの*その先*としてgradual typingから私たちは始めました（必須ではないが、併読すると地続きに読めます）。
+1. **『しくみ』／『TAPL』の終着点が、chibirigorの出発点。** 静的で健全なチェッカーの*その先*としてgradual typingから私たちは始めました（必須ではないが、併読すると地続きに読めます）。
 2. **chibirigorの出発点が、Rigorへの入口。** 最小版で骨格を手で作ったいま、本物のRigorの実装は「拡大した同じ骨格」として読めます。
 3. **そしてRigorの入口は、Rubyの型付けという、まだ続く道の入口。** 漸進的型付けは研究も実装も現在進行形です。
 
@@ -140,7 +140,7 @@ chibirigorを作り終えたいま、RigorのADRを読むと、その多くが**
 | 1 | 双方向型付け（`type_of`＝`⇒`／`accepts`＝`⇐`、診断は照合位置のみ） |
 | 2 | 部分型と変性（width/depth、戻り共変、引数反変、gradual consistency） |
 | 3 | ジェネリクスと型代入（α 同値、変数捕獲、fresh、erasure） |
-| 4 | 再帰型（μ、余帰納 ↔ HKT/fuel。HKTの根拠はTAPL 29章） |
+| 4 | 再帰型（μ、余帰納 ↔ HKT/fuel。HKTの根拠は『TAPL』 29章） |
 | 5 | 本物の型推論（capability/duck、制約ベース、自明な範囲だけ） |
 | 6 | 完全なFactStore（6バケツ、stability、クロージャ捕獲、join） |
 | 7 | 健全性、正規化、そして「わざとunsound」＋gradual guarantee |
