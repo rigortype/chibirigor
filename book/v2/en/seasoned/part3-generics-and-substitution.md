@@ -201,7 +201,7 @@ time."
 
 ---
 
-## 3-6x. A note: reading the element type entered lib (generics 5a)
+## 3-6x. A note: reading the element type now lives in lib (generics 5a)
 
 > [!IMPORTANT]
 > Lib-ifying generics proceeds in three stages — **5a = reading the element type / 5b = pushing down
@@ -209,8 +209,8 @@ time."
 > treated in Seasoned Part 5 "5-6x."
 
 So far we've seen "how to substitute `Elem` in `Array[Elem]`" with concept and sketch (`subst.rb`).
-Its **doorway** — *reading out* `Elem` from a known array — has been promoted into the chibirigor
-body (`element_read` in `lib/chibirigor/type_of.rb`). It works with `annotate`/`check` with no
+Its **doorway** — *reading out* `Elem` from a known array — has graduated into chibirigor proper
+(`element_read` in `lib/chibirigor/type_of.rb`). It works with `annotate`/`check` with no
 special flag:
 
 ```console
@@ -231,7 +231,7 @@ It keeps zero false positives too: **an empty array `[].first` or an unknown rec
 `a = [1,2]; a.first + true` emits one "can't add true to an Integer."
 
 What lib gained here is generics' **read (5a).** The following **push-down (5b)** — flowing the
-element type into a block parameter (making `map { |x| ... }`'s `x` be `Elem`) — entered lib too;
+element type into a block parameter (making `map { |x| ... }`'s `x` be `Elem`) — is in lib too;
 the details, a worked example, and "why direct substitution suffices instead of unification" go to
 Seasoned Part 5 "5-6x." The **substitution `subst`** that led this chapter, and the **full
 unification** ([`examples/unification.rb`](examples/unification.rb)) that solves the general case

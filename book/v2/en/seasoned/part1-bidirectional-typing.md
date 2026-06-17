@@ -115,21 +115,21 @@ expected type is fixed." In bidirectional words:
 
 Let's be precise here. It is **not** that "annotation-free code has no `⇐` position" — a core-type
 method call (the `+` in `1 + x`, etc.) is a `⇐` position even with zero annotations, because RBS
-gives the argument's expected type. So *why* does working code still go unfrightened? There are two
+gives the argument's expected type. So *why* does working code still go unflagged? There are two
 reasons, both corresponding to the Little volume's Part 9 "deliberately miss":
 
 1. **Synthesis `⇒` deliberately doesn't fail (chibirigor-specific).** In bidirectional typing *in
-   general*, synthesis can fail on an unbound variable or unsynthesizable syntax. chibirigor
+   general*, synthesis can fail on an unbound variable or a form with no synthesis rule. chibirigor
    *intentionally* synthesizes every unknown into `untyped`, totalizing it. So even when "an
    expression that lost its type" comes to a `⇐` position, the synthesis result is `untyped`.
 2. **`untyped` passes straight through checking.** `accepts` is unconditionally `:maybe` (not
    punished) if either side is `Dynamic`. So even when `untyped` comes to a `⇐` position, it's not
    a diagnostic.
 
-To sum up — working code goes unfrightened not because "there's no `⇐` position" but because
-**"synthesis collapses the unknown to `untyped`, and checking doesn't punish `untyped`."** It's a
-property statable only by laying chibirigor's two gradual design judgments (① totalizing synthesis,
-② lenient checking) onto the bidirectional framework. Seasoned Part 7's "deliberately let go of
+To sum up — working code goes unflagged not because "there's no `⇐` position" but because
+**"synthesis collapses the unknown to `untyped`, and checking doesn't punish `untyped`."** You can
+state this property only by laying chibirigor's two gradual design judgments — ① totalizing
+synthesis, ② lenient checking — onto the bidirectional framework. Seasoned Part 7's "deliberately let go of
 soundness" catches these same two points in the language of progress/preservation — we recover, late
 in the volume, the foreshadowing dropped at the entrance.
 

@@ -79,9 +79,9 @@ its own; reach for them only where you want more.
 
 - **TAPL** — Benjamin C. Pierce, *Types and Programming Languages* (MIT Press). The full
   textbook, with real proofs for each topic. This is the shared reference for English readers.
-- **『しくみ』** (*The Mechanics of Type Systems*) — Yusuke Endoh, *Building a Type System in
-  TypeScript* (Lambda Note). A gentle distillation of TAPL's essence that builds a *checker*
-  for a typed mini-language — almost exactly chibirigor's mirror image. **It is published in
+- **『しくみ』** (*The Mechanics of Type Systems*) — Yusuke Endoh, *Learning Types and Programming
+  Languages by Building Them in TypeScript* (Lambda Note). A gentle distillation of TAPL's essence
+  that builds a *checker* for a typed mini-language — almost exactly chibirigor's mirror image. **It is published in
   Japanese only**; where it is the sole correspondence and no English equivalent exists, the
   text says so plainly.
 

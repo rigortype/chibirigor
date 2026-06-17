@@ -1,5 +1,5 @@
 ---
-title: Part 4 — Recursive types: μ and coinduction
+title: "Part 4 — Recursive types: μ and coinduction"
 description: "Treat recursive types, where a type references itself, with μ-notation, and read the correspondence with Rigor's HKT / fuel implementation."
 sidebar:
   order: 14

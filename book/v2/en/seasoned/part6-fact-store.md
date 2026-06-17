@@ -9,7 +9,7 @@ sidebar:
 
 > [!TIP]
 > References (optional): the general theory of flow analysis (dataflow analysis). The type-theory
-> textbooks (TAPL / 『しくみ』) have no directly corresponding chapter — this is the own terrain of
+> textbooks (TAPL / 『しくみ』) have no directly corresponding chapter — this is terrain unique to
 > gradual, practical checkers. This chapter extends the Little volume's naive `Scope` / `narrow` into
 > Rigor's real **FactStore.**
 

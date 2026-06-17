@@ -23,8 +23,8 @@ errors, a different question is needed:
 
 > This method wants an `Integer`. What you passed is a `String`. — **Does it fit?**
 
-This is an **acceptance check.** In 『しくみ』 ch. 7 it's built as `subtype(a, b)` (is a a subtype
-of b), and the answer was a two-way `true`/`false`.
+This is an **acceptance check.** In 『しくみ』 ch. 7 it's built as `subtype(a, b)` (is `a` a subtype
+of `b`), and the answer was a two-way `true`/`false`.
 
 But making this two-way in Ruby gets you stuck right away. `type_of` returns `Dynamic` (untyped)
 for an expression it can't tell (we decided so in Part 1). So:

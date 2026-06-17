@@ -1,5 +1,5 @@
 ---
-title: Part 5 — Real type inference: filling in arguments
+title: "Part 5 — Real type inference: filling in arguments"
 description: "Treat the constraint-based inference that derives the argument types the Little volume fell back to `untyped`, from how they're used in the body."
 sidebar:
   order: 15
@@ -266,10 +266,10 @@ diagnostic still appears only at a checking `⇐` position (where there's an RBS
 
 ---
 
-## 5-6x. A note: push-down to a block parameter entered lib (generics 5b · 5c)
+## 5-6x. A note: push-down to a block parameter now lives in lib (generics 5b · 5c)
 
-Road B's core — flowing the element type `Elem` into a block parameter — has been promoted into the
-chibirigor body (`type_of_block` in `lib/chibirigor/type_of.rb`). With the **push-down (5b)** that
+Road B's core — flowing the element type `Elem` into a block parameter — has graduated into
+chibirigor proper (`type_of_block` in `lib/chibirigor/type_of.rb`). With the **push-down (5b)** that
 follows Seasoned Part 3 "3-6x"'s **read (5a)**, generics' read and push-down become one continuous
 thing in lib (the full unification that solves the general case where the element is an *unknown type
 variable* = §5-3 is still a design sketch):
@@ -292,7 +292,7 @@ element type (`Tuple` or `Array[Elem]`), so `x := Elem` is exactly §5-3's unifi
 special case** — corresponding to the case where the constraint is just one `[[X, Integer]]` (the RHS
 `Elem` is ground = contains no free variable, so unification *degenerates to substitution*). Since the
 binding is decided without even calling `solve`, we settled it with direct substitution, adding no
-plumbing (minimal, budget-first). `examples/unification.rb`'s **full constraint-solving** is needed
+extra machinery (minimal, budget-first). `examples/unification.rb`'s **full constraint-solving** is needed
 for the general case where the element type is an *unknown type variable* and you *work it backward*
 from the block's usage — that's left as a design sketch (the "don't do all of it" judgment of Road
 A/B's §5-4).

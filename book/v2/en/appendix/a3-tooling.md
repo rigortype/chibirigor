@@ -91,7 +91,7 @@ demo.rb:2:5: info: fell to untyped here (can't look up the type of `+`)
 What to notice is **line 2.** `mystery_call`'s type is unknown so `x` becomes `untyped`, and the
 `+` against that `x` can't look up a type either and falls back to `untyped` — the **silence
 propagating** shows up on the map. Without `--explain` it just stays quiet with `No type errors`
-(since it produces no false positives). `:info` doesn't soil the exit code (`exit 0`), so you can
+(since it produces no false positives). `:info` doesn't touch the exit code (`exit 0`), so you can
 peek at "where the type vanished" without stopping CI.
 
 The difference from the real thing is that real Rigor keeps `Dynamic[Top]`'s `Dynamic` marker in
@@ -329,8 +329,8 @@ output JSON it's `--json`; auto-play is `--delay 0.5`.
 The mechanism is the same idea as the real thing, and **it doesn't touch the core at all.** It just
 inserts hooks into `type_of` / `eval_statement` / `Type.union` / `Dispatch.dispatch` with
 `Module#prepend`, and when the recorder is `nil` (= not tracing) the hook immediately `super`s. So
-`check`'s and `annotate`'s behavior is unchanged, **soiling not one line of the code copied in the
-main volume** (see the head comment of `tracer.rb`).
+`check`'s and `annotate`'s behavior is unchanged, **without touching a single line of the code you
+copied in the main volume** (see the head comment of `tracer.rb`).
 
 | | This book (chibirigor) | The real thing (Rigor) |
 |---|---|---|

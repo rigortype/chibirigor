@@ -64,7 +64,7 @@ Here's one round of the **three perspectives** (this book's recurring frame):
   later, in `case` branches and constant arithmetic. For now, just "Rigor remembers types
   finely."
 
-When a type is unknown — when there's no way to check — we **fall back to `Dynamic`
+When a type is unknown, with no way to check, we **fall back to `Dynamic`
 (`untyped`)** — the mark for "unknown / no way to check — keep quiet."
 
 > [!NOTE]

@@ -315,8 +315,8 @@ This chapter's three perspectives:
 | ③ Rigor's implementation problem | Make RBS the source of truth (swap only the foundation without changing behavior) / show with an RBS-style sig and make inference's weak point visible with `untyped` (the seed of sig-gen) |
 
 What we assembled in the main volume is just the skeleton of "types in a separate file, the return
-from the body." The rest is homework re-treated in the Seasoned volume *with proper names* — at
-the close of the main volume, let's survey where it's headed.
+from the body." The rest is work the Seasoned volume takes up and gives *proper names*. At the
+close of the main volume, here's where each piece is headed.
 
 **Handed to the sequel / later Parts:**
 

@@ -202,7 +202,7 @@ derivation, known as the OO-design rule "an override may widen arguments, may na
 > "I want to protect the precision for whoever uses a method's return value."
 
 The rule Rigor worked backward from these two *practical complaints* is "arguments lenient, returns
-strict," which matches S-Arrow. It reached the same form from on-the-ground experience without
+strict," which matches S-Arrow. It reached the same form from real-world experience without
 passing through a mathematical proof of substitutability.
 
 ```text

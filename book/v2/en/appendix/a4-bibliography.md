@@ -91,14 +91,14 @@ signpost.
 | 1 | What bidirectional typing really is | ch. 9 | ch. 3 | foundation (typing rules of simply-typed lambda; `⇒`/`⇐`) |
 | 2 | Subtyping and variance | ch. 15, 16 | ch. 7 | match (width/depth, variance, algorithmic subtyping) |
 | 3 | Generics and type substitution | ch. 23, 22, 26, 29 | ch. 9 | match (System F type application, α-conversion, bounded quantification) |
-| 4 | Recursive types: μ and coinduction | ch. 20, 21 (HKT in ch. 29) | ch. 8 | match (equirecursive, coinduction = greatest fixed point; the HKT aside has separate grounds) |
+| 4 | Recursive types: μ and coinduction | ch. 20, 21 (HKT in ch. 29) | ch. 8 | match (equi-recursive, coinduction = greatest fixed point; the HKT aside has separate grounds) |
 | 5 | Real type inference: filling in arguments | ch. 22 | ch. 9 exercises, afterword | frontier (type reconstruction, constraints, unification; where 『しくみ』 gave up the answer) |
 | 6 | The complete FactStore | (no corresponding ch.) | (no corresponding ch.) | own terrain (general dataflow analysis; no chapter in a type-theory textbook) |
 | 7 | Soundness, normalization, unsound on purpose | ch. 8 §8.3, ch. 12 | afterword | sets the central theorem (progress + preservation / normalization), tells *why unsound* |
 | 8 | Toward real Rigor | (no corresponding ch.) | (no corresponding ch.) | bridge (learning minimal version → practical tool; the correspondence is the ADRs and spec) |
 
 > [!NOTE]
-> Seasoned Part 6 (FactStore) and Part 8 (the bridge to Rigor) are **own terrain** with no
+> Seasoned Part 6 (FactStore) and Part 8 (the bridge to Rigor) are **terrain of their own** with no
 > corresponding chapter in a type-theory textbook. This is the engineering layer where the
 > Seasoned volume steps beyond TAPL.
 

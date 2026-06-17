@@ -89,7 +89,7 @@ is this:
 
 | Little §9-2's slogan | In progress/preservation words | The "stuck state" it admits |
 |---|---|---|
-| ① `untyped` accepts anything | abandons progress (accepts `untyped` against any expected type = passes subsumption straight through) | calling a method an `untyped` value doesn't answer → `NoMethodError` |
+| ① `untyped` accepts anything | abandons progress (accepts `untyped` against any expected type = passes subsumption straight through) | calling a method on an `untyped` value that doesn't answer → `NoMethodError` |
 | ② open hash · unknown key → `nil` | abandons progress (loosens width subtyping on arguments) | a key that's actually absent is `nil` → halts on a call to `nil` |
 | ③ doesn't punish `:maybe` | abandons progress (doesn't promote the unprovable to `:no`) | a `:maybe` is actually a mismatch → a runtime type error |
 | ④ conservative narrowing | abandons the *detection* of progress (doesn't narrow disjoint / `Dynamic`) | doesn't report the real error of a branch it couldn't narrow and missed |
@@ -120,7 +120,7 @@ disciplines.** What chibirigor keeps is these two.
 ### Discipline 1 — gradual consistency `~` (the discipline on the type side)
 
 Once `untyped` (`Dynamic`) is involved, subtyping `<:` becomes a special relation that **passes both
-ways.** This is called **gradual consistency** `~` (a point sent from Seasoned Part 2 §2-5):
+ways.** This is called **gradual consistency** `~` (carried over from Seasoned Part 2 §2-5):
 
 - both `untyped ~ T` and `T ~ untyped` hold (**symmetric**).
 - but `~` is **not transitive**: even with `Integer ~ untyped` and `untyped ~ String`, not `Integer ~
@@ -212,7 +212,7 @@ it correctly** (subtyping as the greatest fixed point, TAPL ch. 21).
 ### HKT reduction fuel — "stop when it gets dangerous" (Seasoned Part 4, ADR-20)
 
 Rigor doesn't implement recursive types directly with μ + coinduction; it makes a lightweight HKT
-(`Type::App`) + a **fuel budget** the alternative (a point sent from Seasoned Part 4 §4-5). It consumes
+(`Type::App`) + a **fuel budget** the alternative (carried over from Seasoned Part 4 §4-5). It consumes
 a counter each time it unfolds a higher-order type, cutting off at the ceiling (default 64 steps). This
 is a solution that **stops when it gets dangerous** — when fuel runs out it drops the result to
 `:maybe` and escapes to `untyped`, landing on the safe side.

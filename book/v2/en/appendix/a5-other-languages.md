@@ -52,9 +52,8 @@ is subtyping too.
 But **subtyping isn't only inheritance and implementation.** Recall Part 6 saying "a hash with
 *more* keys is a subtype of a hash with *fewer* keys" — `{name:, age:}` was a subtype of
 `{name:}`. Here there's neither `extends` nor `implements` — **no inheritance relation at all.**
-It's
-decided by *shape* alone: **as long as the structure (the keys held) is there, it's a subtype** —
-this is called **structural subtyping.** Java is basically a **nominal subtyping** world ("decided
+It's decided by *shape* alone: **as long as the structure (the keys held) is there, it's a
+subtype** — this is called **structural subtyping.** Java is basically a **nominal subtyping** world ("decided
 by name, by inheritance declaration"), so this is where intuition easily slips. It might click to
 say Go's interfaces and TypeScript's object types are structural.
 

@@ -59,7 +59,7 @@ Laid out on these two axes, the differences among similar faces become clear:
 
 In a phrase — **`unknown` presses you with "you don't know, so narrow it," while `any` /
 `Dynamic[Top]` say "you don't know, so stay quiet."** Same "don't know," but the attitude is exactly
-opposite — take soundness, or take not-stopping the on-the-ground code.
+opposite — take soundness, or take not-stopping the working code.
 
 ### Cross-language / cross-tool correspondence
 
@@ -166,9 +166,9 @@ Its property, too, is **dual** to top.
 | Rigor / RBS | `bot` (internal: `Bot`) | unreachable; a path that always stops at `raise` |
 
 > [!NOTE]
-> The chibirigor body doesn't build the bottom type *as a type*; it stops at treating "an
+> chibirigor itself doesn't build the bottom type *as a type*; it stops at treating "an
 > unreachable branch" as a **diagnostic** (real Rigor's unreachable arm, ADR-47). Under a "don't
-> frighten" policy, telling you "this won't be taken" is more useful on the ground than dutifully
+> frighten" policy, telling you "this won't be taken" is more useful in practice than dutifully
 > propagating the empty set.
 
 ### a1-3x. A note: chibirigor has an unreachable-arm diagnostic too (opt-in)

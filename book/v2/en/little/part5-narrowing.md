@@ -1,5 +1,5 @@
 ---
-title: Part 5 — Narrowing: splitting by case
+title: "Part 5 — Narrowing: splitting by case"
 description: "Narrow the types that Union grew, per branch of an if / case. Build the `narrow` implementation and the two laws of narrowing."
 sidebar:
   order: 6

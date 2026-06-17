@@ -60,7 +60,7 @@ that returns a new Scope, we can build "a note for this branch only" and hand it
 fouling the original.** The benefit is hard to see now, but this "add without changing the
 original" property pays off in the narrowing of later chapters.
 
-- **① Type theory:** the mapping that remembers variables' types = the type environment, tyenv
+- **① Type theory:** the mapping that remembers variables' types = the type environment, `tyEnv`
   (『しくみ』 ch. 3–4).
 - **② In Ruby:** local variables are everyday. `x = ...; ...x...`.
 - **③ In Rigor:** Scope is immutable. Adding a binding returns a new Scope (real Rigor uses the
@@ -182,7 +182,7 @@ This chapter's three perspectives:
 
 | | Content |
 |---|---|
-| ① Type theory (『しくみ』 ch. 3–4 / TAPL ch. 9, 11) | The type environment tyenv that remembers variables' types; sequencing that threads statements |
+| ① Type theory (『しくみ』 ch. 3–4 / TAPL ch. 9, 11) | The type environment `tyEnv` that remembers variables' types; sequencing that threads statements |
 | ② Ruby / RBS | Reassignment changes the type; a bare name with no assignment is a method call |
 | ③ Rigor's implementation problem | An immutable Scope makes "where what is visible" clear; reassignment is a type swap |
 

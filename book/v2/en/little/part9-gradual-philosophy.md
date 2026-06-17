@@ -68,8 +68,8 @@ The three perspectives:
 
 - **① Type theory:** the trade-off of soundness (ruling out undefined behavior) vs. fewer false
   positives.
-- **② In Ruby:** types bolted onto a dynamic language. Too strict and on-the-ground code stops
-  turning over.
+- **② In Ruby:** types bolted onto a dynamic language. Too strict and real-world code grinds to a
+  halt.
 - **③ In Rigor:** make "never frighten working code" the highest value. Deliberately miss.
 
 ---
@@ -136,9 +136,8 @@ And beneath these three lie the two ends of a **lattice** that orders types by s
 largest (holds anything) `Top` (⊤), and the smallest (zero inhabitants, unreachable) `Bot`
 (⊥)**. `Top` is close to Java's `Object`, a "ceiling," but how it works in checking is a different
 thing. Here it's enough to grasp just the symbols and their positions; the lattice itself in full
-is handed to the Seasoned volume. `untyped` was `Top` with a "be quiet" marker (`Dynamic`) laid
-on it; `never` was `Bot` itself; `void`, as *lattice behavior*, was next to `Top` — that was the
-relationship.
+is handed to the Seasoned volume. `untyped` is `Top` with a "be quiet" marker (`Dynamic`) laid
+on it; `never` is `Bot` itself; and `void`, as *lattice behavior*, sits next to `Top`.
 
 - **`untyped`:** the escape hatch when the type was **lost.** Accepts anything, can be passed to
   anything (the "stay quiet" type that gave up soundness). The hardest-working special type in the

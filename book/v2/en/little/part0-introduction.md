@@ -1,5 +1,5 @@
 ---
-title: Part 0 — Introduction: an inference-driven type checker
+title: "Part 0 — Introduction: an inference-driven type checker"
 description: The doorway to the book. Grasp what chibirigor is and isn't, share the implementation's premises, and the two promises that run through the whole book.
 sidebar:
   order: 1

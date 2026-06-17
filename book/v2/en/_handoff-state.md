@@ -54,6 +54,31 @@ and example `.rb` are reused as-is (English-canonical, byte-identical to v1).
   (per the v1/en convention); the only occurrences are in `seasoned/examples/README.md` where the
   mechanism is *described*, not applied.
 
+## Review pass — DONE (English read-feel battery, 5 lenses)
+
+Ran the established English review model (independent-context subagents; the `chibirigor-review`
+skill itself targets `book/v1/ja/`, so it doesn't apply to EN prose). Notes in
+[.reviews/](.reviews/): `_en-veteran-editor-review.md`, `_en-modern-editor-review.md`,
+`_en-fp-researcher-review.md`, `_en-copyedit-review.md`, `_fidelity-review.md`.
+
+- **Verdict: clean.** Zero type-theory ERRORs, zero fidelity breaks, near-publication copy. The
+  formal content (bidirectional rules, S-Arrow variance, capture-avoiding `subst`, equi/iso
+  split, progress + preservation, gradual consistency) and every citation (TAPL chapters,
+  Kfoury–Wells / Wells / Siek & Taha / Milner / Liskov, fuel = 64, budget 1,000,000) checked out.
+- **Fixes applied (axis-preserving):** a small recurring set of calques + mechanical copyedits —
+  現場 "on-the-ground" → "working code"/"real-world"; 回らない "turns over" → "grinds to a halt";
+  本体 "the chibirigor body" → "chibirigor proper / itself"; libに入った "entered lib" → "now lives
+  in lib"; 汚す "soiling the core" → "polluting"/"without touching a single line"; 送られてくる論点
+  "a point sent from" → "carried over from"; "the own terrain of" → "terrain unique to";
+  "unfrightened" → "unflagged"; "unsynthesizable syntax" → "a form with no synthesis rule"; a
+  few veteran prose tightenings (Part 4 subject-verb split, Part 8/9 flat tags). Copyedits:
+  `(is a a subtype of b)` → backticked vars; "method an `untyped` value" → "on an"; `tyenv` →
+  `tyEnv`; "equirecursive" → "equi-recursive"; 5 front-matter titles quoted (YAML `: ` safety);
+  README 『しくみ』 subtitle normalized to the edition-wide gloss; Part 8 §8-1 table header
+  `部品` "Part" → "Component".
+- **Stop-slop pass (earlier):** scan found the worst AI tells absent; one redundant filler cut
+  (Part 1 "simply").
+
 ## Conventions reminder
 
 - Source of truth is `book/v2/ja/`; **re-transcreate**, don't word-for-word diff. v1/en is the
@@ -73,8 +98,17 @@ and example `.rb` are reused as-is (English-canonical, byte-identical to v1).
    v2/ja's 3-row table. This looks like a v2/ja oversight (v1 had all five) — consider
    back-porting the two missing rows to `book/v2/ja/seasoned/examples/README.md`, after which the
    EN table should be re-synced.
-2. **Optional: wire `check_docs.rb` against `book/v2/en/`** (the EN prose currently omits the
+2. **Candidate source-side fix (shared JA+EN) — HM / "type reconstruction" definition.** The
+   glossary entry reads "type reconstruction / HM — inference that recovers types *from*
+   annotations" (`glossary.md`, EN; `glossary.md` 「注釈から型を復元する推論」, JA). This inverts
+   the defining property: HM recovers types *without* annotations (it reconstructs the *omitted*
+   ones; TAPL ch. 22). The FP-researcher lens flagged it as the one finding with real teeth. It
+   was **not** EN-patched, because it lives in the canonical JA too — fix both together at source
+   (suggested: "infer types **without annotations**, from how terms are used"), then re-sync EN.
+3. **Optional: wire `check_docs.rb` against `book/v2/en/`** (the EN prose currently omits the
    `<!-- include/run -->` markers; output is verified by reading). Same open follow-up noted in
    the examples README's English-edition note.
-3. **Optional: English review pass** — the v1/en "read-feel battery" (veteran editor / modern
-   editor / outside FP researcher) plus a native copyedit, per STYLE "Review."
+4. **Minor, faithful to JA (no action needed):** a4-2's Little-Part-8 row cites TAPL ch. 23/22
+   (the homes of Seasoned P3/P5) under an explicit "partial / distant relative" hedge — matches
+   the JA a4 table. a4-1's 『しくみ』 "Japanese only — the text says so plainly" is a deliberate
+   EN-audience addition (consistent with README / Part 0).
