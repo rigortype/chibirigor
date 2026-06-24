@@ -21,7 +21,7 @@ sidebar:
   - 『TAPL』のエッセンスをやさしく蒸留した入門書で、型注釈付きのミニ言語に対するチェッカーをTypeScriptで作る
   - 注釈を前提にする点で、推論を土台にするchibirigorとちょうど裏表の関係にある
   - 日本語のみ
-- 『**TAPL**』：Benjamin C. Pierce『型システム入門 ― プログラミング言語と型の理論』（オーム社。原著 *Types and Programming Languages*, MIT Press）
+- 『**TAPL**』：Benjamin C. Pierce『型システム入門 ― プログラミング言語と型の理論』（オーム社。原著*Types and Programming Languages*, MIT Press）
   - 本格的な教科書で、各話題に本式の証明がある
   - 英語で読むなら原著がそのまま参照先になる
 
