@@ -56,10 +56,10 @@ Its uses are these:
 
 ### Why a "map" can be drawn — recording the fail-soft moments
 
-This listing works because inference itself **records each moment it falls soft.** Every time it
-can't look up a type and falls to `Dynamic[Top]`, inference leaves that site behind as one record.
-`--explain` merely lays those records back out as `:info` diagnostics — the same idea as
-`rigor trace`, which we'll see later, laying out inference events.
+This listing works because inference itself **records every fail-soft as it happens.** Each time it
+can't look up a type and falls back to `Dynamic[Top]`, it leaves a record of that site.
+`--explain` simply lays those records out as `:info` diagnostics — the same idea as `rigor trace`
+(§a3-3b) laying out inference events.
 
 A record is made only where inference itself lost the type. Sending further methods to a value that
 is already `Dynamic[Top]` adds no new record: the cause of the loss lies at the first site, and
@@ -100,9 +100,9 @@ peek at "where the type vanished" without stopping CI.
 There are two differences from the real thing. One is that real Rigor records fail-soft moments
 *everywhere* in inference, whereas chibirigor picks up **just one kind, the unknown dispatch** (the
 implementation just stacks one line of provenance in the `signature`-is-nil branch of
-`lib/chibirigor/dispatch.rb`). The other is line 2. Real Rigor doesn't record again a call on a
-value that has already become `untyped`, so line 2 doesn't appear in its listing; chibirigor
-deliberately shows both to make the propagation visible. The idea of **mapping the silence** is the
+`lib/chibirigor/dispatch.rb`). The other is how line 2 is handled. Real Rigor adds no second
+record for a call on a value that is already `untyped`, so its listing would stop at line 1;
+chibirigor deliberately shows both to make the propagation visible. The idea of **mapping the silence** is the
 same.
 
 ---
@@ -117,10 +117,10 @@ with `annotate` (a tool of the same name as this book's) and editor hover, but t
 2. The conservative type after **dropping to a coarse type** at the RBS boundary (e.g. `String`,
    `Integer`).
 
-What `annotate` and diagnostics show is the internal type of 1; 2 appears when `sig-gen` writes out
-RBS. The real thing has a double structure of
-"**knowing precisely inside, throwing it away at the boundary**," so "inference seems to know more,
-yet why is the signature (RBS) so coarse" happens. The answer is this two-layer setup.
+`annotate` and the diagnostics show layer 1, the internal type; layer 2 appears only when
+`sig-gen` writes out RBS. Because the real thing "**knows precisely inside and throws it away at
+the boundary**," you meet the puzzle "inference seems to know more — so why is the signature (RBS)
+so coarse?" The answer is this two-layer setup.
 
 > [!NOTE]
 > The boundary operation of dropping a precise internal type to a coarse type expressible in RBS,
@@ -147,8 +147,8 @@ yet why is the signature (RBS) so coarse" happens. The answer is this two-layer 
 > include isn't needed. At run time `dump_type` just returns the value as is — when you `check`,
 > it **prints the inferred type at that position as an `:info` diagnostic** (the same idea as
 > PHPStan's `dumpType()`, riding the same `:info` mechanism as §a3-1's `--explain`. Not an error, so
-> sprinkling them doesn't turn diagnostics red). The type editor hover shows is the result of the
-> same inference, too.
+> sprinkling them doesn't turn diagnostics red). Editor hover shows the result of the same
+> inference.
 
 And **chibirigor also has `dump_type` as a basic feature.** Tools stay narrowed to the two of
 `check` and `annotate` — this is *not a command* but an **expression** `check` recognizes. No

@@ -146,9 +146,9 @@ violates "never frighten working code."
 So **narrow only when that class is possible** — narrow when `x` contains String, as in
 `Integer | String`; don't when it's `Integer` alone (that branch is a dead branch, so leave it
 untouched). We don't narrow `Dynamic` either (something whose type is unknown, we let through
-unknown). That last choice belongs to this book's minimal version: real Rigor does narrow
-`untyped` to `String` in the branch where `is_a?(String)` holds — inside that branch the value
-really is a `String` (or a subclass of it), so narrowing it can't produce a false positive.
+unknown). That last choice is a simplification of this book's minimal version. Real Rigor does
+narrow `untyped` to `String` where `is_a?(String)` holds: inside that branch the value really is a
+`String` (or a subclass), so narrowing can't produce a false positive.
 
 ```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK (dead branch; no false positive)
@@ -182,8 +182,8 @@ explicitly ask with `check --unreachable` — an opt-in (so as not to frighten w
 Real Rigor draws this line differently. It reports unreachable branches by default, but only
 where the proof is solid: a branch decided by a literal, like `if false`, is reported as
 `flow.unreachable-branch` at warning level, and a `case`/`when` clause that can never match as
-`flow.unreachable-clause` at info level. The dead branch that `is_a?` produces is, for now, outside that
-report.
+`flow.unreachable-clause` at info level. The dead branch that `is_a?` produces isn't reported, for
+now.
 
 chibirigor's `--unreachable` is the opposite of Java's and C#'s exhaustiveness checks, which "stop
 you until you write the missing arm": it **stays quiet about what works, and points out an unreachable branch only when asked** —
@@ -261,10 +261,9 @@ This chapter's three perspectives:
   (real Rigor's ADR-47). The main volume stops at `if`'s `nil?` / `is_a?`.
 - **the Union size budget:** the last chapter's `union` helper only drops duplicates. Real Rigor's
   specification sets a budget (`union_size`): when a Union's member count exceeds the cap, it is
-  **widened** to a Union of each member's nominal class (`Integer`, `String`, …) — but this is not
-  implemented yet. It is the same idea as constant
-  folding's "round if it's too big" — another expression of the design principle that "types, too,
-  *have a budget*."
+  **widened** to a Union of each member's nominal class (`Integer`, `String`, …). It isn't
+  implemented yet, but the idea is the same as constant folding's "round if it's too big" —
+  another expression of the design principle that "types, too, *have a budget*."
 
 ## Exercises
 

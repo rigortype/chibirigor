@@ -84,11 +84,10 @@ it through; it's a reference to consult after you've read up to Part 9.
 > whole-program execution tends to explode on large codebases, so we **narrow to local
 > inference and buy scale and "silence" (no false positives)** instead. Rigor doesn't run the
 > whole program from an entry point either, and by default it doesn't infer arguments backward.
-> There is an opt-in path that collects types from call sites; turning it on adds a pre-pass
-> that visits every call site once. Even so, what it collects is used only to add precision —
-> never as grounds for stricter diagnostics. This one line we won't
-> cross — not inferring arguments backward — the Little volume returns to concretely just once,
-> in Part 8, and the Seasoned volume treats carefully in Part 5.
+> It does offer an opt-in that collects types from call sites (an extra pass over them), but what
+> it collects only adds precision — it's never grounds for stricter diagnostics. The line
+> chibirigor won't cross — not inferring arguments backward — comes back concretely just once in
+> the Little volume, in Part 8, and the Seasoned volume treats it carefully in Part 5.
 
 > [!TIP]
 > **About the reference books (optional).** For readers who want to look one level deeper into

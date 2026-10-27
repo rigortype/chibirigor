@@ -64,8 +64,8 @@ Facts are held split into **buckets** by the kind of subject. Rigor has six kind
 2. **captured_local** — a local captured by a block.
 3. **object_content** — an object's contents (ivars, hash keys, etc.).
 4. **global_storage** — globals, class variables, etc.
-5. **dynamic_origin** — facts about dynamic provenance (in real Rigor, for example, a block escaping
-   so that when it gets called can't be read).
+5. **dynamic_origin** — facts about dynamic provenance (in real Rigor, for example, that a block
+   has escaped, so we can't tell when it will be called).
 6. **relational** — relations *between* variables (`x == y`, etc.).
 
 ```text
@@ -80,8 +80,8 @@ Facts are held split into **buckets** by the kind of subject. Rigor has six kind
 
 ![Figure 6-1 — the FactStore's six buckets](../figures/svg/seasoned-6-1.svg)
 > ▼ Figure 6-1 — the FactStore's six buckets. The top 5 split by "*which subject* the fact attaches
-> to." `dynamic_origin` alone is the odd one out, holding not a target scope but facts about dynamic
-> provenance.
+> to." `dynamic_origin` alone is the odd one out: its facts are about dynamic provenance, not about
+> a target scope.
 
 Why split — because the **timing of invalidation differs.** A reassignment to a local need only
 erase that local_binding fact, but a method call must doubt object_content broadly. The bucket names
@@ -95,8 +95,8 @@ union) in appendix [a2 — Narrowing patterns](../appendix/a2-narrowing-patterns
 [^buckets]: Of the six buckets, `local_binding`/`captured_local`/`object_content`/`global_storage`/
     `relational` split by "the subject a fact attaches to," whereas `dynamic_origin` alone is a
     separate lineage holding facts about dynamic provenance. Note that its standing differs (it lines
-    up as the sixth in the real spec too, but its role is separate). Tracking "*where* `untyped` was
-    born" itself is, in real Rigor, the job of an advisory table outside the FactStore
+    up as the sixth in the real spec too, but its role is separate). In real Rigor, tracking "*where*
+    `untyped` was born" is the job of a separate advisory table outside the FactStore
     (`Scope#dynamic_origins`, ADR-75).
 
 ---
@@ -120,7 +120,7 @@ a fact; loosen if you got it wrong," down to the lifetime.
 
 "Escape" is the case where a block that captured a variable **escapes outside the caller** (passing
 the block to `Thread.new`, `define_method`, `Enumerator`, etc., where it's saved). An
-immediately-invoked block like `each`/`map` can mostly retain facts, but an escaping block whose run
+immediately invoked block like `each`/`map` can mostly retain facts, but an escaping block whose run
 timing is unreadable conservatively invalidates the captured variables' `captured_local` facts — the
 details of this "immediate vs. escape" judgment are consolidated in a2-3 (escaping block) in appendix
 [a2 — Narrowing patterns](../appendix/a2-narrowing-patterns.md).
@@ -187,7 +187,7 @@ even for an immediate call.
 
 Real Rigor goes one step further. For a block that doesn't escape, like `each`'s, it re-evaluates the
 block body a bounded number of times, joins the types written, and writes them back to the outer
-scope (ADR-56). In the example above, it keeps `x` as the union type of `nil` or `Integer` instead
+scope (ADR-56). In the example above, it keeps `x` as `nil | Integer` instead
 of throwing the fact away. A local rewritten by a block that escapes, or one it can't judge, drops
 to `untyped`.
 
@@ -261,8 +261,9 @@ Even with all this added, the design's core is the same as the Little volume:
 
 **Next chapter (Part 7):** so far we've stacked "when in doubt, erase" and "deliberately loosen." Next
 chapter we take those head-on — **soundness and normalization**, and the four places chibirigor is
-*deliberately* unsound, and how real Rigor differs. We gather gradual's two disciplines (consistency and guarantee) and
-"coinduction vs. budget" in one place, pairing with Seasoned Part 1's bidirectional map.
+*deliberately* unsound (and where real Rigor differs). We gather gradual's two disciplines
+(consistency and guarantee) and the engineering of termination in one place, pairing with Seasoned
+Part 1's bidirectional map.
 
 ---
 

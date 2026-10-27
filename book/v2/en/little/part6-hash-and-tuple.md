@@ -118,8 +118,8 @@ different story: "you can pass `{name:, admin:}` where `{name:}` is wanted" is s
 called **width subtyping** (『しくみ』, too, adopts this width subtyping in ch. 7, allowing extra
 properties).
 
-chibirigor makes this **a fit.** What differs is the *motive and scope*. It isn't handling
-statically-written records for soundness. The counterpart is **Ruby's options hashes**, and the
+chibirigor, too, makes this **a fit.** What differs from 『しくみ』 is the *motive and scope*. It
+isn't handling statically written records for soundness. The counterpart is **Ruby's options hashes**, and the
 aim is **not producing false positives**:
 
 - In Ruby, "build a big options hash, and each method picks just the keys it needs" is **the
@@ -146,19 +146,19 @@ Laid out in the three perspectives:
   reality.
 - **③ In Rigor:** open versus closed is a *policy* the carrier itself holds. A record written in RBS
   as `{ name: String }` is read as a closed shape, and extra known keys are flagged. An undeclared
-  options hash has no expected type to begin with, so nothing is said. chibirigor reads every
-  expected shape as open, even where one is declared — a simplification that doesn't tell the
-  declared case from the undeclared one.
+  options hash has no expected type to begin with, so there's nothing to flag. chibirigor reads
+  every expected shape as open, declared or not — a simplification.
 
 > [!NOTE]
 > **`HashShape` is not Rigor's invention**
 >
 > "A structural hash type that remembers keys and value types" is not Rigor's invention. Several
-> type checkers have hit the same problem (Hack's `shape`, PHPStan/Psalm's `array{...}`), because a
-> naive join mixes the value types into `String | Integer` and loses the per-key information. Each
-> tool has drawn its own line between open and closed, and which one is the default differs by
-> tool: Hack's `shape` is closed by default and becomes open when you write `...`. chibirigor's `HashShape` is the minimal implementation of that
-> lineage. (For each tool's syntax and history, see appendix
+> type checkers hit the same problem and reached the same kind of type (Hack's `shape`,
+> PHPStan/Psalm's `array{...}`): a naive join mixes the value types into `String | Integer` and
+> loses the per-key information. Where each tool draws the line between open and closed, and which
+> one is the default, differs — Hack's `shape`, for instance, is closed by default and opens up when
+> you write `...`. chibirigor's `HashShape` is the minimal implementation of that lineage. (For each
+> tool's syntax and history, see appendix
 > [a5-3](../appendix/a5-other-languages.md).)
 
 > [!NOTE]
@@ -197,7 +197,7 @@ This chapter's three perspectives:
 |---|---|
 | ① Type theory (『しくみ』 ch. 5 / TAPL ch. 11 §11.8) | Gather values by label = a record type. The side with more keys is the subtype |
 | ② Ruby / RBS | Symbol-keyed options hashes are heavily used. An exact match doesn't fit reality |
-| ③ Rigor's implementation problem | This book makes the expectation open (at least): allow extras, blame only what's missing = apply width subtyping to a *dynamic hash* and avoid false positives. Real Rigor holds open/closed as a carrier policy, and a record written in RBS is closed, so extras are flagged |
+| ③ Rigor's implementation problem | This book reads every expectation as open (at least): allow extras, blame only what's missing = width subtyping on a *dynamic hash*, no false positives. Real Rigor makes open/closed a carrier policy: an RBS record is closed and flags extras |
 
 **Handed to the sequel:**
 

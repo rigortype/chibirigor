@@ -9,8 +9,8 @@ sidebar:
 
 > References (optional): TAPL ch. 22 "Type reconstruction" / 『しくみ』 ch. 9 exercises, afterword.
 > This chapter derives the *argument* types the Little volume fell back to `untyped`, from how they're
-> used in the body — the frontier of inference, which 『しくみ』 left without an answer, saying "we
-> don't know the correct answer."
+> used in the body — the frontier of inference, where 『しくみ』 stops with "we don't know the
+> correct answer."
 
 In Part 4 we treated recursive types, where a type references *itself*. From here we change
 direction and go to fill in the arguments we *fell back to untyped* in the Little volume.
@@ -86,7 +86,7 @@ end
 The procedure is three stages: **(1) assign a type variable to each unknown**, **(2) walk the body
 and gather constraints (equations, subtyping)**, **(3) solve with unification** (= looking at the
 gathered equations, find the type-variable assignment that lets two types be "the same"). If no
-constraint remains, as for `id`, that type variable becomes *generic as-is* (`(X) -> X`) — the type
+constraint remains, as for `id`, that type variable becomes *generic as is* (`(X) -> X`) — the type
 variables and substitution used here are the ones built in Part 3.
 
 The standalone minimal sketch making this "gather constraints and solve by unification" core run is
@@ -195,7 +195,7 @@ stance as 『しくみ』 ch. 9's exercise advice ("it's good to limit inference
 
 To sharpen the answer to "why not do all of it," let's compare with Ruby's official type inference
 tool, **TypeProf.** TypeProf is a type-level abstract interpreter bundled with Ruby core, designed by
-Yusuke Endoh (mametter) (details: the Rigor handbook, appendix-typeprof).
+Yusuke Endoh (mametter; details: the Rigor handbook, appendix-typeprof).
 
 > [!NOTE]
 > **TypeProf's way — whole-program abstract interpretation**
@@ -206,8 +206,8 @@ Yusuke Endoh (mametter) (details: the Rigor handbook, appendix-typeprof).
 > zero-annotation code. Its greatest strength is that, looking at callers, it can **infer argument
 > types from the call site.**
 
-The previous section's "Road B" gathered constraints from how the body uses a value and solved them.
-TypeProf runs the opposite *direction*, raising argument types from the caller. Its *way* isn't
+§5-3's "Road B" gathered constraints from how the body uses a value and solved them.
+TypeProf runs in the opposite *direction*, raising argument types from the caller. Its *way* isn't
 unification of type variables + constraints either; it's **abstract execution of the program at the
 type level** (a separate lineage from HM's unification). Interpreting the whole program at once, it
 tends to combinatorially explode at scale. The Rigor handbook positions TypeProf as "for small
@@ -221,17 +221,17 @@ files, prototype use."
 > contributions). For a method inside the project, it evaluates the callee's body with each call's
 > actual-argument types and takes that call's return type (ADR-57, ADR-84). But it never keeps the
 > types that flowed in as the parameter's type. This is the sharpest difference from TypeProf, which
-> merges the calls into the parameter's type. An unsolvable argument it drops to `Dynamic[Top]` (= `untyped`) and
-> cuts off, keeping cost down with hardcoded cutoff caps (Part 6's cache works too). A configurable
-> inference budget is being designed in ADR-41 and isn't wired in yet. Its goal is to run on the
-> whole codebase every push, so it prioritizes scale above all.
+> merges the calls into the parameter's type. It drops an unsolvable argument to `Dynamic[Top]`
+> (= `untyped`) and moves on, keeping cost down with hard-coded caps (Part 6's cache helps too); a
+> configurable inference budget is designed in ADR-41 but not yet wired in. Its goal is to run on
+> the whole codebase every push, so it prioritizes scale above all.
 
 | | TypeProf | Rigor |
 |---|---|---|
 | Unit of analysis | the whole program (from the entry) | one method at a time |
 | Other methods' return type | re-interpret the body | reference the catalog (in-project: evaluate the body with each call's actual arguments) |
 | Infer argument types from the call site? | **can** (its greatest strength) | not by default (opt-in: gathered, but used only for precision; ADR-67) |
-| Scale goal | small files, prototypes (as the Rigor handbook positions it) | the whole codebase, CI always-on |
+| Scale goal | small files, prototypes | the whole codebase, CI always-on |
 | Main output | RBS signatures (errors are a by-product) | diagnostics (only certain bugs; FP-zero-ism) |
 
 When the previous section said "keep argument inference to the obvious range," this comparison is the
@@ -239,9 +239,9 @@ reason. TypeProf's whole-program method is high-precision but weak at scale. Rig
 with local+catalog, and honestly makes the unsolvable `untyped` — **two answers to the same "infer
 arguments" challenge, solved with different values: scale, and FP-zero.**
 
-Note that `rigor sig-gen` (Chapter 11) does the same job as TypeProf (generate RBS from zero
-annotations), but its handling of argument types differs in the policy "don't make an observed call
-site the default" (ADR-5) — where TypeProf emits the types it saw as-is, Rigor doesn't fix "this
+Note that `rigor sig-gen` (the Rigor handbook, ch. 11) does the same job as TypeProf (generate RBS
+from zero annotations), but its handling of argument types differs in the policy "don't make an observed call
+site the default" (ADR-5) — where TypeProf emits the types it saw as is, Rigor doesn't fix "this
 argument only accepts that," leaving it `untyped` for the human.
 
 ---
@@ -253,18 +253,18 @@ set `parameter_inference: true` explicitly: an undeclared argument is handed to 
 union type of the actual-argument types solved at its call sites (ADR-67). This isn't Road B's
 unification but a merge (join) of observed types, and like TypeProf it runs from the callers.
 
-`rigor sig-gen --params=observed` also gathers argument types from observed calls, but it stands in a
-different place. It writes the gathered types into the RBS as a *proposal* for the parameter types;
-adopt it and it becomes a contract, and diagnostics at the boundary get stricter. That's why the
-default is `--params=untyped`, and whether to pin the arguments down is for a human to review and
-decide (ADR-5, ADR-14).
+`rigor sig-gen --params=observed` also gathers argument types from observed calls, but for a
+different purpose: it writes them into the RBS as a *proposal*. Adopted, the proposal becomes a
+contract and tightens diagnostics at the boundary — which is why, as §5-4a said, the default is
+`--params=untyped` and a human decides (ADR-5, ADR-14).
 
-There's just one hard part here. **The gathered type is a floor, not a ceiling** (in the subtype order, a
+The catch: **the gathered type is a floor, not a ceiling** (in the subtype order, a
 lower bound) — it's only part of the types that will really arrive. Even if only
 `Integer` shows up at the call sites, a call not yet seen might pass a `String`. So the types that
 `parameter_inference:` gathers are used only to raise the precision of the body's inference, never
-as grounds to reject a call at the argument boundary. Wherever the gathered type flows, too, Rigor emits no negative diagnostic that leans on
-the gathered type (an undefined method, a possible nil, and so on). Add precision, but don't add
+as grounds to reject a call at the argument boundary. Nor, wherever that type flows, does Rigor
+emit a negative diagnostic that leans on it (an undefined method, a possible `nil`, and so on). Add
+precision, but don't add
 diagnostics: the same "deliberately let go" judgment we'll see in Part 7 holds even where inference
 gets stronger.
 
@@ -281,9 +281,9 @@ And the important thing is that **precision rising doesn't increase diagnostics.
 type narrows from `untyped` to `{name: () -> String}`, that's a matter of *the synthesis side.* In the
 minimal version, a diagnostic still appears only at a checking `⇐` position (where there's an RBS
 declaration) — the "don't frighten" structure seen in Part 1 doesn't break when you add inference.
-Real Rigor doesn't rely on that alone: it explicitly suppresses negative diagnostics derived from
-inference. In Rigor's own development, too, opening the opt-in gate at first let new diagnostics leak
-out, and guards were added to hold them back (ADR-67 WD6d).
+Real Rigor doesn't rely on that alone; as §5-4b showed, it explicitly suppresses negative
+diagnostics derived from inference. That wasn't free: when the opt-in gate was first opened, new
+diagnostics leaked out until guards were added (ADR-67 WD6d).
 
 ---
 
@@ -291,10 +291,10 @@ out, and guards were added to hold them back (ADR-67 WD6d).
 
 - **capability role:** capability roles like `_ToS`, `_Each[T]`, `_Reader` are the container for
   the capabilities Road A gathers. Used in the acceptance check as structural interfaces.
-  - That said, inference that gathers capabilities from how the body uses a value (Road A itself)
-    is on hold in real Rigor too (ADR-67 WD2), because although named capability roles exist, there's no carrier yet to hold an
-    anonymous gathered capability set (which methods a value responds to). Put as an analogy, it
-    would be a carrier like a method version of the Little volume's Part 6 `HashShape`.
+  - That said, Road A itself — gathering capabilities from how the body uses a value — is on hold
+    in real Rigor too (ADR-67 WD2). Named capability roles exist, but there's no carrier yet for an
+    anonymous gathered set of capabilities (which methods a value responds to); think of it as a
+    method-level counterpart of Little Part 6's `HashShape`.
 - **Generics specialization:** at the call site, bind type variables from the actual arguments
   (a limited version of Road B's unification). Solving type variables from a block's return type, etc.
 - **fail-soft:** an unsolvable type variable degrades to `Dynamic[Top]` (= `untyped`). Same as the

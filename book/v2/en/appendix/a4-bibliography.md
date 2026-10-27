@@ -123,7 +123,7 @@ text use the v1 structure).
 |---|---|---|
 | ADR-5 | The robustness principle (how to avoid false positives) | Little Part 4, 7; Seasoned Part 7 (unsound on purpose) |
 | ADR-22 | baseline + onboarding | Little Part 9 (baseline proper) |
-| ADR-20 | Lightweight HKT (reduction recursion is stopped by cycle detection, with fuel as the outer safety net; implemented) | Seasoned Part 4 (fuel), Part 7 (budget) |
+| ADR-20 | Lightweight HKT (reduction recursion is stopped by cycle detection, with fuel as the outer safety net; implemented) | Seasoned Part 4 (cycle detection, fuel), Part 7 (budget) |
 | ADR-41 | Design of an inference budget (Status: Proposed, not implemented) | Seasoned Part 7 (budget) |
 | ADR-14 | sig-gen (signature generation) | Little Part 8, Seasoned Part 3 (erasure) |
 | ADR-25 | plugin RBS | Little Part 8 |

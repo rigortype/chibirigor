@@ -217,7 +217,7 @@ first error, and where we don't know (`foo.bar`) we *let it slide quietly.* This
 - **② In Ruby:** `1 + "x"` is a `TypeError` if you run it. `foo.bar` might work, depending on
   `foo`.
 - **③ In Rigor:** report only what definitely contradicts, and stay quiet where you don't know.
-  *Don't stop, don't frighten.* How far real Rigor goes in reporting, we'll see in Part 2.
+  *Don't stop, don't frighten.* Part 2 shows how far real Rigor goes in reporting.
 
 ---
 
@@ -271,9 +271,9 @@ RUBY
 > chibirigor's `annotate` is the minimal version that shows the inferred internal type as is.
 >
 > Real Rigor has a two-layer structure — "know precisely inside, round coarsely at the RBS
-> boundary." What `annotate` and the diagnostics show is the precise internal type; the
-> rounding kicks in when `sig-gen` writes out RBS. `sig-gen` is the feature that writes RBS out
-> from the inferred types; Part 8 covers it. So even though inference knows more, the
+> boundary." `annotate` and the diagnostics show the precise internal type; the rounding happens
+> only when `sig-gen` (the feature that writes RBS from inferred types, covered in Part 8) writes a
+> signature out. So even though inference knows more, the
 > outward-facing signature comes out coarse. That machinery is in appendix [a3-2](../appendix/a3-tooling.md).
 
 > [!NOTE]

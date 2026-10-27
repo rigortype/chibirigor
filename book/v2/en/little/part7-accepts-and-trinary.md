@@ -111,8 +111,8 @@ languages." `untyped` is the mark of "the type was lost." About something lost, 
 - **① Type theory:** once unknown (untyped) mixes in, the verdict *can't fall to one side*.
 - **② In Ruby:** code with no annotations is normal. Nobody knows the return of `foo.bar`.
 - **③ In Rigor:** this book's `accepts` stays quiet by answering `:maybe` where it doesn't know.
-  This connects directly to "don't frighten" in the next section. Real Rigor lets it through
-  gradually as `:yes`, but it stays quiet just the same.
+  This connects directly to "don't frighten" in the next section. Real Rigor answers `:yes`
+  instead — gradual typing's way of letting it through — and stays just as quiet.
 
 ---
 
@@ -166,7 +166,7 @@ are all `Integer` it's `:yes` = stay quiet (no false positive). If a `String` mi
   and passing it to an expression expecting `Integer` is `:no`.
 - **③ In Rigor:** even checking against a Union, "if unknown, `:maybe`." If even one member is `:no`, we
   can complain. If there's no `:no`, we let it through silently, even with a `:maybe` mixed in.
-  This is about the side passed as an argument; a Union *receiver*, as we saw in Part 4's 4-1x,
+  This is about the side passed as an argument; a Union *receiver*, as we saw in Part 4 §4-1x,
   complains only when every member fails.
 
 ![Figure 7-1 — accepts's three-valued verdict: untyped is :maybe, a Union the weakest answer](../figures/svg/little-7-1.svg)

@@ -122,16 +122,17 @@ Now that you've finished building chibirigor, reading Rigor's ADRs you see that 
 concrete resolutions of **the tensions met in the Little and Seasoned volumes**:
 
 - **To grasp the big picture first:** ADR-0 (the starting point of foundations and design principles)
-  → ADR-4 (how the type inference engine works). These two are the map of all later ADRs.
+  → ADR-4 (the inference engine, which introduces the FactStore). These two are the map of all
+  later ADRs.
 - "How to avoid false positives" ← Little Part 4, 6, Seasoned Part 7 (unsound on purpose). **To read:**
   ADR-5 (the robustness principle) / ADR-22 (baseline).
-- "How to stop recursion / inference" ← Seasoned Part 4 (fuel), Part 7 (budget). **To read:** ADR-20
-  (lightweight HKT) / ADR-41 (inference-budget design, unimplemented).
+- "How to stop recursion / inference" ← Seasoned Part 4 (cycle detection, fuel), Part 7 (budget).
+  **To read:** ADR-20 (lightweight HKT) / ADR-41 (inference-budget design, unimplemented).
 - "How to get along with RBS" ← Little Part 8, Seasoned Part 3 (erasure). **To read:** ADR-14 (sig-gen)
   / ADR-25, 32, 93 (plugin RBS, inline RBS, and loading it by default).
-- "How to hold flow facts" ← Seasoned Part 6 (FactStore). **To read:** ADR-4 (introducing the
-  FactStore) / ADR-56 (writing back locals captured by a block) and the internal spec
-  `inference-engine.md`.
+- "How to hold flow facts" ← Seasoned Part 6 (FactStore). **To read:** ADR-4 (the inference engine,
+  which introduces the FactStore) / ADR-56 (writing back locals captured by a block) and the
+  internal spec `inference-engine.md`.
 
 Reading the implementation with the eye that's settled, through theory, on "why it's built that way,"
 each ADR reads as a *narrative.*
@@ -165,7 +166,7 @@ Finally, the map of this journey:
    ongoing, in both research and implementation.
 
 If you've built it all the way to here — now, open real Rigor's code and read `ExpressionTyper`'s
-`PRISM_DISPATCH` table. It looks up the handling method from the node kind: the `case` of the
+`PRISM_DISPATCH` table. It maps each node kind to the method that handles it: the `case` of the
 `type_of` you wrote in the Little volume, opened out into a table so it stays readable as the
 branches multiply. The familiar skeleton should be there.
 

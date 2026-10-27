@@ -143,7 +143,7 @@ $ ruby test/test_part7.rb  # … green (only the table's origin changed)
 - **① Type theory:** consolidate the origin of types into a declaration (RBS).
 - **② In Ruby:** `.rbs` is the single source of types.
 - **③ In Rigor:** hand-written table → RBS-derived. Behavior is unchanged (we swap only the
-  internal implementation without changing the externally-observed behavior).
+  internal implementation without changing the externally observed behavior).
 
 With that, we have the foundation for reading types "from outside the code" (RBS). Next is the
 reverse — read the code of an **annotation-free** method, and *synthesize from our side* its
@@ -292,8 +292,8 @@ feature) — the `untyped` in a generated RBS points to "where a human should ad
 > precision, never as grounds for stricter argument diagnostics.
 >
 > `sig-gen --params=observed` is a slightly different animal. It writes the observed argument
-> types into the proposed RBS as parameter types. The default is `--params=untyped`, and whether
-> to narrow a parameter is decided by the human who adopts that proposal.
+> types into the proposed RBS as parameter types. The default is `--params=untyped`, and the human
+> who adopts that proposal decides whether to narrow a parameter.
 >
 > **The "real inference" that guesses arguments from how they're used is taken on head-on in
 > Seasoned Part 5.**

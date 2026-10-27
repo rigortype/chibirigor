@@ -72,15 +72,15 @@ whenever they handled a dynamic hash.
 
 - **Hack (Facebook):** a language that added static types to PHP. It introduced the type
   `shape('name' => string, 'age' => int)` and adopted the design "spell out the keys." The default
-  is closed; writing `...` makes it allow extras (open). A design conscious of coexisting with options hashes from the start.
+  is closed; writing `...` opens it to extra keys, which is how it makes room for options-hash-style
+  code.
 - **PHPStan / Psalm:** PHP's checkers hit the same problem and introduced the same type with the
   notation `array{name: string, age: int}`. The vocabulary follows Hack, and some can state
   open/closed explicitly.
 - **Rigor:** raises types from Ruby's RBS `{ name: String, age: Integer }`. Open/closed is a
   policy the carrier holds: a record written in RBS is read as a closed shape and rejects extra
-  known keys. An undeclared options hash has no expected type, so Rigor stays quiet. Receiving
-  every expected shape uniformly as an open "at least," even where one exists, is chibirigor's
-  simplification.
+  known keys. An undeclared options hash has no expected type, so Rigor stays quiet. Reading every
+  expected shape as an open "at least," declared or not, is chibirigor's simplification.
 
 In all three tools, a naive join (a wide type like `Hash[Symbol, String | Integer]`) loses the
 per-key information, so a type that remembers keys individually was needed. chibirigor's
@@ -108,13 +108,12 @@ union** that doesn't rely on a label, and the narrowing (Part 5) that tightens i
 The "unreachable arm" reporting touched on in Part 5 is a design *the reverse* of Java's and C#'s
 exhaustiveness checks. Java's and C#'s `switch` / pattern matching enforce **exhaustiveness**, and
 if the `case`s don't cover every pattern, the compiler stops you with a "*missing arm*." Rigor (and
-chibirigor) don't ask about "missing"; instead they report an "**unreachable arm**." When you write
-`if x.is_a?(String)` even though `x : Integer`, that branch never executes. chibirigor finds it with
-`check --unreachable` and tells you "this is a superfluous branch" (**opt-in**; by default it keeps
-"stay quiet about working code" and stays silent. A runnable worked example is in appendix
-[a1-3x](a1-special-types.md)). Real Rigor reports, by default, `case`/`when` clauses that can never
-match and branches like `if false`, but dead branches arising from `is_a?` are out of scope at
-present.
+chibirigor) don't ask about "missing"; instead they report an "**unreachable arm**." Real Rigor
+reports, by default, a `case`/`when` clause that can never match and a branch like `if false`.
+chibirigor goes after a different case: write `if x.is_a?(String)` even though `x : Integer`, and
+`check --unreachable` tells you "this is a superfluous branch" (**opt-in**; by default it stays
+quiet about working code. A runnable worked example is in appendix [a1-3x](a1-special-types.md)).
+Real Rigor doesn't report that `is_a?` case at present.
 
 | | Java / C# | Rigor / chibirigor |
 |---|---|---|

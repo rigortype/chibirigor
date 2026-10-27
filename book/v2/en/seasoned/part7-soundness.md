@@ -94,8 +94,8 @@ is this:
 | ③ doesn't punish `:maybe` | abandons progress (doesn't promote the unprovable to `:no`) | a `:maybe` is actually a mismatch → a runtime type error |
 | ④ conservative narrowing | abandons the *detection* of progress (doesn't narrow disjoint / `Dynamic`) | doesn't report the real error of a branch it couldn't narrow and missed |
 
-Note that ④'s "doesn't narrow `Dynamic`" is a gap in chibirigor. Under a trusted `is_a?` guard, real
-Rigor narrows `Dynamic` to a concrete type too (ADR-83).
+Note that ④'s "doesn't narrow `Dynamic`" is chibirigor's own simplification: under a trusted
+`is_a?` guard, real Rigor does narrow `Dynamic` to a concrete type (ADR-83).
 
 On the preservation side (the type is kept under evaluation), chibirigor doesn't *strongly assert* it
 to begin with — when things get doubtful it widens to `untyped`, so preservation is trivially kept in
@@ -183,9 +183,9 @@ distinguish "unsound on purpose" from anarchy.
 > ```ruby
 > # write it on the RBS side, or in the .rb with an rbs-inline comment (ADR-93)
 > class Guard
->   #  %a{rigor:v1:assert x is non-empty-string}
->   #  x: String?
->   #  return: void
+>   # @rbs %a{rigor:v1:assert x is non-empty-string}
+>   # @rbs x: String?
+>   # @rbs return: void
 >   def ensure_present!(x) = (raise if x.nil? || x.empty?)
 > end
 > ```
@@ -212,7 +212,7 @@ distinguish "unsound on purpose" from anarchy.
 chibirigor can't have normalization (if it types, it halts) either. Where theory guarantees "if it
 types, it halts" by *proof*, a practical checker keeps "**the analysis itself halts**" by
 *engineering.* The termination tools that appeared up to this chapter line up as a contrast between
-"stop it correctly" and "stop when it gets dangerous."
+"stop it correctly" and "stop when it gets dangerous," repeated at growing scales.
 
 ### Coinduction — "stop it correctly" (Seasoned Part 4)
 
@@ -223,10 +223,10 @@ it correctly** (subtyping as the greatest fixed point, TAPL ch. 21).
 
 ### HKT reduction: cycle detection and fuel (Seasoned Part 4, ADR-20)
 
-Rigor doesn't implement recursive types directly with μ + coinduction; it makes a lightweight HKT
-(`Type::App`) + a **fuel budget** the alternative (carried over from Seasoned Part 4 §4-5). If reduction
-comes back to the same application, it detects the cycle and returns the `App` being unfolded as-is,
-tying the knot. This cycle detection is a solution that **stops it correctly** on the side that
+Rigor doesn't implement recursive types directly with μ + coinduction; its alternative is a
+lightweight HKT (`Type::App`), stopped mainly by cycle detection with a **fuel budget** behind it
+(carried over from Seasoned Part 4 §4-5). If reduction comes back to the same application, it
+detects the cycle and returns the `App` being unfolded as is, tying the knot. This cycle detection is a solution that **stops it correctly** on the side that
 builds the type — the same role as μ-folding, and a different thing from `seen`, which decides a
 relation. For unfolding that still won't stop, it consumes a counter each time it unfolds, cutting
 off at the ceiling (default 64 steps). This one is a solution that **stops when it gets dangerous** —
@@ -247,9 +247,9 @@ also designed — cutting off the whole analysis with a budget, a large self-sim
 this one is *currently unimplemented* (ADR-41 is Status: Proposed).
 
 The *beauty of theory* "a type system guarantees normalization" is replaced, in a practical checker,
-by the *engineering* of "**cut off the analysis with a budget.**" Coinduction and cycle detection (stop correctly),
-fuel and budget (stop when dangerous) answer the same question of "how to stop the unfolding" at
-varying scales. That a practical checker can choose "stop when dangerous" was because of gradual's
+by the *engineering* of "**cut off the analysis with a budget.**" Coinduction and cycle detection
+stop correctly; fuel and budget stop when it gets dangerous. All four answer the same question —
+"how do we stop the unfolding?" — at varying scales. That a practical checker can choose "stop when dangerous" was because of gradual's
 settling: "fall back to `untyped` when you can't tell."
 
 ---
@@ -267,9 +267,9 @@ settling: "fall back to `untyped` when you can't tell."
   of those holes. We recover §1-3's foreshadowing here.
 - But it isn't anarchic — **gradual's two disciplines:** consistency `~` (symmetric, non-transitive)
   and the gradual guarantee (behavior continuous in annotation amount).
-- Instead of normalization, it keeps termination by **engineering** — coinduction and HKT cycle
-  detection (stop correctly), HKT fuel (ADR-20, implemented) and the inference budget (ADR-41,
-  designed, unimplemented) (stop when dangerous), a self-similar shape at varying scales.
+- Instead of normalization, it keeps termination by **engineering**: coinduction and HKT cycle
+  detection *stop correctly*; HKT fuel (ADR-20, implemented) and the inference budget (ADR-41,
+  designed, unimplemented) *stop when it gets dangerous* — the same answer at varying scales.
 
 ## Exercises
 

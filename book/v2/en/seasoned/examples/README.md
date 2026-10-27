@@ -38,7 +38,7 @@ The mechanism is just three things:
 2. **Verbatim sync of code** — putting `<!-- include: file.rb#region -->` on a prose ```code block
    checks that it's a **byte match** with that file's "`# region <id>` … `# endregion`" span.
 3. **Verbatim sync of output** — putting `<!-- run: file.rb -->` on a prose ```text block checks that
-   each line is **contained as-is in that file's actual output** (a subset is OK).
+   each line is **contained as is in that file's actual output** (a subset is OK).
 
 Usage (zero dependencies, stdlib only):
 
@@ -59,7 +59,7 @@ prose follow. Put `ruby check_docs.rb` in CI and you can stop drift from being p
 > `check_docs.rb` against `book/v2/en/` is an optional follow-up; see the contributor guide
 > [STYLE.md](../../STYLE.md) and the handoff ledger.
 
-> **Extension to the Little volume / implementation.** The same mechanism applies as-is to the Little
+> **Extension to the Little volume / implementation.** The same mechanism applies as is to the Little
 > volume (prose `little/*.md` ↔ `lib/chibirigor/*.rb`) — place regions on the `lib` side, put `include`
 > on the prose, and add the target md directory. Applying it on the Little side is separate (see the
 > handoff notes).

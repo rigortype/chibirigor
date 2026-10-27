@@ -105,18 +105,18 @@ end
 # when the Thread runs is unknown → keeping x's narrowing is dangerous
 ```
 
-The block passed to `Thread.new` runs at *any timing.* That block rewrites `x`, so we can't rule out
-that `x` has become a different type at any later point.
+The block passed to `Thread.new` can run at *any time.* It rewrites `x`, so from here on we can't
+rule out that `x` has become a different type.
 
 - **A fact dies:** on detecting this "escape," Rigor drops the facts about the outer variables
   that block **may rewrite**, and those variables **fall to `untyped`**. Facts about variables the block only reads survive.
 - **Target patterns:** `Thread.new`, `define_method`, `Proc.new` / `Fiber.new`, and other patterns
   that "save the block as an object / call it later."
 
-Whether a block is "immediately invoked" or "called later" Rigor looks up in a built-in catalog of
-(class, method) pairs. It does not infer this from RBS signatures; the plan is to let extension
-annotations override the catalog in the future. When it can't decide, it treats it as an
-escape, adopting the **when-in-doubt-erase** (fall to the looser side) policy.
+Rigor decides whether a block is "immediately invoked" or "called later" by looking it up in a
+built-in catalog of (class, method) pairs. It doesn't infer this from RBS signatures, though the
+plan is to let extension annotations override the catalog. When it can't decide, it treats the
+block as escaping — the **when-in-doubt-erase** policy (fall to the looser side).
 
 > [!NOTE]
 > Also, when a block **rewrites an outer local** (`x = nil; [1,2,3].each { |i| x = i }`), its
@@ -272,7 +272,7 @@ are handed to the Seasoned volume (Part 6).
 |---|---|---|
 | `&&` / `\|\|` (a2-1) | `&&` stacks sequentially from the left | `\|\|` keeps only the common ones at the merge join |
 | regexp capture (a2-2) | `String` to the capture name on the match-success side | `String \| nil` on the match-failure side / outside the block |
-| escaping block (a2-3) | an immediately-invoked block retains facts | invalidate `captured_local` on escape detection |
+| escaping block (a2-3) | an immediately invoked block retains facts | invalidate `captured_local` on escape detection |
 | ivar union (a2-4) | the union of all assignments into `object_content` | contains `nil` until a `nil?` guard adds `non-nil` |
 | reassignment reset (a2-5) | facts into `local_binding` on guard passage | `x = …` erases all of `x`'s facts |
 | refinement carrier (a2-6) | a precise `payload` on predicate-guard passage | back to the coarse type on reassignment / escape |
