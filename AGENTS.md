@@ -135,7 +135,7 @@ Ruby 3.4 以降（Prism 同梱）。テストフレームワークは使わな�
   `❶❷…`（U+2776〜の反転）は**使わない**。三題噺の ①型理論／②Ruby・RBS／③Rigor 実装、
   dispatch の段番号なども `①` 系で統一する。
 - `chibirigor` 独自の最小キャリアは `Const[1]` 等のコード表記のままでよい（実装の都合）。本物の
-  Rigor の表示を引くときは `Constant<3>` / `int<min, max>` / `Dynamic[Top]` のサイト記法に従う。
+  Rigor の表示を引くときは `Constant<3>` / `Integer[min..max]` / `Dynamic[Top]` のサイト記法に従う。
 - **サイト統合の準備（将来）**：Astro + Starlight。各章 md には `title` / `description` /
   `sidebar.order` の frontmatter が要る（その際 `# 【ドラフト】…` の H1 は frontmatter `title` へ移す）。
   本文確定時にまとめて付与する。

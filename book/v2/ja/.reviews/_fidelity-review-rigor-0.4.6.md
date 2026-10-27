@@ -99,6 +99,8 @@
 
 ## E. 統治文書・台帳
 
+> 反映済み（2026-10-27）：AGENTS.mdは`int<min, max>`→`Integer[min..max]`のみ直した。`Dynamic[Top]`は本書の大文字統一（付録a1）に合わせて据え置く。対応レポートは下記6点に加え、fuelの記述を「循環検出＋外側のfuel」に揃えた。
+
 - `AGENTS.md`「用語・表記」：`int<min, max>` → `Integer[min..max]`、`Dynamic[Top]` → `Dynamic[top]`（:126の表と :138）。
   統治ファイルなので**人間の判断で直す**。`Constant<3>`はhandbookの綴りなのでOK（annotateの実際の表示は`3`）。
 - `docs/20260607-type-systems-distilled-rigor-mapping.md`：
