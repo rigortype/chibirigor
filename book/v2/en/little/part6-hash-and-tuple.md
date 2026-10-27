@@ -118,7 +118,7 @@ different story: "you can pass `{name:, admin:}` where `{name:}` is wanted" is s
 called **width subtyping** (『しくみ』, too, adopts this width subtyping in ch. 7, allowing extra
 properties).
 
-Rigor, too, makes `HashShape` **a fit.** What differs is the *motive and scope*. It's not handling
+chibirigor makes this **a fit.** What differs is the *motive and scope*. It's not handling
 statically-written records for soundness; the counterpart is **Ruby's options hashes**, and the
 aim is **not producing false positives**:
 
@@ -127,7 +127,7 @@ aim is **not producing false positives**:
 - If you balked every time there was an extra key, **properly working code would go bright
   red.**
 
-So Rigor's HashShape, seen from the expecting side, is **"as long as it has *at least* these
+So chibirigor's `HashShape`, seen from the expecting side, is **"as long as it has *at least* these
 keys, it's fine"** (open). Extras don't matter. **Only when a needed key is *missing* is it a
 problem.** This is how "never frighten working code" shows up in a structural type.
 
@@ -144,8 +144,10 @@ Laid out in the three perspectives:
     the next chapter, Part 7, as "does it fit in the box."
 - **② In Ruby:** an extra key in an options hash is everyday. Forcing an exact match doesn't fit
   reality.
-- **③ In Rigor:** the expectation is open ("at least"). Allow extras, blame only what's missing =
-  avoid false positives.
+- **③ In Rigor:** open versus closed is a *policy* the carrier itself holds. A record written in RBS
+  as `{ name: String }` is read as a closed shape, and extra known keys are flagged. An undeclared
+  options hash has no expected type to begin with, so nothing is said. chibirigor's always-open
+  choice is a simplification that keeps only the "stay silent where nothing is declared" side.
 
 > [!NOTE]
 > **`HashShape` is not Rigor's invention**
@@ -193,7 +195,7 @@ This chapter's three perspectives:
 |---|---|
 | ① Type theory (『しくみ』 ch. 5 / TAPL ch. 11 §11.8) | Gather values by label = a record type. The side with more keys is the subtype |
 | ② Ruby / RBS | Symbol-keyed options hashes are heavily used. An exact match doesn't fit reality |
-| ③ Rigor's implementation problem | The expectation is open (at least). Allow extras, blame only what's missing = apply width subtyping to a *dynamic hash* and avoid false positives |
+| ③ Rigor's implementation problem | This book makes the expectation open (at least): allow extras, blame only what's missing = apply width subtyping to a *dynamic hash* and avoid false positives. Real Rigor holds open/closed as a carrier policy, and a record written in RBS is closed, so extras are flagged |
 
 **Handed to the sequel:**
 

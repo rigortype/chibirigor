@@ -84,9 +84,10 @@ There are two rules:
 - **Depth subtyping:** if each key's value type is a subtype, the record is too
   (`S_i <: T_i ⇒ {l_i: S_i} <: {l_i: T_i}`). **Covariant** in the value types.
 
-When in Little Part 6 we said "Rigor leans open (allows extra keys)," that meant **allowing this
-width subtyping on the argument side.** `accepts`-over-`HashShape` just runs these two rules
-recursively.
+When chibirigor allowed extra keys in Little Part 6, that meant **always applying this width
+subtyping on the argument side.** In real Rigor, width subtyping applies only when the expected
+side is an *open* shape: a record written in RBS is read as a *closed* shape and rejects extra
+known keys. `accepts`-over-`HashShape` just runs these two rules recursively.
 
 > [!TIP]
 > **Reference note.** TAPL 15.2 "The subtype relation," 『しくみ』 ch. 7 implements this as a

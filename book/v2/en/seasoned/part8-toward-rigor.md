@@ -51,7 +51,7 @@ repository's `docs/adr/`):
 | **LSP (editor integration)** | real-time type-error display, completion, hover | ADR-19 (bundled Language Server) |
 | **CI integration** | output each CI can read: SARIF/GitHub/GitLab, etc. | ADR-51 (CI output formats) / ADR-27 (distribution) |
 | **baseline/onboarding** | retrofit introduction to existing code (Little Part 9's baseline in full) | ADR-22 (baseline + onboarding) |
-| **Performance** | practical speed via reduced allocation, concurrent analysis | ADR-44 (allocation) / ADR-15 (Ractor/fork) / ADR-50 (performance gates) |
+| **Performance** | practical speed via reduced allocation, concurrent analysis | ADR-44 (allocation) / ADR-15 (Ractor/fork) / ADR-50 (release-engineering and stability strategy, including performance gates; Proposed) |
 
 These are not "**the type system itself**" but "features that *apply* the type system" (『しくみ』, too,
 at the start (the book's background and purpose) cautions that editor support is not a property of the
@@ -128,9 +128,10 @@ concrete resolutions of **the tensions met in the Little and Seasoned volumes**:
 - "How to stop recursion / inference" ← Seasoned Part 4 (fuel), Part 7 (budget). **To read:** ADR-20
   (lightweight HKT) / ADR-41 (inference-budget design, unimplemented).
 - "How to get along with RBS" ← Little Part 8, Seasoned Part 3 (erasure). **To read:** ADR-14 (sig-gen)
-  / ADR-25, 32 (plugin RBS, inline RBS).
-- "How to hold flow facts" ← Seasoned Part 6 (FactStore). **To read:** ADR-46 (incremental dependency
-  graph) and the internal spec `inference-engine.md`.
+  / ADR-25, 32, 93 (plugin RBS, inline RBS, and loading it by default).
+- "How to hold flow facts" ← Seasoned Part 6 (FactStore). **To read:** ADR-4 (introducing the
+  FactStore) / ADR-56 (writing back locals captured by a block) and the internal spec
+  `inference-engine.md`.
 
 Reading the implementation with the eye that's settled, through theory, on "why it's built that way,"
 each ADR reads as a *narrative.*
@@ -163,8 +164,10 @@ Finally, the map of this journey:
 3. **And Rigor's doorway is the doorway to the still-continuing road of typing Ruby.** Gradual typing is
    ongoing, in both research and implementation.
 
-If you've built it all the way to here — now, open real Rigor's code and read `ExpressionTyper`'s first
-`case`. The familiar shape of the `type_of` you wrote in the Little volume should be there.
+If you've built it all the way to here — now, open real Rigor's code and read `ExpressionTyper`'s
+`PRISM_DISPATCH` table. It looks up the handling method from the node kind: the `case` of the
+`type_of` you wrote in the Little volume, opened out into a table so it stays readable as the
+branches multiply. The familiar skeleton should be there.
 
 ---
 

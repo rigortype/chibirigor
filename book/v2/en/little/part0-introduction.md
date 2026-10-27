@@ -80,9 +80,12 @@ it through; it's a reference to consult after you've read up to Part 9.
 > to parameter types**, generating RBS — exactly the job chibirigor gives up on by collapsing
 > to `untyped`.
 >
-> That chibirigor (and Rigor) deliberately *don't* do this is not a weakness but a design
-> choice: whole-program execution tends to explode on large codebases, so we **narrow to local
-> inference and buy scale and "silence" (no false positives)** instead. This one line we won't
+> That chibirigor deliberately *doesn't* do this is not a weakness but a design choice:
+> whole-program execution tends to explode on large codebases, so we **narrow to local
+> inference and buy scale and "silence" (no false positives)** instead. Rigor doesn't run the
+> whole program either, and by default it doesn't infer arguments backward. There is an opt-in
+> path that collects types from call sites, but it is used only to add precision — never as
+> grounds for stricter diagnostics. This one line we won't
 > cross — not inferring arguments backward — the Little volume returns to concretely just once,
 > in Part 8, and the Seasoned volume treats carefully in Part 5.
 

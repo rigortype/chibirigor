@@ -146,7 +146,9 @@ violates "never frighten working code."
 So **narrow only when that class is possible** — narrow when `x` contains String, as in
 `Integer | String`; don't when it's `Integer` alone (that branch is a dead branch, so leave it
 untouched). We don't narrow `Dynamic` either (something whose type is unknown, we let through
-unknown).
+unknown). That last choice belongs to this book's minimal version: real Rigor does narrow
+`untyped` to `String` in the branch where `is_a?(String)` holds — inside that branch the value
+really is a `String`, so narrowing it can't produce a false positive.
 
 ```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK (dead branch; no false positive)
@@ -173,12 +175,18 @@ check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n x + 1\nend\n")  # String-addition
 ### Reporting an unreachable arm
 
 Leaving the dead branch of `is_a?` "untouched (not narrowed)" is a passive way to avoid a false
-positive, but Rigor goes one step further and can **point out that branch as "a superfluous branch
-that is never taken."** By default, though, it stays silent; it surfaces only when you explicitly
-ask with `check --unreachable` — an opt-in (so as not to frighten working code).
+positive, but chibirigor goes one step further and can **point out that branch as "a superfluous
+branch that is never taken."** By default, though, it stays silent; it surfaces only when you
+explicitly ask with `check --unreachable` — an opt-in (so as not to frighten working code).
 
-The opposite of Java's and C#'s exhaustiveness checks, which "stop you until you write the missing
-arm," this **stays quiet about what works, and points out an unreachable branch only when asked** —
+Real Rigor draws this line differently. It reports unreachable branches by default, but only
+where the proof is solid: a branch decided by a literal, like `if false`, gets the
+`flow.unreachable-branch` warning, and a `case`/`when` clause that can never match gets the
+`flow.unreachable-clause` info. The dead branch that `is_a?` produces is, for now, outside that
+report.
+
+chibirigor's `--unreachable` is the opposite of Java's and C#'s exhaustiveness checks, which "stop
+you until you write the missing arm": it **stays quiet about what works, and points out an unreachable branch only when asked** —
 another expression of the "don't frighten" value, on the same axis as the judgment, in the
 `possible?` guard above, to "not narrow when it's impossible."
 
@@ -251,9 +259,10 @@ This chapter's three perspectives:
   (the complete FactStore).
 - narrowing for `case`/`when`, `case`/`in` (pattern matching), and detection of unreachable arms
   (real Rigor's ADR-47). The main volume stops at `if`'s `nil?` / `is_a?`.
-- **the Union size budget:** the last chapter's `union` helper only drops duplicates, but in real
-  Rigor, when a Union's member count exceeds a configured cap, it is **forcibly widened** to a
-  Union of each member's nominal class (`Integer`, `String`, …). This is the same idea as constant
+- **the Union size budget:** the last chapter's `union` helper only drops duplicates. Real Rigor's
+  specification sets a budget (`union_size`): when a Union's member count exceeds the cap, it is
+  **widened** to a Union of each member's nominal class (`Integer`, `String`, …) — but this is not
+  implemented yet. It is the same idea as constant
   folding's "round if it's too big" — another expression of the design principle that "types, too,
   *have a budget*."
 

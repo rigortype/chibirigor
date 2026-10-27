@@ -82,8 +82,9 @@ The three perspectives:
 
 - **① Type theory:** does a value *go into* the expected type = subtyping (『しくみ』 ch. 7).
 - **② In Ruby:** `1` is `Integer`, `"x"` is `String`. You can judge roughly by class.
-- **③ In Rigor:** a fine type like `Const[1]` is *rounded to a class* before judging (Part 1's
-  "rounding" works here too).
+- **③ In Rigor:** this book's `accepts` *rounds* a fine type like `Const[1]` *to a class* before
+  judging (Part 1's "rounding" works here too). Real Rigor compares down to the value without
+  rounding, so passing `2` to an argument whose RBS expects the literal type `1` is reported.
 
 ---
 
@@ -162,8 +163,8 @@ are all `Integer` it's `:yes` = stay quiet (no false positive). If a `String` mi
   conclusion = union-subtyping).
 - **② In Ruby:** `c ? 1 : 2` is `Integer | Integer`, so no problem. `c ? 1 : "a"` becomes a Union,
   and passing it to an expression expecting `Integer` is `:no`.
-- **③ In Rigor:** even checking against a Union, "if unknown, `:maybe`." We can only complain when
-  everyone is `:yes`.
+- **③ In Rigor:** even checking against a Union, "if unknown, `:maybe`." If even one member is `:no`, we
+  can complain. Only when every member is `:yes` do we let it through silently.
 
 ![Figure 7-1 — accepts's three-valued verdict: untyped is :maybe, a Union the weakest answer](../figures/svg/little-7-1.svg)
 > ▼ Figure 7-1 — `accepts`'s three-valued verdict: untyped is `:maybe`, a Union takes the weakest answer

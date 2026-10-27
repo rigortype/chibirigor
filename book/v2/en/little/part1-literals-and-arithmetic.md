@@ -217,7 +217,11 @@ first error, and where we don't know (`foo.bar`) we *let it slide quietly.* This
 - **② In Ruby:** `1 + "x"` is a `TypeError` if you run it. `foo.bar` might work, depending on
   `foo`.
 - **③ In Rigor:** report only what definitely contradicts, and stay quiet where you don't know.
-  *Don't stop, don't frighten.*
+  *Don't stop, don't frighten.* Real Rigor goes a little further: when it knows the receiver's
+  class and can prove the method isn't there, it reports `call.undefined-method`. For a shape
+  like `foo.bar`, calling an unidentifiable top-level `foo`, it emits a
+  `call.unresolved-toplevel` warning. It stays quiet when it has lost the receiver's type
+  itself.
 
 ---
 
@@ -270,9 +274,10 @@ RUBY
 > [!NOTE]
 > chibirigor's `annotate` is the minimal version that shows the inferred internal type as is.
 >
-> Real Rigor's `annotate` has a two-layer structure — "know precisely inside, round coarsely at
-> the RBS boundary" — so even though inference knows more, the outward-facing signature comes
-> out coarse. That machinery is in appendix [a3-2](../appendix/a3-tooling.md).
+> Real Rigor has a two-layer structure — "know precisely inside, round coarsely at the RBS
+> boundary." What `annotate` and the diagnostics show is the precise internal type; the
+> rounding kicks in when `sig-gen` writes out RBS. So even though inference knows more, the
+> outward-facing signature comes out coarse. That machinery is in appendix [a3-2](../appendix/a3-tooling.md).
 
 > [!NOTE]
 > The code so far only *rounds* `1 + 2` to `Integer`. But `1` and `2` are both known values, so

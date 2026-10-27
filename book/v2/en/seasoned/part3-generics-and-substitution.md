@@ -182,8 +182,9 @@ the execution result" (a different thing from Java generics' "type erasure" — 
 implementation technique for dropping types from generated code, this is a *semantic* theorem).
 
 For Rigor, erasure has one more meaning — the operation of **conservatively returning the rich
-internal type to RBS.** `HashShape` returns to an RBS record or `Hash[K,V]`, a literal union to its
-base class, `Dynamic[T]` to `untyped`. **It may get wider, but never narrower** (a sound
+internal type to RBS.** `HashShape` returns to an RBS record or `Hash[K,V]`; a literal kind RBS can't
+spell, or a literal union over budget, to its base class; `Dynamic[T]` to `untyped`. Literals RBS
+*can* spell — integers, strings, symbols and the like — stay literals. **It may get wider, but never narrower** (a sound
 approximation). This is the substance of "Rigor is a superset of RBS, writable back to RBS at any
 time."
 

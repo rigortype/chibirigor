@@ -39,7 +39,12 @@ c ? 1 : "a"      ->  1 | "a"
 
 The reasoning is straightforward. If we've lost track of even part of the type, we can't assert
 anything about that union type. Rather than holding it half-baked as `1 | untyped`, we say
-`untyped` honestly. This is gradual's way of thinking.
+`untyped` honestly. This is the most conservative form, and the one chibirigor chose.
+
+Real Rigor makes a different choice. It keeps `c ? 1 : foo.bar` as `1 | Dynamic[top]`, without
+throwing away the side it knows. Remembering which side lost the type is more precise, and the
+known `1` side stays protected from then on. Both refuse to assert anything where the type is
+unknown; what differs is how much of the known side is kept.
 
 ---
 
@@ -58,6 +63,11 @@ code." Let's make clear, at the end, where it misses:
 
 Each trades "a miss = the danger of overlooking a bug" to avoid "a false positive = frightening
 working code." chibirigor (and Rigor) weigh the latter cost far more heavily.
+
+That said, real Rigor draws the line a little differently for 2 and 4. It flags surplus keys in a
+record written in RBS (Part 6), and it narrows even `untyped` under a trusted guard like `is_a?`
+(Part 5). Strict where there is a declaration or a proof, silent where there isn't — an
+adjustment on the same axis.
 
 > [!NOTE]
 > These four, raised here as a slogan, are re-stated in formal language in the Seasoned volume,

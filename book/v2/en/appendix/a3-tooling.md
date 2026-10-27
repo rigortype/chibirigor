@@ -44,8 +44,7 @@ the type here" is output.
 
 ```console
 $ rigor check --explain app/models/user.rb
-app/models/user.rb:42:7: info: fell soft to Dynamic[Top] here (RBS not found for `external_call`)
-app/models/user.rb:51:3: info: fell soft to Dynamic[Top] here (param `opts` is untyped)
+app/models/user.rb:42:7: info: fail-soft fallback at Prism::CallNode: Dynamic[top] [fallback]
 ```
 
 Its uses are these:
@@ -55,17 +54,21 @@ Its uses are these:
 - From the fail-soft site you reach, you can discover **missing RBS, an unconfigured plugin, gaps in
   type annotations.**
 
-### Why a "map" can be drawn — recovering the `Dynamic[Top]` marker
+### Why a "map" can be drawn — recording the fail-soft moments
 
-This listing works because the **`Dynamic` marker of `Dynamic[Top]`** touched on in Little Part 1
-**doesn't vanish** at the fail-soft site. By holding `untyped` not as "just a hole" but as "a `Top`
-marked with `Dynamic`," "where it stayed quiet" **remains as structure.** That's exactly why it can
-be raised into a list later with `--explain`.
+This listing works because inference itself **records each moment it falls soft.** Every time it
+can't look up a type and falls to `Dynamic[Top]`, inference leaves that site behind as one record.
+`--explain` merely lays those records back out as `:info` diagnostics — the same idea as
+`rigor trace`, which we'll see later, laying out inference events.
+
+A record is made only where inference itself lost the type. Sending further methods to a value that
+is already `Dynamic[Top]` adds no new record: the cause of the loss lies at the first site, and
+fixing it there fixes what follows.
 
 | | This book (chibirigor) | The real thing (Rigor) |
 |---|---|---|
 | What `untyped` really is | `Type::Dynamic` (just a mark) | `Dynamic[Top]` (`Top` with a `Dynamic` marker) |
-| The fail-soft site | just quietly returns `Dynamic` | keeps the site in structure, lists it with `--explain` |
+| The fail-soft site | just quietly returns `Dynamic` | records the moment during inference, lists it with `--explain` |
 | Making the silence visible | no mechanism (out of the minimal version's scope) | `check --explain` produces a map with `:info` diagnostics |
 
 chibirigor's "stay quiet if you don't know" prevents false positives, but `--explain` is **a tool
@@ -94,24 +97,28 @@ propagating** shows up on the map. Without `--explain` it just stays quiet with 
 (since it produces no false positives). `:info` doesn't touch the exit code (`exit 0`), so you can
 peek at "where the type vanished" without stopping CI.
 
-The difference from the real thing is that real Rigor keeps `Dynamic[Top]`'s `Dynamic` marker in
-structure and lists *every* fail-soft (missing RBS, an unannotated argument, an unconfigured
-plugin…), whereas chibirigor picks up **just one kind, the unknown dispatch** (the implementation
-just stacks one line of provenance in the `signature`-is-nil branch of `lib/chibirigor/dispatch.rb`).
-The idea of **mapping the silence** is the same.
+There are two differences from the real thing. One is that real Rigor records fail-soft moments
+*everywhere* in inference, whereas chibirigor picks up **just one kind, the unknown dispatch** (the
+implementation just stacks one line of provenance in the `signature`-is-nil branch of
+`lib/chibirigor/dispatch.rb`). The other is line 2. Real Rigor doesn't record again a call on a
+value that has already become `untyped`, so line 2 doesn't appear in its listing; chibirigor
+deliberately shows both to make the propagation visible. The idea of **mapping the silence** is the
+same.
 
 ---
 
 ## a3-2. Rigor's type display — the internal precise type and the RBS-boundary conservative type
 
-This book's `annotate` shows the inferred type, *one* of it, as is. Real Rigor too shows types with
-`annotate` (a tool of the same name as this book's) and editor hover, but the real thing has a
+This book's `annotate` shows the inferred type, *one* of it, as is. Real Rigor too shows internal types
+with `annotate` (a tool of the same name as this book's) and editor hover, but the real thing has a
 **two-layer setup** this book lacks:
 
-1. The **precise type** inside Rigor (e.g. `Constant<"FOO">`).
-2. The conservative type after **dropping to a coarse type** at the RBS boundary (e.g. `String`).
+1. The **precise type** inside Rigor (e.g. `non-empty-string`, `Integer[1..10]`).
+2. The conservative type after **dropping to a coarse type** at the RBS boundary (e.g. `String`,
+   `Integer`).
 
-chibirigor's `annotate` shows only the internal type. The real thing has a double structure of
+What `annotate` and diagnostics show is the internal type of 1; 2 appears when `sig-gen` writes out
+RBS. The real thing has a double structure of
 "**knowing precisely inside, throwing it away at the boundary**," so "inference seems to know more,
 yet why is the signature (RBS) so coarse" happens. The answer is this two-layer setup.
 
@@ -123,7 +130,7 @@ yet why is the signature (RBS) so coarse" happens. The answer is this two-layer 
 
 | | This book (chibirigor) | The real thing (Rigor) |
 |---|---|---|
-| How types are shown | `annotate` lists internal types per line | shows with `annotate` / hover, rounds at the boundary with erasure |
+| How types are shown | `annotate` lists internal types per line | `annotate` / hover show the internal type; the RBS that `sig-gen` writes is rounded by erasure |
 | The type shown | one internal type | two layers: the internal precise type / the boundary-rounded conservative type |
 | What the discrepancy is | (doesn't happen, since there's no boundary) | the divergence between internal precise type and RBS-boundary type = erasure |
 
@@ -135,12 +142,13 @@ yet why is the signature (RBS) so coarse" happens. The answer is this two-layer 
 > [!NOTE]
 > **When you want to see only "some expression's" type pinpoint in real Rigor**, besides `annotate`
 > (the whole file) there's the move of writing `dump_type(expr)` in the source and `check`-ing
-> (a bare `dump_type(x)` needs `include Rigor::Testing`, but fully qualified as `Rigor.dump_type(x)`
-> the include isn't needed). At run time `dump_type` just returns the value as is — when you `check`,
+> (write `require "rigor/testing"` so it can also be called at run time; a bare `dump_type(x)`
+> additionally needs `include Rigor::Testing`, but fully qualified as `Rigor.dump_type(x)` the
+> include isn't needed). At run time `dump_type` just returns the value as is — when you `check`,
 > it **prints the inferred type at that position as an `:info` diagnostic** (the same idea as
 > PHPStan's `dumpType()`, riding the same `:info` mechanism as §a3-1's `--explain`. Not an error, so
-> sprinkling them doesn't turn diagnostics red). The type editor hover shows is the same inference,
-> but that's backed by a **low-level API for tools** — not a command a human strikes directly.
+> sprinkling them doesn't turn diagnostics red). The type editor hover shows is the result of the
+> same inference, too.
 
 And **chibirigor also has `dump_type` as a basic feature.** Tools stay narrowed to the two of
 `check` and `annotate` — this is *not a command* but an **expression** `check` recognizes. No
@@ -351,7 +359,7 @@ The four bridges of this appendix on one sheet:
 
 | Mechanism | Treatment in this book | The real thing's behavior | Pointer back |
 |---|---|---|---|
-| `rigor check --explain` | tiny version present (maps unknown dispatch with `:info` · §a3-1x) | maps fail-soft sites with `:info` using the `Dynamic[Top]` marker as a clue | Little Part 9 |
+| `rigor check --explain` | tiny version present (maps unknown dispatch with `:info` · §a3-1x) | maps the recorded fail-soft moments with `:info` | Little Part 9 |
 | two-layer type display (erasure) | `annotate` shows one internal type (no boundary, so no discrepancy · §a3-2) | rounds internal precise type ↔ RBS-boundary type with erasure behind `annotate` / hover | Little Part 1 |
 | `rigor trace file` | tiny version nearly identical to the real thing (frame-by-frame `bind` / `union` / `dispatch` · §a3-3bx) | replays the steps of inference as a terminal animation (`--verbose` / `--line` / `--format=json`) | — |
 | 5-stage dispatch cascade | 1-stage table lookup (`METHODS`; no tiny version) | ① constant folding → ② shape → ③ RBS → ④ in-source → ⑤ fallback | Little Part 2 |

@@ -180,6 +180,11 @@ side.
 > `nil` (resolution failure)" (`rigor/docs/internal-spec/inference-engine.md`: "`Union` receivers
 > MUST dispatch each member individually"). chibirigor's "if there's an unknown member, the whole
 > is untyped" is a miniature of this.
+>
+> The `nil` in our example, though, gets special treatment in real Rigor. With
+> `x = cond ? 1 : nil`, `x + 1` isn't silent: it's reported as `call.possible-nil-receiver` (a
+> method call on a value that may be `nil`). We revisit `nil` together with narrowing in the
+> next chapter.
 
 ---
 

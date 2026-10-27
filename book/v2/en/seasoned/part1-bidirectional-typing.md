@@ -264,8 +264,8 @@ this, "never frighten working code" is kept in return-type checking too.
 > **The `param:` directive does two jobs**
 >
 > Rigor has a **`param:` directive** written with the RBS extension annotation
-> `%a{rigor:v1:param: name is String}` (it can't be written inline in the `.rb` body; it's placed
-> on the RBS side). It brings **two effects at once**:
+> `%a{rigor:v1:param: name is String}`. It normally lives on the RBS side, but with rbs-inline you
+> can also write it in a `.rb` comment (`# @rbs %a{…}`, ADR-93). It brings **two effects at once**:
 >
 > 1. **Body narrowing** (gives the `⇒` side a starting point for the type): inside the body,
 >    `name`'s type starts from the declared `String`. Inference proceeds from the declared type

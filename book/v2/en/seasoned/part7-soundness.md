@@ -94,6 +94,9 @@ is this:
 | ③ doesn't punish `:maybe` | abandons progress (doesn't promote the unprovable to `:no`) | a `:maybe` is actually a mismatch → a runtime type error |
 | ④ conservative narrowing | abandons the *detection* of progress (doesn't narrow disjoint / `Dynamic`) | doesn't report the real error of a branch it couldn't narrow and missed |
 
+Note that ④'s "doesn't narrow `Dynamic`" is a gap in chibirigor. Under a trusted `is_a?` guard, real
+Rigor narrows `Dynamic` to a concrete type too (ADR-83).
+
 On the preservation side (the type is kept under evaluation), chibirigor doesn't *strongly assert* it
 to begin with — when things get doubtful it widens to `untyped`, so preservation is trivially kept in
 the sense of consistency (`~`) (when types stop fitting, just fall back to `untyped`). **What it lets go
@@ -173,8 +176,9 @@ distinguish "unsound on purpose" from anarchy.
 > directive** (an RBS extension annotation). It's put on methods that check / normalize:
 >
 > ```ruby
-> # write on the RBS side (can't be written inline in the .rb body)
-> # %a{rigor:v1:assert x is non-empty-string}
+> # rbs_inline: enabled
+> # write it on the RBS side, or in the .rb with an rbs-inline comment (ADR-93)
+> #: %a{rigor:v1:assert x is non-empty-string} (String?) -> void
 > def ensure_present!(x) = (raise if x.nil? || x.empty?)
 > ```
 >
@@ -212,10 +216,12 @@ it correctly** (subtyping as the greatest fixed point, TAPL ch. 21).
 ### HKT reduction fuel — "stop when it gets dangerous" (Seasoned Part 4, ADR-20)
 
 Rigor doesn't implement recursive types directly with μ + coinduction; it makes a lightweight HKT
-(`Type::App`) + a **fuel budget** the alternative (carried over from Seasoned Part 4 §4-5). It consumes
-a counter each time it unfolds a higher-order type, cutting off at the ceiling (default 64 steps). This
-is a solution that **stops when it gets dangerous** — when fuel runs out it drops the result to
-`:maybe` and escapes to `untyped`, landing on the safe side.
+(`Type::App`) + a **fuel budget** the alternative (carried over from Seasoned Part 4 §4-5). If reduction
+comes back to the same application, it detects the cycle and returns the `App` being unfolded as-is,
+tying the knot. For unfolding that still won't stop, it consumes a counter each time it unfolds,
+cutting off at the ceiling (default 64 steps). This is a solution that **stops when it gets
+dangerous** — when fuel runs out it returns the reduction to the upper bound `bound` fixed at
+registration (default `untyped`), landing on the safe side.
 
 | Way to stop | Character | Where |
 |---|---|---|

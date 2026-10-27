@@ -227,7 +227,9 @@ with `untyped`.
   incomplete.
 - **③ In Rigor:** the unknown degrades to `Dynamic`. Real Rigor brings the table closer to "the
   real thing" with **RBS + inheritance-chain resolution** instead of a hand-written table (a
-  spoonful in Part 8; the real resolution in the sequel).
+  spoonful in Part 8; the real resolution in the sequel). Because its table is close to the real
+  thing, real Rigor reports `call.undefined-method` only when it can prove "this known class has
+  no such method." It quietly falls back to `Dynamic` when it has lost the receiver's type.
 
 ```text
 1: String

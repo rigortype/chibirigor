@@ -257,7 +257,7 @@ evaluating : (top level)
 
 | 仕組み | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
-| `rigor check --explain` | 極小版あり（未知ディスパッチを`:info`地図化、§a3-1x） | `Dynamic[Top]`マーカーを手がかりにfail-soft地点を`:info`で地図化 | 前編Part 9 |
+| `rigor check --explain` | 極小版あり（未知ディスパッチを`:info`地図化、§a3-1x） | 記録したfail-softの瞬間を`:info`で地図化 | 前編Part 9 |
 | 型表示の二段構え（erasure） | `annotate`は内部型1つ（境界が無いのでズレない、§a3-2） | `annotate`／hoverの裏で内部精密型とRBS境界型をerasureで丸める | 前編Part 1 |
 | `rigor trace file` | ほぼ実物と同型の極小版あり（`bind`、`union`、`dispatch`をコマ送り、§a3-3bx） | 推論の手順を端末アニメーションで再生（`--verbose`、`--line`、`--format=json`） | （なし） |
 | dispatch 5段カスケード | 1段の表引き（`METHODS`、極小版は設けず） | ① 定数畳み込み、② shape、③ RBS、④ in-source、⑤ fallback | 前編Part 2 |

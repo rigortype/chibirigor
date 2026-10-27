@@ -215,17 +215,19 @@ itself is positioned as "for small files, prototype use."
 > [!NOTE]
 > **Rigor's way — local+catalog**
 >
-> Rigor infers **one method at a time.** Where it calls another method, rather than re-interpreting
-> the body, it looks up the return type from a prepared **catalog** (the RBS of core, stdlib, gems,
-> and plugin contributions). An unsolvable argument it drops to `Dynamic[Top]` (= `untyped`) and cuts
-> off, securing a cost ceiling with an **inference budget** (Part 6's cache works too). Its goal is
-> to run on the whole codebase every push, so it prioritizes scale above all.
+> Rigor infers **one method at a time.** Where it calls a core, stdlib, or gem method, it looks up
+> the return type from a prepared **catalog** (the RBS of core, stdlib, gems, and plugin
+> contributions). For a method inside the project, it adopts the return type inferred locally from
+> the callee's body (ADR-57). An unsolvable argument it drops to `Dynamic[Top]` (= `untyped`) and
+> cuts off, keeping cost down with hardcoded cutoff caps (Part 6's cache works too). A configurable
+> inference budget is being designed in ADR-41 and isn't wired in yet. Its goal is to run on the
+> whole codebase every push, so it prioritizes scale above all.
 
 | | TypeProf | Rigor |
 |---|---|---|
 | Unit of analysis | the whole program (from the entry) | one method at a time |
-| Other methods' return type | re-interpret the body | reference the catalog |
-| Infer argument types from the call site? | **can** (its greatest strength) | doesn't (`untyped` is the default) |
+| Other methods' return type | re-interpret the body | reference the catalog (in-project: infer the body locally) |
+| Infer argument types from the call site? | **can** (its greatest strength) | not by default (opt-in, gathered as a lower bound; ADR-67) |
 | Scale goal | small files, prototypes | the whole codebase, CI always-on |
 | Main output | RBS signatures (errors are a by-product) | diagnostics (only certain bugs; FP-zero-ism) |
 
@@ -238,6 +240,21 @@ Note that `rigor sig-gen` (Chapter 11) does the same job as TypeProf (generate R
 annotations), but its handling of argument types differs in the policy "don't make an observed call
 site the default" (ADR-5) — where TypeProf emits the types it saw as-is, Rigor doesn't fix "this
 argument only accepts that," leaving it `untyped` for the human.
+
+## 5-4b. A note: Rigor's Road B only "adds precision"
+
+Rigor has a road for gathering argument types from callers, too. It's opt-in, working only when you
+set `parameter_inference: true` explicitly: an undeclared argument is handed to the body as the
+union type of the actual-argument types solved at its call sites (ADR-67). `rigor sig-gen
+--params=observed` is a tool of the same family, gathering argument types from observed calls.
+
+There's just one hard part here. **The gathered type is a lower bound, not an upper bound.** Even if
+only `Integer` shows up at the call sites, a call not yet seen might pass a `String`. So Rigor uses
+the gathered type only to raise the precision of the body's inference, never as grounds to reject a
+call at the argument boundary. Inside the body, too, it emits no negative diagnostic that leans on
+the gathered type (an undefined method, a possible nil, and so on). Add precision, but don't add
+diagnostics: the same "deliberately let go" judgment we'll see in Part 7 holds even where inference
+gets stronger.
 
 ---
 
@@ -257,8 +274,12 @@ diagnostic still appears only at a checking `⇐` position (where there's an RBS
 
 ## 5-6. Inside Rigor
 
-- **capability role:** capability roles like `_ToS`, `_Each[T]`, `_Reader` are the substance of
-  Road A's "gathered capabilities." Used in the acceptance check as structural interfaces.
+- **capability role:** capability roles like `_ToS`, `_Each[T]`, `_Reader` are the container for
+  the capabilities Road A gathers. Used in the acceptance check as structural interfaces.
+  - That said, inference that gathers capabilities from how the body uses a value (Road A itself)
+    is on hold in real Rigor too (ADR-67 WD2), because there's no structural carrier yet to hold the
+    gathered capabilities. This is where a structural type like the Little volume's Part 6
+    `HashShape` becomes necessary.
 - **Generics specialization:** at the call site, bind type variables from the actual arguments
   (a limited version of Road B's unification). Solving type variables from a block's return type, etc.
 - **fail-soft:** an unsolvable type variable degrades to `Dynamic[Top]` (= `untyped`). Same as the

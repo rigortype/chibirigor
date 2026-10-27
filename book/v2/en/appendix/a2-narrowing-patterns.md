@@ -100,21 +100,22 @@ caller.
 ```ruby
 if x.is_a?(Integer)
   # here "is Integer" enters x's local_binding
-  Thread.new { x.some_integer_method }   # ← captures x and sends it to another thread
+  Thread.new { x = x.to_s }   # ← captures x and rewrites it on another thread
 end
 # when the Thread runs is unknown → keeping x's narrowing is dangerous
 ```
 
-The block passed to `Thread.new` runs at *any timing.* We can't rule out that `x` was reassigned by
-then, or is already a different type.
+The block passed to `Thread.new` runs at *any timing.* That block rewrites `x`, so we can't rule out
+that `x` has become a different type at any later point.
 
-- **A fact dies:** when the FactStore detects this "escape," it **conservatively invalidates** the
-  `captured_local` facts of every variable that block captured.
+- **A fact dies:** on detecting this "escape," it **conservatively invalidates** the facts of the
+  outer variables that block **may rewrite**. Facts about variables the block only reads survive.
 - **Target patterns:** `Thread.new`, `define_method`, `Proc.new` / `Fiber.new`, and other patterns
   that "save the block as an object / call it later."
 
-Whether a block is "immediately invoked" or "called later" Rigor infers from RBS signature
-annotations (whether `&block` is `Proc` or `yield`, etc.). When it can't decide, it treats it as an
+Whether a block is "immediately invoked" or "called later" Rigor looks up in a built-in catalog of
+(class, method) pairs. It does not infer this from RBS signatures; the plan is to let extension
+annotations override the catalog in the future. When it can't decide, it treats it as an
 escape, adopting the **when-in-doubt-erase** (fall to the looser side) policy.
 
 > [!NOTE]
@@ -204,8 +205,8 @@ body doesn't handle it, but the answer to "why that name" for this kind of carri
 > **But not every refinement carrier is a set difference.** Real Rigor is two-layered (ADR-3), and
 > only a **point removal** like `non-empty-string` is a `Difference`. A **predicate subset** like
 > `lowercase-string` / `numeric-string` is a separate carrier, `Refined`, and a **ranged integer**
-> like `Integer[1..10]` is `IntegerRange` (the value notation is `Integer[1..10]`; `int<min,max>`
-> is used in directive vocabulary and internal display). The carriers in the table below are a mix
+> like `Integer[1..10]` is `IntegerRange` (the notation is `Integer[1..10]`; the old `int<min,max>`
+> spelling is merely accepted as a deprecated input alias, per ADR-109). The carriers in the table below are a mix
 > of these three.
 
 - **A fact is born:** in a branch that passes a predicate guard — `unless s.empty?` / `if n > 0` / a

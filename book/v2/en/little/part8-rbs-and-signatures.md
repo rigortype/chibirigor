@@ -283,9 +283,13 @@ feature) — the `untyped` in a generated RBS points to "where a human should ad
 > bundled TypeProf would find **where `double` is called**, as in `double(3)`, work `n` backward
 > to `Integer`, and fill in `(Integer) -> Integer`.
 >
-> chibirigor (and Rigor) deliberately don't — instead of tracing every caller, they look at each
-> method locally and default an unknown argument to `untyped`. It scales better, and produces no
-> false positives.
+> chibirigor deliberately doesn't — instead of tracing every caller, it looks at each method
+> locally and defaults an unknown argument to `untyped`. It scales better, and produces no false
+> positives.
+>
+> Rigor follows the same policy by default. There are opt-in paths that collect caller-side types
+> — the `parameter_inference:` setting and `sig-gen --params=observed` — but what they collect is
+> used only to add precision, never as grounds for stricter argument diagnostics.
 >
 > **The "real inference" that guesses arguments from how they're used is taken on head-on in
 > Seasoned Part 5.**

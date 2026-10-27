@@ -166,9 +166,12 @@ App[:"json::value", [String]]
   → Value = Literal | Array[Value] | Hash[String, Value]   (reduce to a recursive union)
 ```
 
-What corresponds to coinduction's `seen` here is the **fuel budget.** To the same problem of "how to
-stop the unfolding of recursion," 『しくみ』/TAPL answer *theoretically* (correct equivalence test by
-coinduction), Rigor *in engineering* (safely cut off with fuel). **The sum-up of this "coinduction
+What corresponds to coinduction's `seen` here is **cycle detection** on the reduction stack. If
+reduction meets the same `(URI, arguments)` application again partway through, it returns the
+`App` being unfolded as-is and ties the knot (ADR-20 D4). Any unfolding that still doesn't stop is
+cut off by the outer safety net, the **fuel budget.** To the same problem of "how to stop the
+unfolding of recursion," 『しくみ』/TAPL answer *theoretically* (correct equivalence test by
+coinduction), Rigor *in engineering* (safely cut off with cycle detection and fuel). **The sum-up of this "coinduction
 vs. budget" engineering of termination is gathered in Seasoned Part 7, which treats soundness** (read
 together with gradual's settling).
 
@@ -188,16 +191,18 @@ together with gradual's settling).
 > #    reduce: Literal | Array[json::value] | Hash[Symbol, json::value]
 > ```
 >
-> This is possible because the RBS signature declares `symbolize_names:`'s type as the literal type of
-> `true` (`Const[true]`), and that's passed as the HKT's type argument. Only when the `true` literal
-> can be confirmed at the call site does the key type argument become `Symbol`
-> (`App[:"json::value", [Symbol]]`); with `false` or a variable (`untyped`) it returns to the default
-> `String` version.
+> What decides this is a **lookup table** built into Rigor. For a handful of standard-library methods
+> whose upstream RBS can't simply be overridden, Rigor ships a table of return types. The
+> `JSON.parse` entry makes the key type argument `Symbol` (`App[:"json::value", [Symbol]]`) only when
+> the call site's second argument is a `HashShape` and its `symbolize_names:` value is the literal
+> `true` (`Const[true]`); with `false` or a variable (`untyped`) it returns to the default `String`
+> version. Note that the caller only ever sees the reduced form; the opaque `App` itself never
+> surfaces.
 >
 > This "the argument's literal value decides the type" is an example of the Little volume's `Const`
 > at work. The same mechanism as `HashShape`'s key read (the `:foo` in `h[:foo]` is a literal) is used
 > for HKT type-argument selection too. Reduction can unfold infinitely, so it's cut off on the safe
-> side with **fuel (default 64) + progress tracking.**
+> side with **cycle detection and fuel (default 64).**
 
 > [!TIP]
 > **Reference note.** The primary grounds for HKT (a type that takes a type and returns a type) is
@@ -208,19 +213,21 @@ together with gradual's settling).
 > [!NOTE]
 > **The verdict of an HKT conditional type is also three-valued `:yes/:no/:maybe`**
 >
-> Asked whether `App[F, A]` is "compatible with `T`," Rigor **tries reduction within fuel**, and if
-> the result is known returns `:yes` or `:no`, if fuel runs out `:maybe`.
+> Asked whether `App[F, A]` is "compatible with `T`," Rigor doesn't try reduction on the spot. It
+> defers the verdict to the **upper bound `bound`** fixed at registration time, and a reduction that
+> runs out of fuel falls back to that `bound` too. `bound` defaults to `untyped`, so an `App`
+> registered without an upper bound ends up judged `:maybe`.
 >
 > This is **exactly the same framework** as the three values (`:yes/:no/:maybe`) of `accepts`
 > implemented in Little Part 7. What was "lack of knowledge → `:maybe`" for ordinary types just
-> becomes "lack of fuel → `:maybe`" for HKT; from outside the judgment logic they're
+> becomes "upper bound still `untyped` → `:maybe`" for HKT; from outside the judgment logic they're
 > indistinguishable.
 >
 > | Why a verdict can't be made | `accepts`'s return |
 > |---|---|
 > | `untyped` is mixed in | `:maybe` |
 > | the type signature isn't registered | `:maybe` |
-> | HKT reduction ran out of fuel | `:maybe` |
+> | the HKT's upper bound `bound` is still the default `untyped` | `:maybe` |
 >
 > Rigor consistently expresses "if you don't know, pass quietly" with the single word `:maybe`. HKT's
 > complexity doesn't leak out, and the caller of `accepts` need only think about the meaning of the
@@ -250,7 +257,7 @@ reference + fuel.
 | μ-types | fold the recursion, unroll one step by unfold. fold/unfold are the same type |
 | The two manners | **equi-recursive** (no annotation / hard to implement) vs. **iso-recursive** (annotation needed / easy to implement). Practical usage is mostly equi-recursive |
 | Equivalence test | doesn't terminate → cut off with **coinduction (`seen` assumption set)** (TAPL ch. 21) |
-| Rigor's alternative | **HKT/`App` + fuel** (HKT's grounds are TAPL ch. 29): cut off with a *fuel budget* instead of coinduction (the termination-engineering sum-up is Part 7) |
+| Rigor's alternative | **HKT/`App` + fuel** (HKT's grounds are TAPL ch. 29): stop reduction with **cycle detection**, with a *fuel budget* as the outer safety net (the termination-engineering sum-up is Part 7) |
 
 ## Exercises
 
@@ -259,8 +266,8 @@ reference + fuel.
 2. **Why it stops:** state what happens in the `μX.{foo:X} == μY.{foo:Y}` test if you didn't use
    `seen`, and explain in one sentence how `seen` cuts the infinite loop.
 3. **Theory vs. engineering:** compare "coinduction (`seen`)" and "fuel budget" as ways to stop the
-   unfolding of recursion, and state why a practical checker (Rigor) can choose the latter (gradual's
-   settling).
+   unfolding of recursion, and state why a practical checker (Rigor) keeps a fuel budget as an
+   outer safety net on top of cycle detection (gradual's settling).
 
 **Next chapter (Part 5):** we extend the Little volume's naive type inference to Rigor's real **type
 inference.** We treat the unification that fills argument types back in from the callers, and

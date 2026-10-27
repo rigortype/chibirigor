@@ -99,8 +99,8 @@ organized in the [appendices](appendix/).)
 - **unification** 〔Seasoned P5〕 — the operation that finds the substitution making two types
   equal. The core of type reconstruction.
 - **erasure (dropping precision at the boundary)** 〔Little P1 (preview: appendix a3-2) /
-  Seasoned P3 in full〕 — dropping Rigor's internal precise types (`Constant<"FOO">`, etc.) to
-  the coarse types RBS can express (`String`). The operation of "giving up precision at the
+  Seasoned P3 in full〕 — dropping Rigor's internal precise types (`non-empty-string`,
+  `Integer[1..10]`, etc.) to the coarse types RBS can express (`String`, `Integer`). The operation of "giving up precision at the
   boundary to match the outward-facing type." **Not the same as Java generics' "type
   erasure"** — that erases the type argument `<String>` at runtime; this rounds static type
   *precision* at the boundary. Used inside `sig-gen` (signature generation).

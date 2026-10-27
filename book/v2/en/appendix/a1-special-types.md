@@ -47,9 +47,11 @@ Laid out on these two axes, the differences among similar faces become clear:
 - `Dynamic[Top]` is the expression that **deliberately decomposes these two and shows them by
   name.** `Top` is the part (value set) of a sound top type "anything could be here," and `Dynamic`
   is the **gradual `?` marker** laid on top of it (the mark for "the type was lost. stay quiet,
-  don't frighten"). Its behavior is close to `any`, but it isn't collapsed into one word — "where it
-  stayed quiet" remains as structure. That Little Part 9's `rigor check --explain` can map every
-  fail-soft site is because this `Dynamic` marker doesn't vanish.
+  don't frighten"). Its behavior is close to `any`, but it isn't collapsed into one word — the "staying quiet"
+  mark and the upper bound of its contents (the `[Top]` part) remain as structure.
+- *Where* and *why* the type was lost is something real Rigor keeps in a record outside the type.
+  That Little Part 9's `rigor check --explain` can map every fail-soft site is because inference
+  records each of those moments.
 
 > [!NOTE]
 > The main volume's minimal `Dynamic` (`Dynamic.new`) and the internal notation `Dynamic[Top]` are
@@ -201,11 +203,14 @@ For soundness, it asserts **only when it can prove**:
   assert (it holds no ancestor table) — because even with `x : Integer`, `x.is_a?(Numeric)` can be
   true (avoiding a false positive).
 
-This is a miniature of real Rigor's ADR-47 (`flow.unreachable-clause`). The real thing judges a
-clause where narrowing narrowed the subject to `bot` as dead, and has an FP envelope (a fence of
-exclusion conditions to prevent false positives) excluding loops, blocks, and gradual. chibirigor
-minimizes the same idea down to three points: "leaf-class disjointness," "closed types only," and
-"opt-in."
+This is a miniature that borrows the idea of real Rigor's ADR-47 (`flow.unreachable-clause`). The
+real thing targets the clauses of `case`/`when` and `case`/`in`: it judges a clause where narrowing
+narrowed the subject to `bot` as dead, and has an FP envelope (a fence of exclusion conditions to
+prevent false positives) excluding loops, blocks, and gradual. For `if`/`unless`, it reports only
+branches decided by a literal, like `if false`, as `flow.unreachable-branch`; dead branches that
+arise from `is_a?` are not reported at present. Both diagnostics are on by default. chibirigor
+minimizes the same idea down to three points — "leaf-class disjointness," "closed types only," and
+"opt-in" — and applies it to `is_a?` in an `if`.
 
 > [!NOTE]
 > Note it's **the reverse of exhaustiveness (missing arm)** (appendix [a5-5](a5-other-languages.md)).

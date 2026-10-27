@@ -64,7 +64,8 @@ Facts are held split into **buckets** by the kind of subject. Rigor has six kind
 2. **captured_local** — a local captured by a block.
 3. **object_content** — an object's contents (ivars, hash keys, etc.).
 4. **global_storage** — globals, class variables, etc.
-5. **dynamic_origin** — the origin of `untyped` (where the type was lost).
+5. **dynamic_origin** — facts about dynamic provenance (in real Rigor, for example, a block escaping
+   so that when it gets called can't be read).
 6. **relational** — relations *between* variables (`x == y`, etc.).
 
 ```text
@@ -74,13 +75,13 @@ Facts are held split into **buckets** by the kind of subject. Rigor has six kind
    ├ object_content   : obj.name is set        │ about — split into 5
    ├ global_storage   : $cfg is a Hash         │
    ├ relational       : a == b                 ┘
-   └ dynamic_origin   : z made untyped at line N  ← different from the 5 (origin tracking)
+   └ dynamic_origin   : block escaped            ← different from the 5 (dynamic provenance)
 ```
 
 ![Figure 6-1 — the FactStore's six buckets](../figures/svg/seasoned-6-1.svg)
 > ▼ Figure 6-1 — the FactStore's six buckets. The top 5 split by "*which subject* the fact attaches
-> to." `dynamic_origin` alone is the odd one out, tracking not a target scope but "*where* `untyped`
-> was born."
+> to." `dynamic_origin` alone is the odd one out, holding not a target scope but facts about dynamic
+> provenance.
 
 Why split — because the **timing of invalidation differs.** A reassignment to a local need only
 erase that local_binding fact, but a method call must doubt object_content broadly. The bucket names
@@ -93,8 +94,10 @@ union) in appendix [a2 — Narrowing patterns](../appendix/a2-narrowing-patterns
 
 [^buckets]: Of the six buckets, `local_binding`/`captured_local`/`object_content`/`global_storage`/
     `relational` split by "the subject a fact attaches to," whereas `dynamic_origin` alone is a
-    separate lineage "tracking the *origin* of `untyped`." Note that its standing differs (it lines
-    up as the sixth in the real spec too, but its role is separate).
+    separate lineage holding facts about dynamic provenance. Note that its standing differs (it lines
+    up as the sixth in the real spec too, but its role is separate). Tracking "*where* `untyped` was
+    born" itself is, in real Rigor, the job of an advisory table outside the FactStore
+    (`Scope#dynamic_origins`, ADR-75).
 
 ---
 
@@ -173,14 +176,20 @@ x = nil
 ```
 
 Even if narrowing narrows `x` to "not nil," if the block could reassign `x`, that fact is *in
-jeopardy.* The FactStore detects that a block **writes an outer local** and invalidates its
-captured_local fact.
+jeopardy.* In this chapter's minimal model, the FactStore detects that a block **writes an outer
+local** and invalidates its captured_local fact.
 
 In addition to the escape seen in §6-3 (the *timing* of being called is unreadable), the difficulty
 specific to capture is this "the block **rewrites** the outer." Even a block called immediately like
 `each`, if it assigns to an outer local, breaks the narrowing. Handling differs by whether the
 captured variable is **only read** or **written**, and if written, it drops the `captured_local` fact
 even for an immediate call.
+
+Real Rigor goes one step further. For a block that doesn't escape, like `each`'s, it re-evaluates the
+block body a bounded number of times, joins the types written, and writes them back to the outer
+scope (ADR-56). In the example above, it keeps `x` as the union type of `nil` or `Integer` instead
+of throwing the fact away. A local rewritten by a block that escapes, or one it can't judge, drops
+to `untyped`.
 
 The Little volume's naive `Scope` handled this *not at all* (which is why the main volume didn't step
 into narrowing inside blocks like `each`). In practice this is a hotbed of false positives, and the
