@@ -42,8 +42,9 @@ Javaを書く人は「部分型」と聞くと**継承**を思い浮かべるは
   - 当初からoptionsハッシュとの共存を意識した設計です
 - **PHPStan / Psalm**：PHPのチェッカーが同じ問題にぶつかり、`array{name: string, age: int}`という表記で同型を導入
   - 語彙はHackを踏襲し、open/closedを明示できるものもあります
-- **Rigor**：RubyのRBS `{ name: String, age: Integer }`から型を起こし、同じくopenを採用
-  - 「少なくとも」で受け取ります
+- **Rigor**：RubyのRBS `{ name: String, age: Integer }`から型を起こします
+  - open/closedはキャリアが持つ方針で、RBSで書いたレコードは閉じた（closed）形として読み、余分な既知キーを咎めます
+  - 宣言の無いオプションハッシュには期待する型が無いので黙ります。一律にopenの「少なくとも」で受け取るのは、chibirigorの簡略化です
 
 3ツールとも、素朴なjoin（`Hash[Symbol, String | Integer]`のような幅の広い型）ではキーごとの情報が失われてしまうため、キーを個別に覚える型が必要でした。chibirigorの`HashShape`はこの系譜の最小実装です。
 
@@ -61,12 +62,12 @@ Part 4で作る`Union`（`Integer | String`のような**無タグのユニオ�
 
 Part 5で触れた「到達できない枝（unreachable arm）」の報告は、Java、C# の網羅性検査と逆向きの設計です。Java、C# の`switch`/`pattern matching`は**網羅性**を強制し、`case`が全パターンを網羅していないと「missing arm（腕が足りない）」としてコンパイラが止めます。Rigor（とchibirigor）は「足りない」は問わず、代わりに「**到達できない枝（unreachable arm）**」を報告します。
 
-`x : Integer`なのに`if x.is_a?(String)`を書いたとき、その枝は絶対に実行されません。そこを見つけて「余分な分岐です」と伝えます。chibirigorでも`check --unreachable`で実際にこの診断を出せます（opt-in。既定は「動くコードに黙る」を守って沈黙。動くworked exampleは付録[a1-3x](a1-special-types.md)）。
+`x : Integer`なのに`if x.is_a?(String)`を書いたとき、その枝は絶対に実行されません。chibirigorは`check --unreachable`でそこを見つけて「余分な分岐です」と伝えます（opt-in。既定は「動くコードに黙る」を守って沈黙。動くworked exampleは付録[a1-3x](a1-special-types.md)）。実Rigorは`case`/`when`で決して当たらない節や`if false`のような分岐を既定で報告しますが、`is_a?`で生じる死に枝は現時点で対象外です。
 
 | | Java / C# | Rigor / chibirigor |
 |---|---|---|
 | 何を報告するか | missing arm（網羅しない腕） | unreachable arm（絶対に通らない腕） |
-| 動くコードへの態度 | 書くまで止める | 動くものには黙る |
+| 動くコードへの態度 | 書くまで止める | 止めずに「消せる」と教える |
 | 誰が損をするか | 「そのパターンは来ない」と知っている開発者 | 「来ないと思っているが実は来る」バグ |
 
 これは健全性（全パターンを押さえる）より誤検知の少なさ（動くコードを脅かさない）を優先するRigorの価値観の現れです。

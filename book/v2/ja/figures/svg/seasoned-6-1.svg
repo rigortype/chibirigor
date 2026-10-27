@@ -37,7 +37,7 @@
   <line style="fill:none;stroke:var(--rigor-rule-strong,#B7B2A2);stroke-width:1.5;stroke-dasharray:4 4" x1="40" y1="262" x2="600" y2="262"></line>
   <rect style="fill:none;stroke:var(--rigor-info,#2D5C9E);stroke-width:1.5" x="40" y="276" width="10" height="26"></rect>
   <text style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-size:15px;fill:var(--rigor-info,#2D5C9E)" x="66" y="295" text-anchor="start">dynamic_origin</text>
-  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="295" text-anchor="start">z は ◯◯行で untyped 化</text>
-  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-info,#2D5C9E)" x="556" y="295" text-anchor="end">由来追跡（毛色違い）</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-ink-3,#585F6B)" x="300" y="295" text-anchor="start">ブロックがエスケープ</text>
+  <text style="font-family:&#39;Inter&#39;,system-ui,sans-serif;font-size:12.5px;fill:var(--rigor-info,#2D5C9E)" x="556" y="295" text-anchor="end">動的な由来（毛色違い）</text>
 
 </svg>

@@ -28,8 +28,7 @@ sidebar:
 
 ```console
 $ rigor check --explain app/models/user.rb
-app/models/user.rb:42:7: info: fell soft to Dynamic[Top] here (RBS not found for `external_call`)
-app/models/user.rb:51:3: info: fell soft to Dynamic[Top] here (param `opts` is untyped)
+app/models/user.rb:42:7: info: fail-soft fallback at Prism::CallNode: Dynamic[top] [fallback]
 ```
 
 使い道はこうです：
@@ -37,14 +36,16 @@ app/models/user.rb:51:3: info: fell soft to Dynamic[Top] here (param `opts` is u
 - 「このバグを見落としているのでは？」という疑問が出たとき、`--explain`の出力で「どこで型が消えたか」を遡る。
 - たどり着いたfail-soft地点から、RBSの不足、プラグイン未設定、型注釈の抜け漏れを発見できる。
 
-### なぜ「地図」が描けるのか（`Dynamic[Top]`マーカーの回収）
+### なぜ「地図」が描けるのか（fail-softの瞬間を記録する）
 
-この一覧が成り立つのは、前編Part 1で触れた**`Dynamic[Top]`の`Dynamic`マーカー**が、fail-softした箇所に**消えずに残っている**からです。`untyped`を「ただの穴」ではなく「`Dynamic`という印の付いた`Top`」として持つことで、「どこで黙ったか」が**構造として残ります**。だからこそ、後から`--explain`で一覧に起こせます。
+この一覧が成り立つのは、推論そのものが**fail-softした瞬間を記録している**からです。型を引けずに`Dynamic[Top]`へ倒れるたびに、推論はその地点を1件の記録として残します。`--explain`はその記録を`:info`診断として並べ直しているだけです。後で見る`rigor trace`が推論のイベントを並べるのと、同じ発想です。
+
+記録が付くのは、推論が自分で型を見失った地点だけです。すでに`Dynamic[Top]`になった値にさらにメソッドを送っても、新しい記録は増えません。見失った原因は最初の地点にあり、そこを直せば後ろも直るからです。
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
 | `untyped`の正体 | `Type::Dynamic`（印だけ） | `Dynamic[Top]`（`Top`に`Dynamic`マーカー） |
-| fail-soft地点 | 黙って`Dynamic`を返すだけ | 地点を構造に保持し、`--explain`で一覧化 |
+| fail-soft地点 | 黙って`Dynamic`を返すだけ | 推論中にその瞬間を記録し、`--explain`で一覧化 |
 | 沈黙の可視化 | 仕組みなし（最小版の対象外） | `check --explain`が`:info`診断で地図を出す |
 
 chibirigorの「知らなければ黙る」は誤検知を防ぎますが、`--explain`は**その沈黙そのものを可視化する道具**です。
@@ -66,25 +67,25 @@ demo.rb:2:5: info: fell to untyped here (can't look up the type of `+`)
 
 注目したいのは**2行目**です。`mystery_call`の型がわからず`x`が`untyped`になり、その`x`に対する`+`も型を引けずに`untyped`へ倒れています。**沈黙が伝播していく**様子が地図に出ます。`--explain`無しなら（誤検知を出さないので）`No type errors`と黙るだけです。`:info`は終了コードを汚さない（`exit 0`）ので、CIを止めずに「どこで型が消えたか」だけ覗けます。
 
-実物との差は、実Rigorが`Dynamic[Top]`の`Dynamic`マーカーを構造に保持してあらゆるfail-soft（RBS不足、未注釈引数、プラグイン未設定など）を一覧化するのに対し、chibirigorが拾うのは**未知ディスパッチ1種**だけ、という点です（実装は`lib/chibirigor/dispatch.rb`の`signature`がnilの枝でprovenanceを1行積むだけです）。沈黙を**地図にする**という発想は同じです。
+実物との差は二つあります。一つは、実Rigorが推論のあらゆる場所でfail-softの瞬間を記録するのに対し、chibirigorが拾うのは**未知ディスパッチ1種**だけ、という点です（実装は`lib/chibirigor/dispatch.rb`の`signature`がnilの枝でprovenanceを1行積むだけです）。もう一つは2行目の扱いです。実Rigorは`untyped`になった値への呼び出しを改めて記録しないので、2行目は一覧に出ません。chibirigorは伝播の様子を見せるために、あえて両方を出しています。沈黙を**地図にする**という発想は同じです。
 
 ---
 
 ## a3-2. Rigorの型表示（内部の精密型とRBS境界の保守型）
 
-本書の`annotate`は、推論した型を1つそのまま見せます。実Rigorも`annotate`（本書と同じ名前の道具です）やエディタのhoverで型を見せますが、実物には本書に無い**二段構え**があります：
+本書の`annotate`は、推論した型を1つそのまま見せます。実Rigorも`annotate`（本書と同じ名前の道具です）やエディタのhoverで内部の型を見せますが、実物には本書に無い**二段構え**があります：
 
-1. Rigor内部での**精密な型**（例：`Constant<"FOO">`）。
-2. RBSの境界で**粗い型に落とした**後の保守的な型（例：`String`）。
+1. Rigor内部での**精密な型**（例：`non-empty-string`、`Integer[1..10]`）。
+2. RBSの境界で**粗い型に落とした**後の保守的な型（例：`String`、`Integer`）。
 
-chibirigorの`annotate`は内部型だけを見せます。実物は「**内部では精密に知っているが、境界では捨てる**」という二重構造を持つので、「推論はもっと知っていそうなのに、シグネチャ（RBS）はなぜこんなに粗いのか」という状況が起こります。その答えが、この二段構えです。
+`annotate`や診断が見せるのは1.の内部型で、2.が現れるのは`sig-gen`がRBSを書き出すときです。実物は「**内部では精密に知っているが、境界では捨てる**」という二重構造を持つので、「推論はもっと知っていそうなのに、シグネチャ（RBS）はなぜこんなに粗いのか」という状況が起こります。その答えが、この二段構えです。
 
 > [!NOTE]
 > 精密な内部型をRBSで表せる粗い型に落とす境界の操作を、Rigorは**erasure**と呼びます（Javaジェネリクスの実行時「型消去」とは別物です。あちらは実行時の話で、こちらは静的な精度を境界で丸める話です）。仕組みは後編で扱います。
 
 | | 本書（chibirigor） | 実物（Rigor） |
 |---|---|---|
-| 型の見せ方 | `annotate`が行単位で内部型を並べる | `annotate`／hoverで見せ、境界ではerasureで丸める |
+| 型の見せ方 | `annotate`が行単位で内部型を並べる | `annotate`／hoverは内部型を見せ、`sig-gen`が書くRBSはerasureで丸める |
 | 見せる型 | 内部型1つ | 内部の精密な型、境界で丸めた保守的な型の二段 |
 | ズレの正体 | （境界が無いので起きない） | 内部精密型とRBS境界型の食い違い（erasure） |
 
@@ -92,7 +93,7 @@ chibirigorの`annotate`は内部型だけを見せます。実物は「**内部�
 > chibirigor側は道具を`check`と`annotate`の2つに絞っています。推論型を見たいときは`annotate`（行単位）で足ります。「内部では精密、境界では粗く」という二段構えとerasureは、本物のRigorに進んだときに出会う景色です。
 
 > [!NOTE]
-> **実Rigorで「ある式」の型だけをピンポイントに見たいとき**は、`annotate`（ファイル全体）のほかに、ソースに`dump_type(式)`と書いて`check`する手があります（裸の`dump_type(x)`には`include Rigor::Testing`が要りますが、`Rigor.dump_type(x)`と完全修飾すればincludeは不要です）。`dump_type`は実行時には値をそのまま返すだけです。`check`したときに**その位置の推論型を`:info`診断として印字**します（PHPStanの`dumpType()`と同じ発想で、§a3-1の`--explain`と同じ`:info`の仕組みに乗ります。エラーではないので散りばめても診断は赤くなりません）。エディタのhoverが見せる型も同じ推論ですが、そちらは**ツール向けの低レベルAPI**が裏で支えていて、人が直接叩くコマンドではありません。
+> **実Rigorで「ある式」の型だけをピンポイントに見たいとき**は、`annotate`（ファイル全体）のほかに、ソースに`dump_type(式)`と書いて`check`する手があります（実行時にも呼べるよう`require "rigor/testing"`を書いておきます。裸の`dump_type(x)`にはさらに`include Rigor::Testing`が要りますが、`Rigor.dump_type(x)`と完全修飾すればincludeは不要です）。`dump_type`は実行時には値をそのまま返すだけです。`check`したときに**その位置の推論型を`:info`診断として印字**します（PHPStanの`dumpType()`と同じ発想で、§a3-1の`--explain`と同じ`:info`の仕組みに乗ります。エラーではないので散りばめても診断は赤くなりません）。エディタのhoverが見せる型も、同じ推論の結果です。
 
 そして**chibirigorも`dump_type`を基本機能として持っています**。道具は`check`と`annotate`の2つに絞ったままです。これはコマンドではなく、`check`が認識する**式**です。`include`も要らず、`dump_type(式)`と書いて`check`するだけです：
 

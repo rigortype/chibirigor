@@ -35,8 +35,8 @@ sidebar:
   - これがgradual typingの動的型`?`の正体です
 - `Dynamic[Top]`は、この2つを**わざと分解して名前で見せた**表現です
   - `Top`が「何でもありうる」健全なトップ型の部分（値集合）で、`Dynamic`がその上に重ねた**gradualの`?`マーカー**（「型を見失った。黙る、脅かさない」の印）です
-  - ふるまいは`any`に近いが、一語に潰れず「どこで黙ったか」が構造として残ります
-  - 前編Part 9の`rigor check --explain`がfail-softした全箇所を地図にできるのは、この`Dynamic`マーカーが消えずに残るからです
+  - ふるまいは`any`に近いが、一語に潰れず「黙っている」という印と中身の上限（`[Top]`の所）が構造として残ります
+  - 「どこで、なぜ型を見失ったか」は、実Rigorでは型の外の記録に残しています。前編Part 9の`rigor check --explain`がfail-softした全箇所を地図にできるのは、推論がその瞬間を記録しているからです
 
 > [!NOTE]
 > 本文の最小版`Dynamic`（`Dynamic.new`）と内部表記`Dynamic[Top]`は**同じもの**です。
@@ -153,7 +153,7 @@ demo.rb:3:3: info: this branch is unreachable (the condition is always false)
   - `is_a?(Numeric)`や`is_a?(Object)`のような**祖先関係**は祖先表を持たないので断言しません
   - `x : Integer`でも`x.is_a?(Numeric)`は真になり得るからです（誤検知回避）
 
-これが実RigorのADR-47（`flow.unreachable-clause`）の縮図です。実物はnarrowingがsubjectを`bot`に絞った節をdeadと判定し、ループ、ブロック、gradualを除外するFP envelope（誤検知を防ぐための除外条件の囲い）を持ちます。chibirigorは同じ着想を「葉クラスの互いに素」「閉じた型限定」「opt-in」の三点で最小化しています。
+これは実RigorのADR-47（`flow.unreachable-clause`）の着想を借りた縮図です。実物は`case`/`when`と`case`/`in`の節を対象に、narrowingがsubjectを`bot`に絞った節をdeadと判定し、ループ、ブロック、gradualを除外するFP envelope（誤検知を防ぐための除外条件の囲い）を持ちます。`if`/`unless`については、`if false`のようにリテラルで決まる分岐だけを`flow.unreachable-branch`として報告し、`is_a?`で生じる死に枝は現時点で報告しません。どちらも既定で出る診断です。chibirigorは同じ着想を「葉クラスの互いに素」「閉じた型限定」「opt-in」の三点で最小化し、`if`の`is_a?`に当てています。
 
 > [!NOTE]
 > **網羅性（missing arm）とは逆向き**である点に注意してください（付録[a5-5](a5-other-languages.md)）。

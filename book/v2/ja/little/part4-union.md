@@ -129,6 +129,8 @@ x = cond ? 1 : "a" ; x + 1      # 2: 2 | String （Integer 側は畳み、String
 > [!NOTE]
 > **実Rigorでは**、`Union`レシーバは「各メンバを個別にディスパッチし、全メンバが解決したら戻り型をunion、どれか1つでも解決しなければ全体を`nil`（解決失敗）にする」と定めています（`rigor/docs/internal-spec/inference-engine.md`「`Union` receivers MUST dispatch each member
 > individually」）。chibirigorの「未知メンバがいたら全体をuntyped」は、この縮図です。
+>
+> ただし例に使った`nil`は、実Rigorでは特別扱いです。`x = cond ? 1 : nil`の`x + 1`は黙らず、`call.possible-nil-receiver`（`nil`かもしれない値へのメソッド呼び出し）として報告されます。`nil`の扱いは、ナローイングと合わせて次章で見直します。
 
 ---
 

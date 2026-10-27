@@ -42,7 +42,7 @@ sidebar:
 2. **captured_local** … ブロックに捕獲されたローカル。
 3. **object_content** … オブジェクトの中身（ivar、ハッシュのキーなど）。
 4. **global_storage** … グローバル変数、クラス変数など。
-5. **dynamic_origin** … `untyped`の出どころ（どこで型を見失ったか）。
+5. **dynamic_origin** … 動的な由来に関する事実（実Rigorでは、たとえば呼ばれるタイミングが読めないブロックのエスケープ）。
 6. **relational** … 変数間の関係（`x == y`など）。
 
 ```text
@@ -52,18 +52,18 @@ sidebar:
    ├ object_content   : obj.name は設定済み    │ で 5 つに分ける
    ├ global_storage   : $cfg は Hash           │
    ├ relational       : a == b                 ┘
-   └ dynamic_origin   : z は ◯◯行で untyped 化  ← 他5つと毛色が違う（由来追跡）
+   └ dynamic_origin   : ブロックがエスケープ    ← 他5つと毛色が違う（動的な由来）
 ```
 
 ![図6-1　FactStoreの6バケツ](../figures/svg/seasoned-6-1.svg)
 > ▼ 図6-1　FactStoreの6バケツ。上5つは「事実がどの対象に付くか」で分ける。
-> `dynamic_origin`だけは対象スコープではなく「`untyped`がどこで生まれたか」を追う毛色違い。
+> `dynamic_origin`だけは対象スコープではなく、動的な由来に関する事実を持つ毛色違い。
 
 バケツに分ける理由は、**無効化（invalidation）のタイミングが違う**からです。ローカルへの再代入はそのlocal_bindingの事実だけを消せばよいですが、メソッド呼び出しはobject_contentを広く疑う必要があります。バケツ名は本物のRigorの内部仕様（`inference-engine.md`）の正式名と一致します。[^buckets]
 
 なお`object_content`バケツに入るivar（インスタンス変数）の型は「すべての可視な代入のunion」になります（`@x`をどこかで`nil`にし得るなら、どこで読んでも`nil`を含む保守的近似）。この個別パターンは付録[a2（ナローイングのパターン集）](../appendix/a2-narrowing-patterns.md)のa2-4（ivar union）へ。
 
-[^buckets]: 6バケツのうち`local_binding`、`captured_local`、`object_content`、`global_storage`、`relational`は「事実が付く対象」で分かれるのに対し、`dynamic_origin`だけは「`untyped`の由来を追う」別系統です。位置づけが違うことに注意したい（実specでも6つ目として並ぶが役割は別）。
+[^buckets]: 6バケツのうち`local_binding`、`captured_local`、`object_content`、`global_storage`、`relational`は「事実が付く対象」で分かれるのに対し、`dynamic_origin`だけは動的な由来に関する事実を持つ別系統です。位置づけが違うことに注意したい（実specでも6つ目として並ぶが役割は別）。なお「`untyped`がどこで生まれたか」という由来の追跡そのものは、実RigorではFactStoreの外にある助言用の表（`Scope#dynamic_origins`、ADR-75）が担います。
 
 ---
 
@@ -128,9 +128,11 @@ x = nil
 # ここで x は nil とは限らない
 ```
 
-ナローイングが`x`を「nilでない」と絞っても、ブロックが`x`に再代入し得るなら、その事実は危うくなります。FactStoreは、ブロックが外側のローカルを書くことを検知して、そのcaptured_local事実を無効化します。
+ナローイングが`x`を「nilでない」と絞っても、ブロックが`x`に再代入し得るなら、その事実は危うくなります。本章の最小モデルでは、FactStoreはブロックが外側のローカルを書くことを検知して、そのcaptured_local事実を無効化します。
 
 §6-3で見たエスケープ（呼ばれるタイミングが読めない）に加えて、捕獲固有の難所はこの「ブロックが外側を書き換える」点です。`each`のように即時に呼ばれるブロックでも、外側のローカルへ代入していればナローイングは崩れます。捕獲した変数を読むだけか書くかで扱いが変わり、書くなら即時呼びでも`captured_local`事実を落とします。
+
+実Rigorはもう一歩進めています。`each`のようにエスケープしないブロックなら、ブロック本体を上限つきで繰り返し評価し、書き込まれた型を合流させて外側へ書き戻します（ADR-56）。上の例なら、事実を捨てずに`x`を`nil`か`Integer`のユニオン型として保てます。エスケープするブロックや判定できないブロックが書き換えるローカルは、`untyped`へ落とします。
 
 前編の素朴な`Scope`はここをまったく扱いませんでした（だから本編は`each`等のブロック内ナローイングに踏み込まなかった）。実用ではここが誤検知の温床で、Rigorが最も気を遣う所です。
 

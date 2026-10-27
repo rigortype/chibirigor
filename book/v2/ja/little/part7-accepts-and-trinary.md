@@ -64,7 +64,7 @@ accepts(Type::Nominal[:Integer], Type::Const["x"])    # => :no   （"x" は入�
 
 - **① 型理論**：値が期待の型に*入る*かが部分型付けです（『しくみ』 7章）。
 - **② Rubyだと**：`1`は`Integer`、`"x"`は`String`。クラスで大まかに判定できます。
-- **③ Rigorだと**：`Const[1]`のような細かい型は、比べる前にクラスに丸めてから判定します。Part 1の「丸め」がここでも効きます。
+- **③ Rigorだと**：本書の`accepts`は、`Const[1]`のような細かい型を比べる前にクラスに丸めてから判定します。Part 1の「丸め」がここでも効きます。実Rigorは丸めずに値まで比べるので、RBSでリテラル型`1`を期待する引数に`2`を渡すと報告します。
 
 ---
 
@@ -126,7 +126,7 @@ end
 
 - **① 型理論**：Unionのメンバ全員が通って初めて`:yes`です（一番弱い結論を採る、union-subtyping）。
 - **② Rubyだと**：`c ? 1 : 2`は`Integer | Integer`だから問題ありません。`c ? 1 : "a"`はUnionになり、`Integer`を期待する式に渡すと`:no`になります。
-- **③ Rigorだと**：Unionへの照合でも「分からなければ`:maybe`」です。全員`:yes`のときだけ怒れます。
+- **③ Rigorだと**：Unionへの照合でも「分からなければ`:maybe`」です。メンバが1つでも`:no`なら怒れます。全員が`:yes`になって初めて、黙って通します。
 
 ![図7-1　acceptsの三値判定（untypedは :maybe、Unionは一番弱い答え）](../figures/svg/little-7-1.svg)
 > ▼ 図7-1　`accepts`の三値判定（untypedは`:maybe`、Unionは一番弱い答え）

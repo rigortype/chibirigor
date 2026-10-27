@@ -66,6 +66,8 @@ Part 6では、フローを支える本物の**FactStore**（6種の事実、無
 | ③ `:maybe`を罰しない | progressを放棄（証明不能を`:no`に昇格させない） | `:maybe`が実は不一致 → 実行時の型エラー |
 | ④ 保守的ナローイング | progressの*検出*を放棄（disjoint、`Dynamic`を絞らない） | 絞れず見逃した枝の実エラーを報告しない |
 
+なお④の「`Dynamic`を絞らない」はchibirigorの穴です。実Rigorは、信頼できる`is_a?`ガードの下では`Dynamic`も具体的な型に絞ります（ADR-83）。
+
 preservation（評価で型が保たれる）の側は、chibirigorはそもそも*強く主張しません*。怪しくなれば`untyped`にwidenするので、preservationはconsistency（`~`）の意味で自明に保たれます（型が合わなくなったら`untyped`に倒すだけ）。**手放しているのは主にprogress**、というのがこの4箇所の正体です。
 
 形式的に言えば：**chibirigorは健全性（soundness）、とくにprogressを、誤検知の少なさ（"never frighten working code"）と引き換えに、限定的に放棄している。**これは欠陥ではなく**設計の選択**です。健全性は「バグを1つも見逃さない」を意味しますが、その代償（動くコードを脅かす）の方が、実用チェッカーでは高くつくと判断しているのです。
@@ -126,8 +128,9 @@ chibirigorの「`untyped`に倒す」「注釈の無い所は照合位置を作�
 > 検査、正規化を行うメソッドに付けます：
 >
 > ```ruby
-> # RBS側に書く（`.rb`本体にはインラインで書けない）
-> # %a{rigor:v1:assert x is non-empty-string}
+> # rbs_inline: enabled
+> # RBS側に書くか、rbs-inlineのコメントで.rbに書く（ADR-93）
+> #: %a{rigor:v1:assert x is non-empty-string} (String?) -> void
 > def ensure_present!(x) = (raise if x.nil? || x.empty?)
 > ```
 >
@@ -157,7 +160,7 @@ chibirigorの「`untyped`に倒す」「注釈の無い所は照合位置を作�
 
 ### HKT還元fuel（後編Part 4、ADR-20）
 
-Rigorは再帰型を μ＋余帰納で直接は実装せず、軽量HKT（`Type::App`）＋ **fuel（燃料）予算**で別解にしています（後編Part 4 §4-5から送られてくる論点）。高階型を展開するたびにカウンタを消費し、上限（既定64ステップ）で打ち切ります。これは**危なくなったら止める**解です。fuelが尽きれば結果を`:maybe`に倒し、`untyped`に逃がして安全側に着地します。
+Rigorは再帰型を μ＋余帰納で直接は実装せず、軽量HKT（`Type::App`）＋ **fuel（燃料）予算**で別解にしています（後編Part 4 §4-5から送られてくる論点）。還元中に同じ適用へ戻ってきたら循環として検出し、展開中の`App`をそのまま返して結び目を作ります。それでも止まらない展開に備えて、展開するたびにカウンタを消費し、上限（既定64ステップ）で打ち切ります。これは**危なくなったら止める**解です。fuelが尽きれば還元を登録時の上界`bound`（既定は`untyped`）に戻し、安全側に着地します。
 
 | 止め方 | 性格 | どこで |
 |---|---|---|
