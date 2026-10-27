@@ -71,15 +71,16 @@ Rigor's invention; it's the product of a history in which type checkers hit the 
 whenever they handled a dynamic hash.
 
 - **Hack (Facebook):** a language that added static types to PHP. It introduced the type
-  `shape('name' => string, 'age' => int)` and adopted the design "spell out the keys, but allow
-  extras (open)." A design conscious of coexisting with options hashes from the start.
+  `shape('name' => string, 'age' => int)` and adopted the design "spell out the keys." The default
+  is closed; writing `...` makes it allow extras (open). A design conscious of coexisting with options hashes from the start.
 - **PHPStan / Psalm:** PHP's checkers hit the same problem and introduced the same type with the
   notation `array{name: string, age: int}`. The vocabulary follows Hack, and some can state
   open/closed explicitly.
 - **Rigor:** raises types from Ruby's RBS `{ name: String, age: Integer }`. Open/closed is a
   policy the carrier holds: a record written in RBS is read as a closed shape and rejects extra
   known keys. An undeclared options hash has no expected type, so Rigor stays quiet. Receiving
-  everything uniformly as an open "at least" is chibirigor's simplification.
+  every expected shape uniformly as an open "at least," even where one exists, is chibirigor's
+  simplification.
 
 In all three tools, a naive join (a wide type like `Hash[Symbol, String | Integer]`) loses the
 per-key information, so a type that remembers keys individually was needed. chibirigor's

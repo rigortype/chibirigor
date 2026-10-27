@@ -108,8 +108,8 @@ end
 The block passed to `Thread.new` runs at *any timing.* That block rewrites `x`, so we can't rule out
 that `x` has become a different type at any later point.
 
-- **A fact dies:** on detecting this "escape," it **conservatively invalidates** the facts of the
-  outer variables that block **may rewrite**. Facts about variables the block only reads survive.
+- **A fact dies:** on detecting this "escape," Rigor drops the facts about the outer variables
+  that block **may rewrite**, and those variables **fall to `untyped`**. Facts about variables the block only reads survive.
 - **Target patterns:** `Thread.new`, `define_method`, `Proc.new` / `Fiber.new`, and other patterns
   that "save the block as an object / call it later."
 
@@ -205,8 +205,8 @@ body doesn't handle it, but the answer to "why that name" for this kind of carri
 > **But not every refinement carrier is a set difference.** Real Rigor is two-layered (ADR-3), and
 > only a **point removal** like `non-empty-string` is a `Difference`. A **predicate subset** like
 > `lowercase-string` / `numeric-string` is a separate carrier, `Refined`, and a **ranged integer**
-> like `Integer[1..10]` is `IntegerRange` (the notation is `Integer[1..10]`; the old `int<min,max>`
-> spelling is merely accepted as a deprecated input alias, per ADR-109). The carriers in the table below are a mix
+> like `Integer[1..10]` is `IntegerRange`. The old `int<min,max>` spelling is merely
+> accepted as a deprecated input alias (ADR-109). The carriers in the table below are a mix
 > of these three.
 
 - **A fact is born:** in a branch that passes a predicate guard — `unless s.empty?` / `if n > 0` / a

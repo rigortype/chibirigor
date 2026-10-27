@@ -9,7 +9,7 @@ sidebar:
 
 This chapter's goal: **build `accepts`, which judges "does this type fit, passed here?"** But the
 answer isn't a two-way `yes` / `no` — it's a three-way **`yes` / `no` / `maybe`**. This "maybe"
-is the single biggest reason Rigor can stay gentle.
+is the single biggest reason chibirigor can stay gentle.
 
 > In 『しくみ』 this is ch. 7 "Subtyping" (TAPL ch. 15 "Subtyping"). That book answered "fits /
 > doesn't fit" as a two-way `true`/`false`. We add one thing to it.
@@ -110,8 +110,9 @@ languages." `untyped` is the mark of "the type was lost." About something lost, 
 
 - **① Type theory:** once unknown (untyped) mixes in, the verdict *can't fall to one side*.
 - **② In Ruby:** code with no annotations is normal. Nobody knows the return of `foo.bar`.
-- **③ In Rigor:** where unknown, `:maybe`. This connects directly to "don't frighten" in the next
-  section.
+- **③ In Rigor:** this book's `accepts` stays quiet by answering `:maybe` where it doesn't know.
+  This connects directly to "don't frighten" in the next section. Real Rigor lets it through
+  gradually as `:yes`, but it stays quiet just the same.
 
 ---
 
@@ -164,7 +165,9 @@ are all `Integer` it's `:yes` = stay quiet (no false positive). If a `String` mi
 - **② In Ruby:** `c ? 1 : 2` is `Integer | Integer`, so no problem. `c ? 1 : "a"` becomes a Union,
   and passing it to an expression expecting `Integer` is `:no`.
 - **③ In Rigor:** even checking against a Union, "if unknown, `:maybe`." If even one member is `:no`, we
-  can complain. Only when every member is `:yes` do we let it through silently.
+  can complain. If there's no `:no`, we let it through silently, even with a `:maybe` mixed in.
+  This is about the side passed as an argument; a Union *receiver*, as we saw in Part 4's 4-1x,
+  complains only when every member fails.
 
 ![Figure 7-1 — accepts's three-valued verdict: untyped is :maybe, a Union the weakest answer](../figures/svg/little-7-1.svg)
 > ▼ Figure 7-1 — `accepts`'s three-valued verdict: untyped is `:maybe`, a Union takes the weakest answer

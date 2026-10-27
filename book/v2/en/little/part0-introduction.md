@@ -67,8 +67,8 @@ from checking — it's the **foundation** that makes checking possible.
 
 The "inference" we mean here is **building a type upward from an expression (synthesis)** — "`1`
 is an integer," "`"a".upcase` is a string" — stacking up types from what's written. The
-reverse — **working out a method's parameter types backward from how callers use it** — we do
-*not* do (in the Little volume). If we can't tell a parameter's type, we collapse it to
+reverse — **deciding a method's parameter types by working backward from how callers use it** —
+we do *not* do (in the Little volume). If we can't tell a parameter's type, we collapse it to
 `untyped` (just remember: when in doubt, fall back to `untyped`). The catalog of special types,
 `untyped` first among them, is appendix [a1](../appendix/a1-special-types.md) — no need to read
 it through; it's a reference to consult after you've read up to Part 9.
@@ -83,9 +83,10 @@ it through; it's a reference to consult after you've read up to Part 9.
 > That chibirigor deliberately *doesn't* do this is not a weakness but a design choice:
 > whole-program execution tends to explode on large codebases, so we **narrow to local
 > inference and buy scale and "silence" (no false positives)** instead. Rigor doesn't run the
-> whole program either, and by default it doesn't infer arguments backward. There is an opt-in
-> path that collects types from call sites, but it is used only to add precision — never as
-> grounds for stricter diagnostics. This one line we won't
+> whole program from an entry point either, and by default it doesn't infer arguments backward.
+> There is an opt-in path that collects types from call sites; turning it on adds a pre-pass
+> that visits every call site once. Even so, what it collects is used only to add precision —
+> never as grounds for stricter diagnostics. This one line we won't
 > cross — not inferring arguments backward — the Little volume returns to concretely just once,
 > in Part 8, and the Seasoned volume treats carefully in Part 5.
 

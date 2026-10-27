@@ -281,15 +281,19 @@ feature) — the `untyped` in a generated RBS points to "where a human should ad
 > [!NOTE]
 > Leaving `def double(n)`'s argument `n` as `untyped` here is a **design judgment.** Ruby's
 > bundled TypeProf would find **where `double` is called**, as in `double(3)`, work `n` backward
-> to `Integer`, and fill in `(Integer) -> Integer`.
+> from there to `Integer`, and fill in `(Integer) -> Integer`.
 >
 > chibirigor deliberately doesn't — instead of tracing every caller, it looks at each method
 > locally and defaults an unknown argument to `untyped`. It scales better, and produces no false
 > positives.
 >
-> Rigor follows the same policy by default. There are opt-in paths that collect caller-side types
-> — the `parameter_inference:` setting and `sig-gen --params=observed` — but what they collect is
-> used only to add precision, never as grounds for stricter argument diagnostics.
+> Rigor follows the same policy by default. There is an opt-in path that collects caller-side
+> types — the `parameter_inference:` setting — but what it collects is used only to add
+> precision, never as grounds for stricter argument diagnostics.
+>
+> `sig-gen --params=observed` is a slightly different animal. It writes the observed argument
+> types into the proposed RBS as parameter types. The default is `--params=untyped`, and whether
+> to narrow a parameter is decided by the human who adopts that proposal.
 >
 > **The "real inference" that guesses arguments from how they're used is taken on head-on in
 > Seasoned Part 5.**

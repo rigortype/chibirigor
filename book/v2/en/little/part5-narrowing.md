@@ -148,7 +148,7 @@ So **narrow only when that class is possible** — narrow when `x` contains Stri
 untouched). We don't narrow `Dynamic` either (something whose type is unknown, we let through
 unknown). That last choice belongs to this book's minimal version: real Rigor does narrow
 `untyped` to `String` in the branch where `is_a?(String)` holds — inside that branch the value
-really is a `String`, so narrowing it can't produce a false positive.
+really is a `String` (or a subclass of it), so narrowing it can't produce a false positive.
 
 ```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK (dead branch; no false positive)
@@ -180,9 +180,9 @@ branch that is never taken."** By default, though, it stays silent; it surfaces 
 explicitly ask with `check --unreachable` — an opt-in (so as not to frighten working code).
 
 Real Rigor draws this line differently. It reports unreachable branches by default, but only
-where the proof is solid: a branch decided by a literal, like `if false`, gets the
-`flow.unreachable-branch` warning, and a `case`/`when` clause that can never match gets the
-`flow.unreachable-clause` info. The dead branch that `is_a?` produces is, for now, outside that
+where the proof is solid: a branch decided by a literal, like `if false`, is reported as
+`flow.unreachable-branch` at warning level, and a `case`/`when` clause that can never match as
+`flow.unreachable-clause` at info level. The dead branch that `is_a?` produces is, for now, outside that
 report.
 
 chibirigor's `--unreachable` is the opposite of Java's and C#'s exhaustiveness checks, which "stop

@@ -90,7 +90,7 @@ is this:
 | Little §9-2's slogan | In progress/preservation words | The "stuck state" it admits |
 |---|---|---|
 | ① `untyped` accepts anything | abandons progress (accepts `untyped` against any expected type = passes subsumption straight through) | calling a method on an `untyped` value that doesn't answer → `NoMethodError` |
-| ② open hash · unknown key → `nil` | abandons progress (loosens width subtyping on arguments) | a key that's actually absent is `nil` → halts on a call to `nil` |
+| ② open hash · unknown key → `nil` | abandons progress (asserts an unknown key is `nil` and doesn't flag that call) | a key that's actually absent is `nil` → halts on a call to `nil` |
 | ③ doesn't punish `:maybe` | abandons progress (doesn't promote the unprovable to `:no`) | a `:maybe` is actually a mismatch → a runtime type error |
 | ④ conservative narrowing | abandons the *detection* of progress (doesn't narrow disjoint / `Dynamic`) | doesn't report the real error of a branch it couldn't narrow and missed |
 
@@ -144,6 +144,11 @@ The Little volume's three-valued `accepts` was exactly for **folding this `<:` (
 | `untyped` is involved (`~` but `<:` unknown) | `:maybe` |
 | `S` and `T` are definitely unrelated | `:no` |
 
+> [!NOTE]
+> This table is the chibirigor `accepts` built in the Little volume. Real Rigor's gradual mode answers
+> `:yes` with `Dynamic` on either side (it passes when consistency holds). Whether it stays quiet with
+> `:maybe` or passes with `:yes`, neither raises a diagnostic on a check involving `untyped`.
+
 It's precisely because `~` is **non-transitive** that `untyped` doesn't become an unlimited escape
 hatch — this is the first meaning of "not anarchic."
 
@@ -176,10 +181,13 @@ distinguish "unsound on purpose" from anarchy.
 > directive** (an RBS extension annotation). It's put on methods that check / normalize:
 >
 > ```ruby
-> # rbs_inline: enabled
 > # write it on the RBS side, or in the .rb with an rbs-inline comment (ADR-93)
-> #: %a{rigor:v1:assert x is non-empty-string} (String?) -> void
-> def ensure_present!(x) = (raise if x.nil? || x.empty?)
+> class Guard
+>   #  %a{rigor:v1:assert x is non-empty-string}
+>   #  x: String?
+>   #  return: void
+>   def ensure_present!(x) = (raise if x.nil? || x.empty?)
+> end
 > ```
 >
 > Its meaning is "**after this method returns, the *caller's* `x` is `non-empty-string`**" — a **gate**
@@ -199,12 +207,12 @@ distinguish "unsound on purpose" from anarchy.
 
 ---
 
-## 7-6. How to keep termination in engineering — coinduction, fuel, budget
+## 7-6. How to keep termination in engineering — coinduction, cycle detection, fuel, budget
 
 chibirigor can't have normalization (if it types, it halts) either. Where theory guarantees "if it
 types, it halts" by *proof*, a practical checker keeps "**the analysis itself halts**" by
-*engineering.* The termination tools that appeared up to this chapter line up as a **self-similar
-shape** of the same contrast, at three sizes.
+*engineering.* The termination tools that appeared up to this chapter line up as a contrast between
+"stop it correctly" and "stop when it gets dangerous."
 
 ### Coinduction — "stop it correctly" (Seasoned Part 4)
 
@@ -213,19 +221,22 @@ The type equivalence test of equi-recursive doesn't halt if left alone (it keeps
 the pair currently being compared again, *assume* equal and cut off." This is a solution that **stops
 it correctly** (subtyping as the greatest fixed point, TAPL ch. 21).
 
-### HKT reduction fuel — "stop when it gets dangerous" (Seasoned Part 4, ADR-20)
+### HKT reduction: cycle detection and fuel (Seasoned Part 4, ADR-20)
 
 Rigor doesn't implement recursive types directly with μ + coinduction; it makes a lightweight HKT
 (`Type::App`) + a **fuel budget** the alternative (carried over from Seasoned Part 4 §4-5). If reduction
 comes back to the same application, it detects the cycle and returns the `App` being unfolded as-is,
-tying the knot. For unfolding that still won't stop, it consumes a counter each time it unfolds,
-cutting off at the ceiling (default 64 steps). This is a solution that **stops when it gets
-dangerous** — when fuel runs out it returns the reduction to the upper bound `bound` fixed at
+tying the knot. This cycle detection is a solution that **stops it correctly** on the side that
+builds the type — the same role as μ-folding, and a different thing from `seen`, which decides a
+relation. For unfolding that still won't stop, it consumes a counter each time it unfolds, cutting
+off at the ceiling (default 64 steps). This one is a solution that **stops when it gets dangerous** —
+when fuel runs out it replaces the reduction's result with the upper bound `bound` fixed at
 registration (default `untyped`), landing on the safe side.
 
 | Way to stop | Character | Where |
 |---|---|---|
 | coinduction (`seen`) | stop it correctly (greatest fixed point) | the teaching equivalence test (Seasoned Part 4) |
+| HKT reduction cycle detection (ADR-20 D4) | stop it correctly (ties the knot) | implemented in Rigor |
 | HKT reduction fuel (ADR-20) | stop when it gets dangerous | implemented in Rigor |
 | inference budget (ADR-41) | stop when it gets dangerous (broad sense) | designed, unimplemented |
 
@@ -236,9 +247,9 @@ also designed — cutting off the whole analysis with a budget, a large self-sim
 this one is *currently unimplemented* (ADR-41 is Status: Proposed).
 
 The *beauty of theory* "a type system guarantees normalization" is replaced, in a practical checker,
-by the *engineering* of "**cut off the analysis with a budget.**" Coinduction (stop correctly) → fuel →
-budget (stop when dangerous) is the same answer, at varying scales, to the same question of "how to stop
-the unfolding." That a practical checker can choose "stop when dangerous" was because of gradual's
+by the *engineering* of "**cut off the analysis with a budget.**" Coinduction and cycle detection (stop correctly),
+fuel and budget (stop when dangerous) answer the same question of "how to stop the unfolding" at
+varying scales. That a practical checker can choose "stop when dangerous" was because of gradual's
 settling: "fall back to `untyped` when you can't tell."
 
 ---
@@ -256,9 +267,9 @@ settling: "fall back to `untyped` when you can't tell."
   of those holes. We recover §1-3's foreshadowing here.
 - But it isn't anarchic — **gradual's two disciplines:** consistency `~` (symmetric, non-transitive)
   and the gradual guarantee (behavior continuous in annotation amount).
-- Instead of normalization, it keeps termination by **engineering** — coinduction (stop correctly) →
-  HKT fuel (ADR-20, implemented) → inference budget (ADR-41, designed, unimplemented), a self-similar
-  shape at varying scales.
+- Instead of normalization, it keeps termination by **engineering** — coinduction and HKT cycle
+  detection (stop correctly), HKT fuel (ADR-20, implemented) and the inference budget (ADR-41,
+  designed, unimplemented) (stop when dangerous), a self-similar shape at varying scales.
 
 ## Exercises
 
@@ -273,8 +284,8 @@ settling: "fall back to `untyped` when you can't tell."
 4. **The two disciplines:** explain, in one sentence each, that gradual consistency `~` is
    *non-transitive* and that the gradual guarantee works on *annotation amount*, each by "what would
    break if this discipline didn't exist."
-5. **Line up the ways to stop:** classify the three — coinduction (`seen`), HKT fuel, inference budget
-   — into "stop correctly / stop when dangerous," and state in a phrase why Rigor can choose the latter
+5. **Line up the ways to stop:** classify the four — coinduction (`seen`), HKT cycle detection, HKT
+   fuel, inference budget — into "stop correctly / stop when dangerous," and state in a phrase why Rigor can choose the latter
    (gradual's settling).
 
 **Next chapter (Part 8, finale):** from chibirigor's minimal version to real Rigor's build-out

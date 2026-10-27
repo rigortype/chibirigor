@@ -260,8 +260,8 @@ Even with all this added, the design's core is the same as the Little volume:
 ---
 
 **Next chapter (Part 7):** so far we've stacked "when in doubt, erase" and "deliberately loosen." Next
-chapter we take those head-on — **soundness and normalization**, and the four places Rigor makes
-*deliberately* unsound. We gather gradual's two disciplines (consistency and guarantee) and
+chapter we take those head-on — **soundness and normalization**, and the four places chibirigor is
+*deliberately* unsound, and how real Rigor differs. We gather gradual's two disciplines (consistency and guarantee) and
 "coinduction vs. budget" in one place, pairing with Seasoned Part 1's bidirectional map.
 
 ---

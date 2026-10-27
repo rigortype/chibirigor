@@ -92,7 +92,7 @@ signpost.
 | 2 | Subtyping and variance | ch. 15, 16 | ch. 7 | match (width/depth, variance, algorithmic subtyping) |
 | 3 | Generics and type substitution | ch. 23, 22, 26, 29 | ch. 9 | match (System F type application, α-conversion, bounded quantification) |
 | 4 | Recursive types: μ and coinduction | ch. 20, 21 (HKT in ch. 29) | ch. 8 | match (equi-recursive, coinduction = greatest fixed point; the HKT aside has separate grounds) |
-| 5 | Real type inference: filling in arguments | ch. 22 | ch. 9 exercises, afterword | frontier (type reconstruction, constraints, unification; where 『しくみ』 gave up the answer) |
+| 5 | Real type inference: filling in arguments | ch. 22 | ch. 9 exercises, afterword | frontier (type reconstruction, constraints, unification; where 『しくみ』 left the exercise without an answer) |
 | 6 | The complete FactStore | (no corresponding ch.) | (no corresponding ch.) | own terrain (general dataflow analysis; no chapter in a type-theory textbook) |
 | 7 | Soundness, normalization, unsound on purpose | ch. 8 §8.3, ch. 12 | afterword | sets the central theorem (progress + preservation / normalization), tells *why unsound* |
 | 8 | Toward real Rigor | (no corresponding ch.) | (no corresponding ch.) | bridge (learning minimal version → practical tool; the correspondence is the ADRs and spec) |
@@ -123,11 +123,11 @@ text use the v1 structure).
 |---|---|---|
 | ADR-5 | The robustness principle (how to avoid false positives) | Little Part 4, 7; Seasoned Part 7 (unsound on purpose) |
 | ADR-22 | baseline + onboarding | Little Part 9 (baseline proper) |
-| ADR-20 | Lightweight HKT (stop recursion with reduction fuel; implemented) | Seasoned Part 4 (fuel), Part 7 (budget) |
+| ADR-20 | Lightweight HKT (reduction recursion is stopped by cycle detection, with fuel as the outer safety net; implemented) | Seasoned Part 4 (fuel), Part 7 (budget) |
 | ADR-41 | Design of an inference budget (Status: Proposed, not implemented) | Seasoned Part 7 (budget) |
 | ADR-14 | sig-gen (signature generation) | Little Part 8, Seasoned Part 3 (erasure) |
 | ADR-25 | plugin RBS | Little Part 8 |
-| ADR-32 | inline RBS | Little Part 8 |
+| ADR-32 | inline RBS (read by default since ADR-93) | Little Part 8 |
 | ADR-46 | incremental analysis (a cross-file dependency graph) | Seasoned Part 8 §8-2 (engineering) |
 
 ### Engineering ADRs the practical tool adds

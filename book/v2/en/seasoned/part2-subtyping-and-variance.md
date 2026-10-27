@@ -76,7 +76,8 @@ With the Little volume's `HashShape` (the structure of a hash), subtyping first 
 > You can. The extra `age` can be ignored, and the needed `name` is there.
 
 This often runs against intuition — **the side with *more* keys is the subtype** (the smaller box).
-Because the values that pass as `{name:, age:}` are a *subset* of the values that pass as `{name:}`.
+If we read a record as an *open* shape that tolerates extra keys, the values that pass as
+`{name:, age:}` are a *subset* of the values that pass as `{name:}`.
 There are two rules:
 
 - **Width subtyping:** `{l_i: T_i (i∈1..n+k)} <: {l_i: T_i (i∈1..n)}` (`k ≥ 0`; at `k=0` it matches
@@ -84,10 +85,10 @@ There are two rules:
 - **Depth subtyping:** if each key's value type is a subtype, the record is too
   (`S_i <: T_i ⇒ {l_i: S_i} <: {l_i: T_i}`). **Covariant** in the value types.
 
-When chibirigor allowed extra keys in Little Part 6, that meant **always applying this width
+When chibirigor allowed extra keys in Little Part 6, that was because it **always applied this width
 subtyping on the argument side.** In real Rigor, width subtyping applies only when the expected
 side is an *open* shape: a record written in RBS is read as a *closed* shape and rejects extra
-known keys. `accepts`-over-`HashShape` just runs these two rules recursively.
+known keys. chibirigor's `accepts`-over-`HashShape` just runs these two rules recursively.
 
 > [!TIP]
 > **Reference note.** TAPL 15.2 "The subtype relation," 『しくみ』 ch. 7 implements this as a

@@ -41,10 +41,11 @@ The reasoning is straightforward. If we've lost track of even part of the type, 
 anything about that union type. Rather than holding it half-baked as `1 | untyped`, we say
 `untyped` honestly. This is the most conservative form, and the one chibirigor chose.
 
-Real Rigor makes a different choice. It keeps `c ? 1 : foo.bar` as `1 | Dynamic[top]`, without
-throwing away the side it knows. Remembering which side lost the type is more precise, and the
-known `1` side stays protected from then on. Both refuse to assert anything where the type is
-unknown; what differs is how much of the known side is kept.
+Real Rigor makes a different choice. It keeps `c ? 1 : foo.bar` as `1 | Dynamic[Top]`, without
+throwing away the side it knows. Pass it to an argument expecting `String`, for example, and
+the `1` side doesn't fit, so it can say `:no`. Method calls on the value, on the other hand,
+aren't reported, because the `Dynamic[Top]` side is there. Both refuse to assert anything
+where the type is unknown; what differs is how much of the known side is kept.
 
 ---
 
@@ -55,8 +56,8 @@ code." Let's make clear, at the end, where it misses:
 
 1. **`untyped` accepts anything** (Part 7's `accepts` is `:maybe`). The hole at the boundary where
    the type was lost.
-2. **A hash's unknown key is `nil`** (Part 6). Extra keys allowed too (open). Reject by exact match,
-   as 『しくみ』 does, and working options hashes go bright red.
+2. **A hash's unknown key is asserted to be `nil`** (Part 6). Reading the hash as open is the
+   premise. Reject by exact match, as 『しくみ』 does, and working options hashes go bright red.
 3. **`:maybe` is not punished** (Part 7's `dispatch`). When in doubt, stay quiet.
 4. **Narrowing is conservative** (Part 5). A condition we can't read, disjoint, or `Dynamic` — we
    don't narrow.
@@ -64,8 +65,9 @@ code." Let's make clear, at the end, where it misses:
 Each trades "a miss = the danger of overlooking a bug" to avoid "a false positive = frightening
 working code." chibirigor (and Rigor) weigh the latter cost far more heavily.
 
-That said, real Rigor draws the line a little differently for 2 and 4. It flags surplus keys in a
-record written in RBS (Part 6), and it narrows even `untyped` under a trusted guard like `is_a?`
+That said, real Rigor draws the line a little differently for 2 and 4. In a record written in
+RBS, it flags surplus keys (Part 6) — allowing surplus keys is not a hole in itself, just a
+different policy. And it narrows even `untyped` under a trusted guard like `is_a?`
 (Part 5). Strict where there is a declaration or a proof, silent where there isn't — an
 adjustment on the same axis.
 

@@ -118,8 +118,8 @@ different story: "you can pass `{name:, admin:}` where `{name:}` is wanted" is s
 called **width subtyping** (『しくみ』, too, adopts this width subtyping in ch. 7, allowing extra
 properties).
 
-chibirigor makes this **a fit.** What differs is the *motive and scope*. It's not handling
-statically-written records for soundness; the counterpart is **Ruby's options hashes**, and the
+chibirigor makes this **a fit.** What differs is the *motive and scope*. It isn't handling
+statically-written records for soundness. The counterpart is **Ruby's options hashes**, and the
 aim is **not producing false positives**:
 
 - In Ruby, "build a big options hash, and each method picks just the keys it needs" is **the
@@ -146,16 +146,18 @@ Laid out in the three perspectives:
   reality.
 - **③ In Rigor:** open versus closed is a *policy* the carrier itself holds. A record written in RBS
   as `{ name: String }` is read as a closed shape, and extra known keys are flagged. An undeclared
-  options hash has no expected type to begin with, so nothing is said. chibirigor's always-open
-  choice is a simplification that keeps only the "stay silent where nothing is declared" side.
+  options hash has no expected type to begin with, so nothing is said. chibirigor reads every
+  expected shape as open, even where one is declared — a simplification that doesn't tell the
+  declared case from the undeclared one.
 
 > [!NOTE]
 > **`HashShape` is not Rigor's invention**
 >
 > "A structural hash type that remembers keys and value types" is not Rigor's invention. Several
-> type checkers hit the same problem (Hack's `shape`, PHPStan/Psalm's `array{...}`), and all chose
-> "allow extras (open)" — because a naive join mixes the value types into `String | Integer` and
-> loses the per-key information. chibirigor's `HashShape` is the minimal implementation of that
+> type checkers have hit the same problem (Hack's `shape`, PHPStan/Psalm's `array{...}`), because a
+> naive join mixes the value types into `String | Integer` and loses the per-key information. Each
+> tool has drawn its own line between open and closed, and which one is the default differs by
+> tool: Hack's `shape` is closed by default and becomes open when you write `...`. chibirigor's `HashShape` is the minimal implementation of that
 > lineage. (For each tool's syntax and history, see appendix
 > [a5-3](../appendix/a5-other-languages.md).)
 

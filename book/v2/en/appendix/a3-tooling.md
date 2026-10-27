@@ -141,10 +141,10 @@ yet why is the signature (RBS) so coarse" happens. The answer is this two-layer 
 
 > [!NOTE]
 > **When you want to see only "some expression's" type pinpoint in real Rigor**, besides `annotate`
-> (the whole file) there's the move of writing `dump_type(expr)` in the source and `check`-ing
-> (write `require "rigor/testing"` so it can also be called at run time; a bare `dump_type(x)`
+> (the whole file) there's the move of writing `dump_type(expr)` in the source and `check`-ing.
+> Write `require "rigor/testing"` so it can also be called at run time. A bare `dump_type(x)`
 > additionally needs `include Rigor::Testing`, but fully qualified as `Rigor.dump_type(x)` the
-> include isn't needed). At run time `dump_type` just returns the value as is — when you `check`,
+> include isn't needed. At run time `dump_type` just returns the value as is — when you `check`,
 > it **prints the inferred type at that position as an `:info` diagnostic** (the same idea as
 > PHPStan's `dumpType()`, riding the same `:info` mechanism as §a3-1's `--explain`. Not an error, so
 > sprinkling them doesn't turn diagnostics red). The type editor hover shows is the result of the
@@ -360,7 +360,7 @@ The four bridges of this appendix on one sheet:
 | Mechanism | Treatment in this book | The real thing's behavior | Pointer back |
 |---|---|---|---|
 | `rigor check --explain` | tiny version present (maps unknown dispatch with `:info` · §a3-1x) | maps the recorded fail-soft moments with `:info` | Little Part 9 |
-| two-layer type display (erasure) | `annotate` shows one internal type (no boundary, so no discrepancy · §a3-2) | rounds internal precise type ↔ RBS-boundary type with erasure behind `annotate` / hover | Little Part 1 |
+| two-layer type display (erasure) | `annotate` shows one internal type (no boundary, so no discrepancy · §a3-2) | `annotate` and diagnostics show the internal precise type; erasure rounds it only when `sig-gen` writes RBS | Little Part 1 |
 | `rigor trace file` | tiny version nearly identical to the real thing (frame-by-frame `bind` / `union` / `dispatch` · §a3-3bx) | replays the steps of inference as a terminal animation (`--verbose` / `--line` / `--format=json`) | — |
 | 5-stage dispatch cascade | 1-stage table lookup (`METHODS`; no tiny version) | ① constant folding → ② shape → ③ RBS → ④ in-source → ⑤ fallback | Little Part 2 |
 
