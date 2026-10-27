@@ -225,11 +225,13 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 これはRigorの`sig-gen`（RBSを生成する機能）の発想の芽です。生成されたRBSの`untyped`は「人間が型を足すべき場所」を指しています。
 
 > [!NOTE]
-> ここで`def double(n)`の引数`n`を`untyped`のままにしているのは、**設計判断**です。Ruby同梱のTypeProfなら、`double`が`double(3)`のように**呼ばれている場所**を見つけて`n`を`Integer`まで逆算し、`(Integer) -> Integer`を埋めてくれます。
+> ここで`def double(n)`の引数`n`を`untyped`のままにしているのは、**設計判断**です。Ruby同梱のTypeProfなら、`double`が`double(3)`のように**呼ばれている場所**を見つけ、そこから`n`を`Integer`まで逆算し、`(Integer) -> Integer`を埋めてくれます。
 >
 > chibirigorはあえてそれをしません。呼び出し元を全部たどる代わりに、各メソッドをローカルに見て、分からない引数は`untyped`に倒します。その方がスケールするし、誤検知も出ません。
 >
-> Rigorも既定では同じ方針です。opt-inの`parameter_inference:`設定や`sig-gen --params=observed`で呼び出し元の型を集める道はありますが、集めた型は精度を足すためだけに使い、引数の診断を厳しくする根拠にはしません。
+> Rigorも既定では同じ方針です。opt-inの`parameter_inference:`設定で呼び出し元の型を集める道はありますが、集めた型は精度を足すためだけに使い、引数の診断を厳しくする根拠にはしません。
+>
+> `sig-gen --params=observed`は少し性格が違います。観測した引数の型を、提案するRBSの引数型として書き出します。既定は`--params=untyped`で、引数を狭めるかどうかは、その提案を採用する人間が決めます。
 >
 > **引数を使われ方から当てる「本物の推論」は、後編Part 5で扱います。**
 

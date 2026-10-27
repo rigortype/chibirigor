@@ -93,7 +93,7 @@ demo.rb:2:5: info: fell to untyped here (can't look up the type of `+`)
 > chibirigor側は道具を`check`と`annotate`の2つに絞っています。推論型を見たいときは`annotate`（行単位）で足ります。「内部では精密、境界では粗く」という二段構えとerasureは、本物のRigorに進んだときに出会う景色です。
 
 > [!NOTE]
-> **実Rigorで「ある式」の型だけをピンポイントに見たいとき**は、`annotate`（ファイル全体）のほかに、ソースに`dump_type(式)`と書いて`check`する手があります（実行時にも呼べるよう`require "rigor/testing"`を書いておきます。裸の`dump_type(x)`にはさらに`include Rigor::Testing`が要りますが、`Rigor.dump_type(x)`と完全修飾すればincludeは不要です）。`dump_type`は実行時には値をそのまま返すだけです。`check`したときに**その位置の推論型を`:info`診断として印字**します（PHPStanの`dumpType()`と同じ発想で、§a3-1の`--explain`と同じ`:info`の仕組みに乗ります。エラーではないので散りばめても診断は赤くなりません）。エディタのhoverが見せる型も、同じ推論の結果です。
+> **実Rigorで「ある式」の型だけをピンポイントに見たいとき**は、`annotate`（ファイル全体）のほかに、ソースに`dump_type(式)`と書いて`check`する手があります。実行時にも呼べるよう、`require "rigor/testing"`を書いておきます。裸の`dump_type(x)`にはさらに`include Rigor::Testing`が要りますが、`Rigor.dump_type(x)`と完全修飾すればincludeは不要です。`dump_type`は実行時には値をそのまま返すだけです。`check`したときに**その位置の推論型を`:info`診断として印字**します（PHPStanの`dumpType()`と同じ発想で、§a3-1の`--explain`と同じ`:info`の仕組みに乗ります。エラーではないので散りばめても診断は赤くなりません）。エディタのhoverが見せる型も、同じ推論の結果です。
 
 そして**chibirigorも`dump_type`を基本機能として持っています**。道具は`check`と`annotate`の2つに絞ったままです。これはコマンドではなく、`check`が認識する**式**です。`include`も要らず、`dump_type(式)`と書いて`check`するだけです：
 
@@ -258,7 +258,7 @@ evaluating : (top level)
 | 仕組み | 本書での扱い | 実物の挙動 | 戻りポインタ |
 |---|---|---|---|
 | `rigor check --explain` | 極小版あり（未知ディスパッチを`:info`地図化、§a3-1x） | 記録したfail-softの瞬間を`:info`で地図化 | 前編Part 9 |
-| 型表示の二段構え（erasure） | `annotate`は内部型1つ（境界が無いのでズレない、§a3-2） | `annotate`／hoverの裏で内部精密型とRBS境界型をerasureで丸める | 前編Part 1 |
+| 型表示の二段構え（erasure） | `annotate`は内部型1つ（境界が無いのでズレない、§a3-2） | `annotate`や診断は内部の精密型を出し、`sig-gen`がRBSを書くときだけerasureで丸める | 前編Part 1 |
 | `rigor trace file` | ほぼ実物と同型の極小版あり（`bind`、`union`、`dispatch`をコマ送り、§a3-3bx） | 推論の手順を端末アニメーションで再生（`--verbose`、`--line`、`--format=json`） | （なし） |
 | dispatch 5段カスケード | 1段の表引き（`METHODS`、極小版は設けず） | ① 定数畳み込み、② shape、③ RBS、④ in-source、⑤ fallback | 前編Part 2 |
 

@@ -38,13 +38,13 @@ Javaを書く人は「部分型」と聞くと**継承**を思い浮かべるは
 「キーと値の型を覚えた構造的なハッシュ型」（本編の`HashShape`）はRigorの発明ではなく、型チェッカーがdynamicなハッシュを扱うたびに同じ問題にぶつかってきた歴史の産物です。
 
 - **Hack（Facebook）**：PHPに静的型を足した言語
-  - `shape('name' => string, 'age' => int)`という型を導入し、「キーを明記する代わりに余分は許す（open）」という設計を採りました
+  - `shape('name' => string, 'age' => int)`という型を導入し、キーを明記する形を採りました。既定は閉じた（closed）形で、`...`を書くと余分を許す（open）形になります
   - 当初からoptionsハッシュとの共存を意識した設計です
 - **PHPStan / Psalm**：PHPのチェッカーが同じ問題にぶつかり、`array{name: string, age: int}`という表記で同型を導入
   - 語彙はHackを踏襲し、open/closedを明示できるものもあります
 - **Rigor**：RubyのRBS `{ name: String, age: Integer }`から型を起こします
-  - open/closedはキャリアが持つ方針で、RBSで書いたレコードは閉じた（closed）形として読み、余分な既知キーを咎めます
-  - 宣言の無いオプションハッシュには期待する型が無いので黙ります。一律にopenの「少なくとも」で受け取るのは、chibirigorの簡略化です
+  - open/closedはキャリアが持つ方針です。RBSで書いたレコードは閉じた（closed）形として読み、余分な既知キーを咎めます
+  - 宣言の無いオプションハッシュには期待する型が無いので黙ります。期待する形がある所でも一律にopenの「少なくとも」で受け取るのは、chibirigorの簡略化です
 
 3ツールとも、素朴なjoin（`Hash[Symbol, String | Integer]`のような幅の広い型）ではキーごとの情報が失われてしまうため、キーを個別に覚える型が必要でした。chibirigorの`HashShape`はこの系譜の最小実装です。
 

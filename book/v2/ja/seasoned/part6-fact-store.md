@@ -188,7 +188,7 @@ FactStoreの`join`は、二つの入り口の事実集合の共通部分だけ�
 
 ---
 
-**次章予告（Part 7）**：ここまで「迷ったら消す」「わざと緩める」を積んできました。次章ではそれを扱います。**健全性（soundness）と正規化**、そしてRigorがわざとunsoundにする4箇所を扱います。gradualの2つの規律（consistencyとguarantee）と「余帰納vs予算」を一箇所にまとめ、後編Part 1の双方向の地図と対をなします。
+**次章予告（Part 7）**：ここまで「迷ったら消す」「わざと緩める」を積んできました。次章ではそれを扱います。**健全性（soundness）と正規化**、そしてchibirigorがわざとunsoundにする4箇所と、実Rigorとの違いを扱います。gradualの2つの規律（consistencyとguarantee）と「余帰納vs予算」を一箇所にまとめ、後編Part 1の双方向の地図と対をなします。
 
 ---
 

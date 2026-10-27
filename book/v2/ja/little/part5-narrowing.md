@@ -119,7 +119,7 @@ expected String but got 1
 
 ただし`is_a?`には落とし穴が一つあります。`x`がもともと`Integer`のとき`if x.is_a?(String)`の中身を「`x`は`String`」と絞ると、IntegerはStringにならないため*起き得ない*枝なのに、`x + 1`をStringの足し算とみなして**誤検知**します。これは「動くコードを脅かさない」に反します。
 
-だから**「そのクラスがあり得るときだけ絞る」**という方針をとります。`x`が`Integer | String`のようにStringを含むときは絞り、`Integer`単体なら絞りません。その枝はdead branchなので触りません。`Dynamic`も絞りません。型が分からないものは、分からないまま通します。これは本書の最小版の選択で、実Rigorは`is_a?(String)`が成り立った枝では`untyped`も`String`に絞ります。その枝の中身は本当に`String`なので、絞っても誤検知にはならないからです。
+だから**「そのクラスがあり得るときだけ絞る」**という方針をとります。`x`が`Integer | String`のようにStringを含むときは絞り、`Integer`単体なら絞りません。その枝はdead branchなので触りません。`Dynamic`も絞りません。型が分からないものは、分からないまま通します。これは本書の最小版の選択で、実Rigorは`is_a?(String)`が成り立った枝では`untyped`も`String`に絞ります。その枝の中身は本当に`String`（かその部分クラス）なので、絞っても誤検知にはならないからです。
 
 ```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK（dead branch、誤検知しない）
@@ -144,7 +144,7 @@ check("x = c ? 1 : \"a\"\nif x.is_a?(String)\n x + 1\nend\n")  # String の足�
 
 `is_a?`のdead branchを「触らない（絞らない）」のは誤検知を避ける消極的な対応ですが、chibirigorはもう一歩進めて、その枝を**「絶対に通らない余分な分岐です」と指摘できる**ようにしています。ただし動くコードを脅かさないため、**既定では黙ったまま**で、`check --unreachable`を明示したときだけ表に出るopt-inです。
 
-実Rigorはこの線の引き方が違います。到達できない枝の報告は既定で出しますが、対象を証明の堅い所に絞っています。`if false`のようにリテラルで決まる分岐は`flow.unreachable-branch`の警告、`case`/`when`で決して当たらない節は`flow.unreachable-clause`の情報として出ます。一方、`is_a?`で生じる死に枝は、現時点ではこの報告の対象外です。
+実Rigorはこの線の引き方が違います。到達できない枝の報告は既定で出しますが、対象を証明の堅い所に絞っています。`if false`のようにリテラルで決まる分岐は`flow.unreachable-branch`として警告（warning）で、`case`/`when`で決して当たらない節は`flow.unreachable-clause`として情報（info）で出ます。一方、`is_a?`で生じる死に枝は、現時点ではこの報告の対象外です。
 
 chibirigorの`--unreachable`は、「足りない腕（missing arm）を書くまで止める」JavaとC# の網羅性検査とは逆に、**動くものには黙り、求められたときだけ通らない枝を指摘する**という姿勢です。上の`possible?`ガードで「あり得ないときは絞らない」とした判断と、同じ軸の上にあります。
 
