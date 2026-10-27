@@ -98,8 +98,10 @@ Note that ④'s "doesn't narrow `Dynamic`" is chibirigor's own simplification: u
 `is_a?` guard, real Rigor does narrow `Dynamic` to a concrete type (ADR-83).
 
 On the preservation side (the type is kept under evaluation), chibirigor doesn't *strongly assert* it
-to begin with — when things get doubtful it widens to `untyped`, so preservation is trivially kept in
-the sense of consistency (`~`) (when types stop fitting, just fall back to `untyped`). **What it lets go
+to begin with — when things get doubtful it widens to `untyped`, so preservation is mostly kept in
+the sense of consistency (`~`) (when types stop fitting, just fall back to `untyped`). The exception is
+②'s `nil` assertion: assert `nil` for a key added later, or for an extra key that really exists on
+an open hash, and the static type and the runtime value part ways — preservation breaks too. **What it lets go
 of is mainly progress** — that's the true form of these four places.
 
 Formally: **chibirigor gives up soundness — progress in particular — in a limited way, in exchange for
@@ -145,9 +147,13 @@ The Little volume's three-valued `accepts` was exactly for **folding this `<:` (
 | `S` and `T` are definitely unrelated | `:no` |
 
 > [!NOTE]
-> This table is the chibirigor `accepts` built in the Little volume. Real Rigor's gradual mode answers
-> `:yes` with `Dynamic` on either side (it passes when consistency holds). Whether it stays quiet with
-> `:maybe` or passes with `:yes`, neither raises a diagnostic on a check involving `untyped`.
+> This table describes the chibirigor `accepts` built in the Little volume. Real Rigor's gradual mode answers
+> `:yes` when one side of the check is wholly `Dynamic` (it passes when consistency holds). Whether it
+> stays quiet with `:maybe` or passes with `:yes`, neither raises a diagnostic when `untyped` itself
+> is passed. Real Rigor does, however, judge a Union with a `Dynamic` arm member by member: pass
+> `1 | Dynamic[Top]` to a `String` and the `1` arm is `:no`, so it's reported (Little Part 9 §9-1).
+> chibirigor never meets this case, because its `union` folds the whole thing to `untyped` as soon
+> as `untyped` mixes in.
 
 It's precisely because `~` is **non-transitive** that `untyped` doesn't become an unlimited escape
 hatch — this is the first meaning of "not anarchic."

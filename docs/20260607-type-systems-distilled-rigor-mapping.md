@@ -202,6 +202,15 @@ union（variant 型）**を扱う。
 - **`<:` 部分型関係**：Rigor は部分型 `<:`（値集合包含、反射的・推移的、`bot <: T <: top`）を
   持つ。本書が `typeEq → subtype` に差し替えたのと同様、Rigor の引数受理は `accepts` を通り、
   その内部が部分型・整合性判定を行う。
+- **`Dynamic` の受理**（`lib/rigor/inference/acceptance.rb`）：gradual モードでは、照合の片側が
+  丸ごと `Dynamic` なら `:yes`。実引数が Union なら `accepts_union_other` でメンバごとに判定し、
+  どれか `:no` なら `:no`。よって `1 | Dynamic[Top]` を `String` に渡すと
+  `call.argument-type-mismatch`（実行で確認済み、2026-10-28）。chibirigor は Union に `untyped` が
+  混じると全体を `untyped` に畳むので `:maybe`。本書：後編 Part 7 §7-5 の注、後編 Part 4 の表、
+  前編 Part 9 §9-1。
+- **ナローイングされた `untyped`**：実 Rigor は `is_a?(String)` の枝で `untyped` を `String` に
+  絞る（ADR-83）。事実は正しいが、部分クラスにしかないメソッドを呼ぶと `call.undefined-method`
+  が出る（実行で確認済み）。本書：前編 Part 5。
 - **変性**：Rigor は現状 Nominal 型引数を**一律共変**に扱い（宣言変性は Slice 5+ の予定）、
   Tuple/HashShape は要素ごと共変。本書の変性規則のうち、宣言変性はまだ実用キャリアに
   展開されていない。
@@ -244,6 +253,13 @@ union（variant 型）**を扱う。
   停止させるか」という同じ問題に、本書は理論的（coinduction で正しく等価判定）、Rigor は
   工学的（予算で安全側に打ち切り）に答えている好対照。正規化自体は決定的・非循環で、祖先
   チェーンの循環は visited 集合で検出する。
+- **`App` の受理の向き**（`lib/rigor/type/app.rb`）：`App#accepts` が上界 `bound` に委ねるのは
+  `App` が**期待側**のときだけ。`App` を実引数に渡すと `bound` を経由せず、期待側の通常の規則で
+  判定される。`String` の仮引数に `json::value[String]` を渡すと拒否（実行で確認済み、
+  2026-10-28。実 Rigor 自身の誤検知の可能性あり、read-only のため記録のみ）。本書：後編 Part 4 の
+  NOTE と表、§4-7 のまとめ。
+- **本書の `seen` は TAPL 21 章と同じ形**：展開前のペアを仮定集合に入れ α 同値で照合する。
+  「TAPL より弱い」という旧記述は誤りとして撤回（後編 Part 4）。
 - **同値 vs 同型**：本書が TypeScript 同様に同値再帰を選んだのに対し、Rigor は型エイリアスの
   遅延展開や HKT の URI 参照という、本書が NOTE で「実用のチェッカーはこうすることが多い（エラー
   メッセージが読みやすい）」と触れた**現実路線**に近い設計。

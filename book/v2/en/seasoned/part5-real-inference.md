@@ -78,9 +78,9 @@ end
 
 ```ruby
 def inc(n)
-  n + 1        # n can be passed to Integer#+ → constraint X <: (accepts Integer#+'s argument)
+  n + 1        # n is the receiver → constraint: N responds to a + that accepts Integer
 end
-# solution: n is narrowed toward Integer
+# solution: guess N = Integer (Float and Rational work too, so it isn't the only solution)
 ```
 
 The procedure is three stages: **(1) assign a type variable to each unknown**, **(2) walk the body
@@ -186,12 +186,12 @@ stance as 『しくみ』 ch. 9's exercise advice ("it's good to limit inference
 > `untyped`.
 >
 > chibirigor's judgment "arguments are `untyped`" is the most conservative answer that avoids all
-> three at once. Rigor narrowing its inference to "local + catalog" is the same answer to the same
-> three problems.
+> three at once. Rigor not settling parameter types by inference — making do with the catalog and
+> per-call evaluation — is the same answer to the same three problems.
 
 ---
 
-## 5-4a. Comparison with TypeProf — whole-program vs. local+catalog
+## 5-4a. Comparison with TypeProf — whole-program vs. per-call evaluation + catalog
 
 To sharpen the answer to "why not do all of it," let's compare with Ruby's official type inference
 tool, **TypeProf.** TypeProf is a type-level abstract interpreter bundled with Ruby core, designed by
@@ -214,29 +214,32 @@ tends to combinatorially explode at scale. The Rigor handbook positions TypeProf
 files, prototype use."
 
 > [!NOTE]
-> **Rigor's way — local+catalog**
+> **Rigor's way — per-call evaluation + catalog**
 >
 > Rigor infers **one method at a time.** Where it calls a library method, it looks up
 > the return type from a prepared **catalog** (the RBS of core, stdlib, gems, and plugin
 > contributions). For a method inside the project, it evaluates the callee's body with each call's
 > actual-argument types and takes that call's return type (ADR-57, ADR-84). But it never keeps the
 > types that flowed in as the parameter's type. This is the sharpest difference from TypeProf, which
-> merges the calls into the parameter's type. It drops an unsolvable argument to `Dynamic[Top]`
-> (= `untyped`) and moves on, keeping cost down with hard-coded caps (Part 6's cache helps too); a
-> configurable inference budget is designed in ADR-41 but not yet wired in. Its goal is to run on
+> merges the calls into the parameter's type. In abstract-interpretation terms, Rigor, which
+> evaluates a callee separately for each call, is *polyvariant*; merging every call into one
+> parameter type is *monovariant*. It drops an unsolvable argument to `Dynamic[Top]`
+> (= `untyped`) and moves on, keeping cost down with hard-coded caps (Part 6's cache helps too). A
+> configurable inference budget is specified in ADR-41, but it is still Proposed and its wiring is
+> deferred until there's demand. Its goal is to run on
 > the whole codebase every push, so it prioritizes scale above all.
 
 | | TypeProf | Rigor |
 |---|---|---|
-| Unit of analysis | the whole program (from the entry) | one method at a time |
+| Unit of analysis | the whole program (from the entry) | one method at a time (in-project callees evaluated per call) |
 | Other methods' return type | re-interpret the body | reference the catalog (in-project: evaluate the body with each call's actual arguments) |
 | Infer argument types from the call site? | **can** (its greatest strength) | not by default (opt-in: gathered, but used only for precision; ADR-67) |
 | Scale goal | small files, prototypes | the whole codebase, CI always-on |
 | Main output | RBS signatures (errors are a by-product) | diagnostics (only certain bugs; FP-zero-ism) |
 
 When the previous section said "keep argument inference to the obvious range," this comparison is the
-reason. TypeProf's whole-program method is high-precision but weak at scale. Rigor prioritizes scale
-with local+catalog, and honestly makes the unsolvable `untyped` — **two answers to the same "infer
+reason. TypeProf's whole-program method is high-precision but weak at scale. Rigor doesn't merge
+parameter types; it prioritizes scale with the catalog and per-call evaluation, and honestly makes the unsolvable `untyped` — **two answers to the same "infer
 arguments" challenge, solved with different values: scale, and FP-zero.**
 
 Note that `rigor sig-gen` (the Rigor handbook, ch. 11) does the same job as TypeProf (generate RBS
@@ -283,7 +286,8 @@ minimal version, a diagnostic still appears only at a checking `⇐` position (w
 declaration) — the "don't frighten" structure seen in Part 1 doesn't break when you add inference.
 Real Rigor doesn't rely on that alone; as §5-4b showed, it explicitly suppresses negative
 diagnostics derived from inference. That wasn't free: when the opt-in gate was first opened, new
-diagnostics leaked out until guards were added (ADR-67 WD6d).
+diagnostics leaked out until guards were added (the guards are ADR-67 WD6b; the WD6d measurement
+found the leaks).
 
 ---
 

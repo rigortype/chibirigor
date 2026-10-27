@@ -193,8 +193,9 @@ internal type to RBS**:
 **It may get wider, but never narrower** (a sound approximation). This is the substance of "Rigor
 is a superset of RBS, writable back to RBS at any time" — for covariant positions such as value
 types. In an argument position, widening a type makes the function type a *stronger* promise
-instead (Part 2's contravariance), which is also part of why `sig-gen` writes parameters as
-`untyped` by default.
+instead (Part 2's contravariance). So by default `sig-gen` neither narrows a parameter to the
+observed types nor widens it to a concrete supertype; it writes `untyped`. `untyped` is the gradual
+unknown, not `Top`, so it promises nothing in either direction.
 
 ---
 

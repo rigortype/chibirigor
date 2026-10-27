@@ -225,7 +225,7 @@ $ printf 'def greet\n  "hi".upcase\nend\n' | ruby exe/chibirigor annotate /dev/s
 これはRigorの`sig-gen`（RBSを生成する機能）の発想の芽です。生成されたRBSの`untyped`は「人間が型を足すべき場所」を指しています。
 
 > [!NOTE]
-> ここで`def double(n)`の引数`n`を`untyped`のままにしているのは、**設計判断**です。Ruby同梱のTypeProfなら、`double`が`double(3)`のように**呼ばれている場所**を見つけ、そこから`n`を`Integer`まで逆算し、`(Integer) -> Integer`を埋めてくれます。
+> ここで`def double(n)`の引数`n`を`untyped`のままにしているのは、**設計判断**です。Ruby同梱のTypeProfなら、`double`が`double(3)`のように**呼ばれている場所**を見つけ、その呼び出しから実引数の型`Integer`を`n`へ流し込み、`(Integer) -> Integer`を埋めてくれます。
 >
 > chibirigorはあえてそれをしません。呼び出し元を全部たどる代わりに、各メソッドをローカルに見て、分からない引数は`untyped`に倒します。その方がスケールするし、誤検知も出ません。
 >

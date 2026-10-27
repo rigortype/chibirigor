@@ -68,7 +68,7 @@ Part 6では、フローを支える本物の**FactStore**（6種の事実、無
 
 なお④の「`Dynamic`を絞らない」はchibirigorの穴です。実Rigorは、信頼できる`is_a?`ガードの下では`Dynamic`も具体的な型に絞ります（ADR-83）。
 
-preservation（評価で型が保たれる）の側は、chibirigorはそもそも*強く主張しません*。怪しくなれば`untyped`にwidenするので、preservationはconsistency（`~`）の意味で自明に保たれます（型が合わなくなったら`untyped`に倒すだけ）。**手放しているのは主にprogress**、というのがこの4箇所の正体です。
+preservation（評価で型が保たれる）の側は、chibirigorはそもそも*強く主張しません*。怪しくなれば`untyped`にwidenするので、preservationはconsistency（`~`）の意味でほぼ保たれます（型が合わなくなったら`untyped`に倒すだけ）。例外は②の`nil`の断定です。後から足したキーや、openなhashに実在する余分なキーを`nil`と断定すると、静的な型と実行時の値が食い違い、preservationも破れます。**手放しているのは主にprogress**、というのがこの4箇所の正体です。
 
 形式的に言えば：**chibirigorは健全性（soundness）、とくにprogressを、誤検知の少なさ（"never frighten working code"）と引き換えに、限定的に放棄している。**これは欠陥ではなく**設計の選択**です。健全性は「バグを1つも見逃さない」を意味しますが、その代償（動くコードを脅かす）の方が、実用チェッカーでは高くつくと判断しているのです。
 
@@ -104,7 +104,7 @@ preservation（評価で型が保たれる）の側は、chibirigorはそもそ�
 | `S`と`T`が確実に互いに無関係 | `:no` |
 
 > [!NOTE]
-> この表は前編で作ったchibirigorの`accepts`です。実Rigorのgradualモードは、`Dynamic`がどちら側にあっても`:yes`と答えます（consistencyが成り立てば通す）。`:maybe`で黙るか、`:yes`で通すかの違いはあっても、`untyped`の絡む照合で診断を出さない点は同じです。
+> この表は前編で作ったchibirigorの`accepts`です。実Rigorのgradualモードは、照合の片側が丸ごと`Dynamic`なら`:yes`と答えます（consistencyが成り立てば通す）。`:maybe`で黙るか、`:yes`で通すかの違いはあっても、`untyped`そのものを渡した照合で診断を出さない点は同じです。ただし実Rigorは、`Dynamic`を腕に持つUnionをメンバごとに判定します。`1 | Dynamic[Top]`を`String`に渡せば`1`の腕が`:no`になり、報告されます（前編Part 9 §9-1）。chibirigorはUnionに`untyped`が混じると全体を`untyped`に畳むので、この場面には出会いません。
 
 `~`が**非推移**だからこそ、`untyped`は無制限の抜け穴になりきらない。ここが「無秩序ではない」の一つ目の意味です。
 

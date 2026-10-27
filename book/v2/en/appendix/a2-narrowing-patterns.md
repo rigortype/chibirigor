@@ -119,9 +119,11 @@ plan is to let extension annotations override the catalog. When it can't decide,
 block as escaping — the **when-in-doubt-erase** policy (fall to the looser side).
 
 > [!NOTE]
-> Also, when a block **rewrites an outer local** (`x = nil; [1,2,3].each { |i| x = i }`), its
-> `captured_local` fact is invalidated too — if the block could reassign `x`, the narrowing fact is
-> in jeopardy. This is treated in the main line of closure capture in Seasoned Part 6.
+> Also, when a block **rewrites an outer local** (`x = nil; [1,2,3].each { |i| x = i }`), this
+> book's minimal model invalidates its `captured_local` fact too — if the block could reassign `x`,
+> the narrowing fact is in jeopardy. For an immediately invoked block like `each`, real Rigor goes
+> one step further: it re-evaluates the block body and writes the joined type back (ADR-56). This
+> is treated in the main line of closure capture in Seasoned Part 6.
 
 ---
 

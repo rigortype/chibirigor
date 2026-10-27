@@ -119,7 +119,7 @@ expected String but got 1
 
 ただし`is_a?`には落とし穴が一つあります。`x`がもともと`Integer`のとき`if x.is_a?(String)`の中身を「`x`は`String`」と絞ると、IntegerはStringにならないため*起き得ない*枝なのに、`x + 1`をStringの足し算とみなして**誤検知**します。これは「動くコードを脅かさない」に反します。
 
-だから**「そのクラスがあり得るときだけ絞る」**という方針をとります。`x`が`Integer | String`のようにStringを含むときは絞り、`Integer`単体なら絞りません。その枝はdead branchなので触りません。`Dynamic`も絞りません。型が分からないものは、分からないまま通します。これは本書の最小版の選択で、実Rigorは`is_a?(String)`が成り立った枝では`untyped`も`String`に絞ります。その枝の中身は本当に`String`（かその部分クラス）なので、絞っても誤検知にはならないからです。
+だから**「そのクラスがあり得るときだけ絞る」**という方針をとります。`x`が`Integer | String`のようにStringを含むときは絞り、`Integer`単体なら絞りません。その枝はdead branchなので触りません。`Dynamic`も絞りません。型が分からないものは、分からないまま通します。これは本書の最小版の選択で、実Rigorは`is_a?(String)`が成り立った枝では`untyped`も`String`に絞ります。その枝の中身は本当に`String`（かその部分クラス）なので、絞った事実そのものは正しいからです。ただし、部分クラスにしかないメソッドをその枝で呼ぶと、動くコードでも`call.undefined-method`が出ます。
 
 ```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK（dead branch、誤検知しない）

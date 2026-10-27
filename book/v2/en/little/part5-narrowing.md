@@ -148,7 +148,8 @@ So **narrow only when that class is possible** — narrow when `x` contains Stri
 untouched). We don't narrow `Dynamic` either (something whose type is unknown, we let through
 unknown). That last choice is a simplification of this book's minimal version. Real Rigor does
 narrow `untyped` to `String` where `is_a?(String)` holds: inside that branch the value really is a
-`String` (or a subclass), so narrowing can't produce a false positive.
+`String` (or a subclass), so the narrowed fact itself is true. Call a method that only a subclass
+has in that branch, though, and you get `call.undefined-method` even on working code.
 
 ```ruby
 check("x = 1\nif x.is_a?(String)\n x + 1\nend\n")              # OK (dead branch; no false positive)

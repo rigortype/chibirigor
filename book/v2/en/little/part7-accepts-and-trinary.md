@@ -104,7 +104,7 @@ end
 accepts(Type::Nominal[:Integer], Type::Dynamic.new)   # => :maybe  (the unknown stays unknown)
 ```
 
-Just one line, but it's one of the main pillars making Rigor a "type checker gentle to dynamic
+Just one line, but it's one of the main pillars making chibirigor a "type checker gentle to dynamic
 languages." `untyped` is the mark of "the type was lost." About something lost, not insisting it
 "fits" or "doesn't fit" — that is what honesty is.
 
@@ -226,8 +226,9 @@ Here we set down the single most important sentence in this book. No jargon need
 
 『しくみ』 ch. 7 had a column with a very similar concern: "a sound type system *rejecting good
 programs* is a false positive." 『しくみ』 worked in the direction of *reducing* false positives.
-Rigor goes one step further, **placing "unknown = maybe = stay quiet" at the center of the
-mechanism,** making false positives hard to produce in the first place.
+chibirigor goes one step further, **placing "unknown = maybe = stay quiet" at the center of the
+mechanism,** making false positives hard to produce in the first place. Real Rigor stays quiet just
+the same, but its answer is `:yes`, not `:maybe`.
 
 And in fact — that ad-hoc `integerish?` check we wrote for `+` in Part 1–2 was **the hand-written
 version of this `accepts`.** We've now replaced it with the proper mechanism.

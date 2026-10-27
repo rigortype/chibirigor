@@ -142,11 +142,11 @@ heart of coinduction. TAPL ch. 21 develops this algorithm and its correctness (s
 greatest fixed point).
 
 > [!NOTE]
-> **To be precise:** this sketch's `seen` check is `naive_eq` (α-equivalence of bound variables, a
-> comparison **without unfolding**). This is a sound *reduced version*, weaker than TAPL ch. 21's
-> proper coinduction — which takes the **greatest fixed point** of pairs reached after unfolding (it
-> catches fewer "equals"). It's enough for teaching, but the proper equivalence test puts the
-> post-unfold pairs into `seen` and runs.
+> **To be precise:** this sketch puts each pair into `seen` *before* unfolding it, and matches against
+> `seen` with `naive_eq` (α-equivalence of bound variables, a comparison **without unfolding**). That
+> is the same shape as TAPL ch. 21's coinductive decision algorithm, and it catches the same
+> "equals." What differs is that it handles only equivalence, not subtyping, and that sibling record
+> fields don't share the assumption set.
 >
 > **Reference note.** 『しくみ』 ch. 8 illustrates *why* naive unfolding doesn't terminate, with
 > single recursion (Figure 8.2) and mutual recursion (Figure 8.3), and solves it with a `typeEqSub`
@@ -170,8 +170,8 @@ What stops reduction is mainly **cycle detection** on the reduction stack. If re
 same `(URI, arguments)` application again partway through, it returns the `App` being unfolded
 as is and ties the knot (ADR-20 D4). Like μ-folding, this is an *exact* stop on the side that
 *builds* the type. It is a different thing from `seen`, which decides a relation between two types
-by coinduction; Rigor's acceptance check defers to `bound` (see below), so nothing in it plays the
-role of `seen`. Any unfolding that still doesn't stop is cut off, approximately, by the outer
+by coinduction; Rigor defers acceptance *into* an `App` to `bound` (see below), so nothing there plays
+the role of `seen`. Any unfolding that still doesn't stop is cut off, approximately, by the outer
 safety net: the **fuel budget.**
 
 So to the same problem — "how do we stop the unfolding of recursion?" — 『しくみ』/TAPL answer
@@ -216,26 +216,31 @@ engineering of termination in one place** (read together with gradual's settling
 > attaches a *kind* to types. Rigor's lightweight HKT is its defunctionalized implementation version.
 
 > [!NOTE]
-> **Acceptance of an `App` is deferred to its upper bound `bound`**
+> **Acceptance into an `App` is deferred to its upper bound `bound`**
 >
-> Asked whether `App[F, A]` is "compatible with `T`," Rigor doesn't try reduction on the spot. It
-> defers the verdict to the **upper bound `bound`** fixed at registration time, and a reduction that
-> runs out of fuel falls back to that `bound` too. Judging by the upper bound is an approximation
-> from above, so passes come out lenient. `bound` defaults to `untyped` (`Dynamic[Top]`), and real
-> Rigor answers `:yes` with `Dynamic` on either side, so an `App` registered without an upper bound
-> passes through gradually.
+> When `App[F, A]` is the expected type and Rigor is asked whether it accepts `T`, it doesn't try
+> reduction on the spot. It defers the verdict to the **upper bound `bound`** fixed at registration
+> time, and a reduction that runs out of fuel falls back to that `bound` too. Judging by the upper
+> bound is an approximation from above, so it errs toward passing. `bound` defaults to `untyped`
+> (`Dynamic[Top]`), and real Rigor answers `:yes` when the expected type is `Dynamic`, so an `App`
+> registered without an upper bound lets anything through when it's the expected type.
+>
+> The other direction is a different story. Pass an `App` that stayed unreduced *as an argument*, and
+> today it isn't routed through `bound`: the expected type's ordinary rules judge it, so passing a
+> `json::value[String]` to a `String` parameter is rejected.
 >
 > The judgment itself uses **the same framework** as the three values (`:yes/:no/:maybe`) of
 > `accepts` implemented in Little Part 7. But "mix in `untyped` and you get `:maybe`" is
-> chibirigor's simplification; real Rigor answers `:yes` in the same situation (the difference is
-> gathered in the note in Seasoned Part 7 §7-5).
+> chibirigor's simplification; real Rigor answers `:yes` when one side is wholly `untyped` (the
+> difference is gathered in the note in Seasoned Part 7 §7-5).
 >
-> | Why a verdict can't be made | chibirigor's `accepts` | real Rigor |
+> | Where the type is unknown | chibirigor's `accepts` | real Rigor |
 > |---|---|---|
-> | `untyped` is mixed in | `:maybe` | `:yes` (passes through gradually) |
-> | the HKT's upper bound `bound` is still the default `untyped` | — | `:yes` (passes through gradually) |
+> | one side is wholly `untyped` | `:maybe` | `:yes` (let through, gradual) |
+> | passing a Union with an `untyped` arm | folded to `untyped` as a whole → `:maybe` | judged member by member (can be `:no`) |
+> | an `App` whose upper bound `bound` is still the default `untyped`, as the expected type | (no HKT) | `:yes` (let through, gradual) |
 >
-> Both agree on "if you don't know, pass quietly." HKT's complexity hides behind `bound`, and the
+> Where the type is wholly unknown, both pass quietly. HKT's complexity hides behind `bound`, and the
 > caller of `accepts` need only think about the meaning of the three values — the cleanness of the
 > design.
 
@@ -263,7 +268,7 @@ reference, cycle detection, and fuel.
 | μ-types | fold the recursion, unroll one step by unfold. fold/unfold are the same type |
 | The two manners | **equi-recursive** (no annotation / hard to implement) vs. **iso-recursive** (annotation needed / easy to implement). Practical usage is mostly equi-recursive |
 | Equivalence test | doesn't terminate → cut off with **coinduction (`seen` assumption set)** (TAPL ch. 21) |
-| Rigor's alternative | **HKT / `App`, cycle detection + fuel** (HKT's grounds are TAPL ch. 29): stop reduction *exactly* with **cycle detection**, and cut it off *approximately* with a *fuel budget* as the outer safety net; acceptance is deferred to the upper bound `bound` (the termination-engineering sum-up is Part 7) |
+| Rigor's alternative | **HKT / `App`, cycle detection + fuel** (HKT's grounds are TAPL ch. 29): stop reduction *exactly* with **cycle detection**, and cut it off *approximately* with a *fuel budget* as the outer safety net; acceptance *into* an `App` is deferred to the upper bound `bound` (the termination-engineering sum-up is Part 7) |
 
 ## Exercises
 
